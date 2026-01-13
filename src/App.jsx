@@ -31,6 +31,7 @@ import {
   Camera,
   ListChecks,
   ArrowRight,
+  History,
 } from "lucide-react";
 
 import {
@@ -70,6 +71,13 @@ function toYmd(d) {
   const day = String(dt.getDate()).padStart(2, "0");
   return `${y}-${m}-${day}`;
 }
+
+const UPDATE_HISTORY = [
+  { id: 4, date: "2026-01-13 17:37", content: "업데이트 이력 페이지 UI 개선 (헤더 명칭 변경) 및 자동 기록 규칙 적용" },
+  { id: 3, date: "2026-01-13 17:25", content: "업데이트 이력 ID 컬럼 추가 및 정렬, 사이드바 스크롤바 숨김 처리" },
+  { id: 2, date: "2026-01-13 16:57", content: "전체 용어 및 데이터 표기 형식 표준화 (차량번호, 존이름, 파트너명 등)" },
+  { id: 1, date: "2026-01-13 15:53", content: "기능 명세(Markdown) Drawer 연동 및 렌더러 구현" },  
+];
 
 /**
  * shadcn-ish minimal UI (Tailwind only)
@@ -368,6 +376,10 @@ const WASH_TYPES = ["내외부", "특수", "라이트", "내부", "외부", "물
  */
 const NAV = [
   {
+    group: "시스템",
+    items: [{ key: "update-history", label: "업데이트 이력", icon: History }],
+  },
+  {
     group: "관제",
     items: [{ key: "dashboard", label: "대시보드(HOME)", icon: LayoutDashboard }],
   },
@@ -401,6 +413,7 @@ const NAV = [
 ];
 
 const PAGE_TITLES = {
+  "update-history": "업데이트 이력",
   dashboard: "관제 대시보드",
   "ai-policy": "AI 모델 정책 관리",
   "zone-policy": "존 정책 관리",
@@ -448,6 +461,7 @@ export default function App() {
           <main className="min-w-0 flex-1 p-6 md:p-8">
             {activeKey === "dashboard" && <Dashboard onClickKpi={goOrdersWithStatus} />}
 
+            {activeKey === "update-history" && <UpdateHistoryPage />}
             {activeKey === "vehicles" && <VehiclesPage />}
 
             {activeKey === "orders" && (
@@ -465,6 +479,7 @@ export default function App() {
             {activeKey !== "dashboard" &&
               activeKey !== "vehicles" &&
               activeKey !== "orders" &&
+              activeKey !== "update-history" &&
               activeKey !== "settlement" &&
               activeKey !== "billing" &&
               activeKey !== "lostfound" &&
@@ -497,7 +512,16 @@ function Sidebar({ activeKey, onSelect }) {
         </div>
       </div>
 
-      <nav className="h-[calc(100vh-64px)] overflow-y-auto px-2 pb-4">
+      <nav className="h-[calc(100vh-64px)] overflow-y-auto px-2 pb-4 no-scrollbar">
+        <style>{`
+          .no-scrollbar::-webkit-scrollbar {
+            display: none;
+          }
+          .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+          }
+        `}</style>
         {NAV.map((g) => (
           <div key={g.group} className="mt-3">
             <div className="px-4 pb-2 pt-4 text-xs font-bold text-[#8993A4] uppercase tracking-wider">{g.group}</div>
@@ -751,10 +775,10 @@ function Dashboard({ onClickKpi }) {
   ];
 
   const partnerData = [
-    { name: "A협력사", rate: 95 },
-    { name: "B협력사", rate: 88 },
-    { name: "C협력사", rate: 92 },
-    { name: "D협력사", rate: 85 },
+    { name: "A파트너명", rate: 95 },
+    { name: "B파트너명", rate: 88 },
+    { name: "C파트너명", rate: 92 },
+    { name: "D파트너명", rate: 85 },
   ];
 
   const hourlyData = [
@@ -952,18 +976,18 @@ function VehiclesPage() {
     // 12건 더미 데이터
     // activeOrderId가 있으면 현재 진행중인 오더가 있다는 의미
     return [
-      { plate: "12가3456", zoneName: "강남역 1번존", zoneId: "Z-1001", region1: "서울", region2: "강남", partner: "A협력사", activeOrderId: "O-90001", lastWash: "2026-01-10", model: "아반떼 AD", fuel: "가솔린" },
-      { plate: "34나7890", zoneName: "잠실역 2번존", zoneId: "Z-1002", region1: "서울", region2: "송파", partner: "B협력사", activeOrderId: null, lastWash: "2026-01-08", model: "K5", fuel: "가솔린" },
-      { plate: "56다1122", zoneName: "홍대입구 3번존", zoneId: "Z-1003", region1: "서울", region2: "마포", partner: "A협력사", activeOrderId: "O-90003", lastWash: "2026-01-05", model: "쏘나타", fuel: "하이브리드" },
-      { plate: "78라3344", zoneName: "판교 1번존", zoneId: "Z-2001", region1: "경기", region2: "성남", partner: "C협력사", activeOrderId: "O-90004", lastWash: "2026-01-09", model: "아이오닉5", fuel: "EV" },
-      { plate: "90마5566", zoneName: "수원역 2번존", zoneId: "Z-2002", region1: "경기", region2: "수원", partner: "B협력사", activeOrderId: null, lastWash: "2026-01-07", model: "스포티지", fuel: "디젤" },
-      { plate: "11바7788", zoneName: "부산역 1번존", zoneId: "Z-3001", region1: "부산", region2: "동구", partner: "D협력사", activeOrderId: "O-90006", lastWash: "2026-01-03", model: "그랜저", fuel: "가솔린" },
-      { plate: "22사9900", zoneName: "해운대 2번존", zoneId: "Z-3002", region1: "부산", region2: "해운대", partner: "D협력사", activeOrderId: "O-90007", lastWash: "2026-01-11", model: "레이", fuel: "가솔린" },
-      { plate: "33아1212", zoneName: "대전역 1번존", zoneId: "Z-4001", region1: "대전", region2: "동구", partner: "C협력사", activeOrderId: null, lastWash: "2026-01-06", model: "카니발", fuel: "디젤" },
-      { plate: "44자3434", zoneName: "청주 2번존", zoneId: "Z-5002", region1: "충북", region2: "청주", partner: "B협력사", activeOrderId: "O-90009", lastWash: "2026-01-02", model: "모닝", fuel: "가솔린" },
-      { plate: "55차5656", zoneName: "광주 1번존", zoneId: "Z-6001", region1: "광주", region2: "서구", partner: "A협력사", activeOrderId: "O-90010", lastWash: "2026-01-09", model: "EV6", fuel: "EV" },
-      { plate: "66카7878", zoneName: "인천공항 1번존", zoneId: "Z-7001", region1: "인천", region2: "중구", partner: "C협력사", activeOrderId: null, lastWash: "2026-01-08", model: "티볼리", fuel: "가솔린" },
-      { plate: "77타9090", zoneName: "제주공항 1번존", zoneId: "Z-8001", region1: "제주", region2: "제주시", partner: "D협력사", activeOrderId: "O-90012", lastWash: "2026-01-01", model: "셀토스", fuel: "가솔린" },
+      { plate: "12가3456", zoneName: "강남역 1번존", zoneId: "Z-1001", region1: "서울", region2: "강남", partner: "A파트너명", activeOrderId: "O-90001", lastWash: "2026-01-10", model: "아반떼 AD", fuel: "가솔린" },
+      { plate: "34나7890", zoneName: "잠실역 2번존", zoneId: "Z-1002", region1: "서울", region2: "송파", partner: "B파트너명", activeOrderId: null, lastWash: "2026-01-08", model: "K5", fuel: "가솔린" },
+      { plate: "56다1122", zoneName: "홍대입구 3번존", zoneId: "Z-1003", region1: "서울", region2: "마포", partner: "A파트너명", activeOrderId: "O-90003", lastWash: "2026-01-05", model: "쏘나타", fuel: "하이브리드" },
+      { plate: "78라3344", zoneName: "판교 1번존", zoneId: "Z-2001", region1: "경기", region2: "성남", partner: "C파트너명", activeOrderId: "O-90004", lastWash: "2026-01-09", model: "아이오닉5", fuel: "EV" },
+      { plate: "90마5566", zoneName: "수원역 2번존", zoneId: "Z-2002", region1: "경기", region2: "수원", partner: "B파트너명", activeOrderId: null, lastWash: "2026-01-07", model: "스포티지", fuel: "디젤" },
+      { plate: "11바7788", zoneName: "부산역 1번존", zoneId: "Z-3001", region1: "부산", region2: "동구", partner: "D파트너명", activeOrderId: "O-90006", lastWash: "2026-01-03", model: "그랜저", fuel: "가솔린" },
+      { plate: "22사9900", zoneName: "해운대 2번존", zoneId: "Z-3002", region1: "부산", region2: "해운대", partner: "D파트너명", activeOrderId: "O-90007", lastWash: "2026-01-11", model: "레이", fuel: "가솔린" },
+      { plate: "33아1212", zoneName: "대전역 1번존", zoneId: "Z-4001", region1: "대전", region2: "동구", partner: "C파트너명", activeOrderId: null, lastWash: "2026-01-06", model: "카니발", fuel: "디젤" },
+      { plate: "44자3434", zoneName: "청주 2번존", zoneId: "Z-5002", region1: "충북", region2: "청주", partner: "B파트너명", activeOrderId: "O-90009", lastWash: "2026-01-02", model: "모닝", fuel: "가솔린" },
+      { plate: "55차5656", zoneName: "광주 1번존", zoneId: "Z-6001", region1: "광주", region2: "서구", partner: "A파트너명", activeOrderId: "O-90010", lastWash: "2026-01-09", model: "EV6", fuel: "EV" },
+      { plate: "66카7878", zoneName: "인천공항 1번존", zoneId: "Z-7001", region1: "인천", region2: "중구", partner: "C파트너명", activeOrderId: null, lastWash: "2026-01-08", model: "티볼리", fuel: "가솔린" },
+      { plate: "77타9090", zoneName: "제주공항 1번존", zoneId: "Z-8001", region1: "제주", region2: "제주시", partner: "D파트너명", activeOrderId: "O-90012", lastWash: "2026-01-01", model: "셀토스", fuel: "가솔린" },
     ];
   }, []);
 
@@ -1007,7 +1031,7 @@ function VehiclesPage() {
     { key: "zoneId", header: "존 ID" },
     { key: "region1", header: "지역1" },
     { key: "region2", header: "지역2" },
-    { key: "partner", header: "협력사" },
+    { key: "partner", header: "파트너명" },
     {
       key: "activeOrderId",
       header: "진행중 오더",
@@ -1028,7 +1052,7 @@ function VehiclesPage() {
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
           <div className="text-base font-bold text-[#172B4D]">차량 관리</div>
-          <div className="mt-1 text-sm text-[#6B778C]">수행률 낮은 차량, 존별 현황 모니터링(프로토타입)</div>
+          <div className="mt-1 text-sm text-[#6B778C]">수행률 낮은 차량, 존이름별 현황 모니터링(프로토타입)</div>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="secondary">
@@ -1041,14 +1065,14 @@ function VehiclesPage() {
       <Card>
         <CardHeader>
           <CardTitle>검색 및 필터</CardTitle>
-          <CardDescription>검색: 차량번호, 존이름, 존 ID / 필터: 지역1, 지역2, 협력사</CardDescription>
+          <CardDescription>검색: 차량번호, 존이름, 존 ID / 필터: 지역1, 지역2, 파트너명</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 gap-3 md:grid-cols-12">
             <div className="md:col-span-4">
               <div className="relative">
                 <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B778C]" />
-                <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="차량번호/존이름/존ID 검색" className="pl-9" />
+                <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="차량번호/존이름/존 ID 검색" className="pl-9" />
               </div>
             </div>
             <div className="md:col-span-2">
@@ -1065,7 +1089,7 @@ function VehiclesPage() {
             </div>
             <div className="md:col-span-2">
               <Select value={fPartner} onChange={(e) => setFPartner(e.target.value)}>
-                <option value="">협력사 전체</option>
+                <option value="">파트너명 전체</option>
                 {partners.map((v) => <option key={v} value={v}>{v}</option>)}
               </Select>
             </div>
@@ -1075,7 +1099,7 @@ function VehiclesPage() {
                 {q ? <Chip onRemove={() => setQ("")}>검색: {q}</Chip> : null}
                 {fRegion1 ? <Chip onRemove={() => { setFRegion1(""); setFRegion2(""); }}>지역1: {fRegion1}</Chip> : null}
                 {fRegion2 ? <Chip onRemove={() => setFRegion2("")}>지역2: {fRegion2}</Chip> : null}
-                {fPartner ? <Chip onRemove={() => setFPartner("")}>협력사: {fPartner}</Chip> : null}
+                {fPartner ? <Chip onRemove={() => setFPartner("")}>파트너명: {fPartner}</Chip> : null}
               </div>
               <Button
                 variant="secondary"
@@ -1122,9 +1146,10 @@ function VehiclesPage() {
                 <Field label="차량번호" value={selected.plate} />
                 <Field label="차종" value={selected.model} />
                 <Field label="연료유형" value={selected.fuel} />
-                <Field label="존" value={`${selected.zoneName} (${selected.zoneId})`} />
-                <Field label="지역" value={`${selected.region1} / ${selected.region2}`} />
-                <Field label="협력사" value={selected.partner} />
+                <Field label="존이름" value={`${selected.zoneName} (${selected.zoneId})`} />
+                <Field label="지역1" value={selected.region1} />
+                <Field label="지역2" value={selected.region2} />
+                <Field label="파트너명" value={selected.partner} />
                 <Field label="진행중 오더" value={selected.activeOrderId || "없음"} />
                 <Field label="마지막 세차일" value={selected.lastWash} />
                 <Field label="세차 경과일" value={`${getElapsedDays(selected.lastWash)}일`} />
@@ -1165,18 +1190,18 @@ function OrdersPage({ quickStatus, onClearQuickStatus }) {
 
   // 오더 데이터 상태 관리
   const [orders, setOrders] = useState(() => [
-      { orderId: "O-90001", washType: "내부", orderGroup: "정규", orderType: "주기세차", carId: "C-1001", model: "아반떼 AD", plate: "12가3456", zone: "강남역 1번존", zoneId: "Z-1001", region1: "서울", region2: "강남", partner: "A협력사", partnerType: "현장", status: "예약", elapsedDays: 2, worker: "수행원 김00", comment: "오염도 3, 내부 우선" , createdAt: toYmd(today)},
-      { orderId: "O-90002", washType: "내외부", orderGroup: "수시", orderType: "수시세차", carId: "C-1002", model: "K5", plate: "34나7890", zone: "잠실역 2번존", zoneId: "Z-1002", region1: "서울", region2: "송파", partner: "B협력사", partnerType: "현장", status: "완료", elapsedDays: 4, worker: "수행원 이00", comment: "합의건, 추가요금 협의" , createdAt: toYmd(today)},
-      { orderId: "O-90003", washType: "외부", orderGroup: "정규", orderType: "주기세차", carId: "C-1003", model: "쏘나타", plate: "56다1122", zone: "홍대입구 3번존", zoneId: "Z-1003", region1: "서울", region2: "마포", partner: "A협력사", partnerType: "현장", status: "미배정", elapsedDays: 7, worker: "-", comment: "미배정 상태, 수행원 부족" , createdAt: toYmd(today)},
-      { orderId: "O-90004", washType: "내부", orderGroup: "특별", orderType: "특수세차", carId: "C-2001", model: "아이오닉5", plate: "78라3344", zone: "판교 1번존", zoneId: "Z-2001", region1: "경기", region2: "성남", partner: "C협력사", partnerType: "입고", status: "입고 중", elapsedDays: 3, worker: "수행원 박00", comment: "EV, 실내 매트 확인" , createdAt: toYmd(today)},
-      { orderId: "O-90005", washType: "내외부", orderGroup: "정규", orderType: "주기세차", carId: "C-2002", model: "스포티지", plate: "90마5566", zone: "수원역 2번존", zoneId: "Z-2002", region1: "경기", region2: "수원", partner: "B협력사", partnerType: "현장", status: "완료", elapsedDays: 5, worker: "수행원 최00", comment: "점검 체크리스트 완료" , createdAt: toYmd(today)},
-      { orderId: "O-90006", washType: "외부", orderGroup: "정규", orderType: "주기세차", carId: "C-3001", model: "그랜저", plate: "11바7788", zone: "부산역 1번존", zoneId: "Z-3001", region1: "부산", region2: "동구", partner: "D협력사", partnerType: "현장", status: "미배정", elapsedDays: 9, worker: "-", comment: "장기 미배정 리스크" , createdAt: toYmd(today)},
-      { orderId: "O-90007", washType: "내부", orderGroup: "수시", orderType: "수시세차", carId: "C-3002", model: "레이", plate: "22사9900", zone: "해운대 2번존", zoneId: "Z-3002", region1: "부산", region2: "해운대", partner: "D협력사", partnerType: "현장", status: "예약", elapsedDays: 1, worker: "수행원 정00", comment: "오염도 2" , createdAt: toYmd(today)},
-      { orderId: "O-90008", washType: "내외부", orderGroup: "정규", orderType: "주기세차", carId: "C-4001", model: "카니발", plate: "33아1212", zone: "대전역 1번존", zoneId: "Z-4001", region1: "대전", region2: "동구", partner: "C협력사", partnerType: "입고", status: "출고 중", elapsedDays: 6, worker: "수행원 한00", comment: "분실물 없음" , createdAt: toYmd(today)},
-      { orderId: "O-90009", washType: "외부", orderGroup: "정규", orderType: "주기세차", carId: "C-5002", model: "모닝", plate: "44자3434", zone: "청주 2번존", zoneId: "Z-5002", region1: "충북", region2: "청주", partner: "B협력사", partnerType: "현장", status: "미배정", elapsedDays: 10, worker: "-", comment: "존 인력 수급 이슈" , createdAt: toYmd(today)},
-      { orderId: "O-90010", washType: "내부", orderGroup: "긴급", orderType: "위생장애", carId: "C-6001", model: "EV6", plate: "55차5656", zone: "광주 1번존", zoneId: "Z-6001", region1: "광주", region2: "서구", partner: "A협력사", partnerType: "현장", status: "예약", elapsedDays: 3, worker: "수행원 오00", comment: "내부 먼지 제거 요청" , createdAt: toYmd(today)},
-      { orderId: "O-90011", washType: "내외부", orderGroup: "정규", orderType: "주기세차", carId: "C-7001", model: "티볼리", plate: "66카7878", zone: "인천공항 1번존", zoneId: "Z-7001", region1: "인천", region2: "중구", partner: "C협력사", partnerType: "입고", status: "완료", elapsedDays: 4, worker: "수행원 유00", comment: "사진 업로드 완료" , createdAt: toYmd(today)},
-      { orderId: "O-90012", washType: "외부", orderGroup: "정규", orderType: "주기세차", carId: "C-8001", model: "셀토스", plate: "77타9090", zone: "제주공항 1번존", zoneId: "Z-8001", region1: "제주", region2: "제주시", partner: "D협력사", partnerType: "현장", status: "미배정", elapsedDays: 11, worker: "-", comment: "장기 미배정, 알림 필요" , createdAt: toYmd(today)},
+      { orderId: "O-90001", washType: "내부", orderGroup: "정규", orderType: "주기세차", carId: "C-1001", model: "아반떼 AD", plate: "12가3456", zone: "강남역 1번존", zoneId: "Z-1001", region1: "서울", region2: "강남", partner: "A파트너명", partnerType: "현장", status: "예약", elapsedDays: 2, worker: "수행원 김00", comment: "오염도 3, 내부 우선" , createdAt: toYmd(today)},
+      { orderId: "O-90002", washType: "내외부", orderGroup: "수시", orderType: "수시세차", carId: "C-1002", model: "K5", plate: "34나7890", zone: "잠실역 2번존", zoneId: "Z-1002", region1: "서울", region2: "송파", partner: "B파트너명", partnerType: "현장", status: "완료", elapsedDays: 4, worker: "수행원 이00", comment: "합의건, 추가요금 협의" , createdAt: toYmd(today)},
+      { orderId: "O-90003", washType: "외부", orderGroup: "정규", orderType: "주기세차", carId: "C-1003", model: "쏘나타", plate: "56다1122", zone: "홍대입구 3번존", zoneId: "Z-1003", region1: "서울", region2: "마포", partner: "A파트너명", partnerType: "현장", status: "미배정", elapsedDays: 7, worker: "-", comment: "미배정 상태, 수행원 부족" , createdAt: toYmd(today)},
+      { orderId: "O-90004", washType: "내부", orderGroup: "특별", orderType: "특수세차", carId: "C-2001", model: "아이오닉5", plate: "78라3344", zone: "판교 1번존", zoneId: "Z-2001", region1: "경기", region2: "성남", partner: "C파트너명", partnerType: "입고", status: "입고 중", elapsedDays: 3, worker: "수행원 박00", comment: "EV, 실내 매트 확인" , createdAt: toYmd(today)},
+      { orderId: "O-90005", washType: "내외부", orderGroup: "정규", orderType: "주기세차", carId: "C-2002", model: "스포티지", plate: "90마5566", zone: "수원역 2번존", zoneId: "Z-2002", region1: "경기", region2: "수원", partner: "B파트너명", partnerType: "현장", status: "완료", elapsedDays: 5, worker: "수행원 최00", comment: "점검 체크리스트 완료" , createdAt: toYmd(today)},
+      { orderId: "O-90006", washType: "외부", orderGroup: "정규", orderType: "주기세차", carId: "C-3001", model: "그랜저", plate: "11바7788", zone: "부산역 1번존", zoneId: "Z-3001", region1: "부산", region2: "동구", partner: "D파트너명", partnerType: "현장", status: "미배정", elapsedDays: 9, worker: "-", comment: "장기 미배정 리스크" , createdAt: toYmd(today)},
+      { orderId: "O-90007", washType: "내부", orderGroup: "수시", orderType: "수시세차", carId: "C-3002", model: "레이", plate: "22사9900", zone: "해운대 2번존", zoneId: "Z-3002", region1: "부산", region2: "해운대", partner: "D파트너명", partnerType: "현장", status: "예약", elapsedDays: 1, worker: "수행원 정00", comment: "오염도 2" , createdAt: toYmd(today)},
+      { orderId: "O-90008", washType: "내외부", orderGroup: "정규", orderType: "주기세차", carId: "C-4001", model: "카니발", plate: "33아1212", zone: "대전역 1번존", zoneId: "Z-4001", region1: "대전", region2: "동구", partner: "C파트너명", partnerType: "입고", status: "출고 중", elapsedDays: 6, worker: "수행원 한00", comment: "분실물 없음" , createdAt: toYmd(today)},
+      { orderId: "O-90009", washType: "외부", orderGroup: "정규", orderType: "주기세차", carId: "C-5002", model: "모닝", plate: "44자3434", zone: "청주 2번존", zoneId: "Z-5002", region1: "충북", region2: "청주", partner: "B파트너명", partnerType: "현장", status: "미배정", elapsedDays: 10, worker: "-", comment: "존 인력 수급 이슈" , createdAt: toYmd(today)},
+      { orderId: "O-90010", washType: "내부", orderGroup: "긴급", orderType: "위생장애", carId: "C-6001", model: "EV6", plate: "55차5656", zone: "광주 1번존", zoneId: "Z-6001", region1: "광주", region2: "서구", partner: "A파트너명", partnerType: "현장", status: "예약", elapsedDays: 3, worker: "수행원 오00", comment: "내부 먼지 제거 요청" , createdAt: toYmd(today)},
+      { orderId: "O-90011", washType: "내외부", orderGroup: "정규", orderType: "주기세차", carId: "C-7001", model: "티볼리", plate: "66카7878", zone: "인천공항 1번존", zoneId: "Z-7001", region1: "인천", region2: "중구", partner: "C파트너명", partnerType: "입고", status: "완료", elapsedDays: 4, worker: "수행원 유00", comment: "사진 업로드 완료" , createdAt: toYmd(today)},
+      { orderId: "O-90012", washType: "외부", orderGroup: "정규", orderType: "주기세차", carId: "C-8001", model: "셀토스", plate: "77타9090", zone: "제주공항 1번존", zoneId: "Z-8001", region1: "제주", region2: "제주시", partner: "D파트너명", partnerType: "현장", status: "미배정", elapsedDays: 11, worker: "-", comment: "장기 미배정, 알림 필요" , createdAt: toYmd(today)},
     ]);
 
   const [q, setQ] = useState("");
@@ -1235,7 +1260,7 @@ function OrdersPage({ quickStatus, onClearQuickStatus }) {
       zoneId: "Z-Temp",
       region1: "서울", // 더미
       region2: "기타", // 더미
-      partner: "A협력사", // 더미
+      partner: "A파트너명", // 더미
       partnerType: "현장", // 기본값
       status: "예약",
       elapsedDays: 0,
@@ -1309,12 +1334,12 @@ function OrdersPage({ quickStatus, onClearQuickStatus }) {
     },
     { key: "orderGroup", header: "오더구분" },
     { key: "orderType", header: "오더유형" },
-    { key: "carId", header: "Car ID" },
+    { key: "carId", header: "차량 ID" },
     { key: "model", header: "차종" },
-    { key: "plate", header: "차번호" },
-    { key: "zone", header: "존" },
-    { key: "elapsedDays", header: "세차경과일" },
-    { key: "partner", header: "협력사명" },
+    { key: "plate", header: "차량번호" },
+    { key: "zone", header: "존이름" },
+    { key: "elapsedDays", header: "세차경과일", render: (r) => `${r.elapsedDays}일` },
+    { key: "partner", header: "파트너명" },
     { key: "partnerType", header: "파트너유형" },
     {
       key: "status",
@@ -1337,7 +1362,7 @@ function OrdersPage({ quickStatus, onClearQuickStatus }) {
       {fOrderGroup ? <Chip onRemove={() => setFOrderGroup("")}>오더구분: {fOrderGroup}</Chip> : null}
       {fOrderType ? <Chip onRemove={() => setFOrderType("")}>오더유형: {fOrderType}</Chip> : null}
       {fWashType ? <Chip onRemove={() => setFWashType("")}>세차타입: {fWashType}</Chip> : null}
-      {fPartner ? <Chip onRemove={() => setFPartner("")}>협력사: {fPartner}</Chip> : null}
+      {fPartner ? <Chip onRemove={() => setFPartner("")}>파트너명: {fPartner}</Chip> : null}
       {fStatus ? <Chip onRemove={() => { setFStatus(""); onClearQuickStatus(); }}>상태: {fStatus}</Chip> : null}
     </div>
   );
@@ -1367,7 +1392,7 @@ function OrdersPage({ quickStatus, onClearQuickStatus }) {
         <CardHeader>
           <CardTitle>검색 및 필터</CardTitle>
           <CardDescription>
-            검색: 차량번호, 오더ID, 존ID, 존이름, 수행원, 코멘트 요약 / 필터: 기간, 지역1/2, 오더구분/유형, 세차타입, 협력사명, 진행상태
+            검색: 차량번호, 오더 ID, 존 ID, 존이름, 수행원, 코멘트 요약 / 필터: 기간, 지역1/2, 오더구분/유형, 세차타입, 파트너명, 진행상태
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -1375,7 +1400,7 @@ function OrdersPage({ quickStatus, onClearQuickStatus }) {
             <div className="md:col-span-4">
               <div className="relative">
                 <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B778C]" />
-                <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="검색(차량번호/오더ID/존/수행원/코멘트)" className="pl-9" />
+                <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="검색(차량번호/오더 ID/존이름/수행원/코멘트)" className="pl-9" />
               </div>
             </div>
 
@@ -1419,7 +1444,7 @@ function OrdersPage({ quickStatus, onClearQuickStatus }) {
             </div>
             <div className="md:col-span-2">
               <Select value={fPartner} onChange={(e) => setFPartner(e.target.value)}>
-                <option value="">협력사 전체</option>
+                <option value="">파트너명 전체</option>
                 {partners.map((v) => <option key={v} value={v}>{v}</option>)}
               </Select>
             </div>
@@ -1525,11 +1550,11 @@ function OrdersPage({ quickStatus, onClearQuickStatus }) {
                   <div className="col-span-2 border-t border-[#DFE1E6] my-1"></div>
 
                   <div className="space-y-1">
-                    <div className="text-xs text-[#6B778C]">차량 정보</div>
+                    <div className="text-xs text-[#6B778C]">차량번호 / 차종</div>
                     <div className="font-medium">{selected.plate} ({selected.model})</div>
                   </div>
                   <div className="space-y-1">
-                    <div className="text-xs text-[#6B778C]">쏘카존</div>
+                    <div className="text-xs text-[#6B778C]">존이름</div>
                     <div className="font-medium">{selected.zone}</div>
                   </div>
                   <div className="space-y-1">
@@ -1787,7 +1812,7 @@ function OrdersPage({ quickStatus, onClearQuickStatus }) {
                 <Input value={newOrderForm.model} onChange={e => setNewOrderForm({...newOrderForm, model: e.target.value})} placeholder="예: 아반떼" />
               </div>
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-[#6B778C]">존 이름 *</label>
+                <label className="text-xs font-semibold text-[#6B778C]">존이름 *</label>
                 <Input value={newOrderForm.zone} onChange={e => setNewOrderForm({...newOrderForm, zone: e.target.value})} placeholder="예: 강남역 1번존" />
               </div>
               <div className="space-y-1">
@@ -1859,9 +1884,9 @@ function OrdersPage({ quickStatus, onClearQuickStatus }) {
  */
 function AgreementsPage() {
   const [items, setItems] = useState([
-    { id: "A-1001", orderId: "O-90002", plate: "34나7890", model: "K5", zoneName: "잠실역 2번존", partner: "B협력사", requestedAt: "2026-01-12 10:30", status: "요청", cost: 15000, reason: "오염도 심각으로 인한 추가 요금", comment: "사진 확인 부탁드립니다.", washItems: ["내부세차", "특수오염제거"] },
-    { id: "A-1002", orderId: "O-90005", plate: "90마5566", model: "스포티지", zoneName: "수원역 2번존", partner: "B협력사", requestedAt: "2026-01-11 14:20", status: "수락", cost: 10000, reason: "카시트 분리 세척", comment: "승인 완료", washItems: ["카시트세척"] },
-    { id: "A-1003", orderId: "O-90010", plate: "55차5656", model: "EV6", zoneName: "광주 1번존", partner: "A협력사", requestedAt: "2026-01-10 09:15", status: "거절", cost: 20000, reason: "광택 작업 요청", comment: "정책상 불가", washItems: ["광택"] },
+    { id: "A-1001", orderId: "O-90002", plate: "34나7890", model: "K5", zoneName: "잠실역 2번존", partner: "B파트너명", requestedAt: "2026-01-12 10:30", status: "요청", cost: 15000, reason: "오염도 심각으로 인한 추가 요금", comment: "사진 확인 부탁드립니다.", washItems: ["내부세차", "특수오염제거"] },
+    { id: "A-1002", orderId: "O-90005", plate: "90마5566", model: "스포티지", zoneName: "수원역 2번존", partner: "B파트너명", requestedAt: "2026-01-11 14:20", status: "수락", cost: 10000, reason: "카시트 분리 세척", comment: "승인 완료", washItems: ["카시트세척"] },
+    { id: "A-1003", orderId: "O-90010", plate: "55차5656", model: "EV6", zoneName: "광주 1번존", partner: "A파트너명", requestedAt: "2026-01-10 09:15", status: "거절", cost: 20000, reason: "광택 작업 요청", comment: "정책상 불가", washItems: ["광택"] },
   ]);
 
   const [selected, setSelected] = useState(null);
@@ -1872,8 +1897,8 @@ function AgreementsPage() {
     { key: "orderId", header: "오더 ID" },
     { key: "plate", header: "차량번호" },
     { key: "model", header: "차종" },
-    { key: "zoneName", header: "쏘카존" },
-    { key: "partner", header: "파트너사" },
+    { key: "zoneName", header: "존이름" },
+    { key: "partner", header: "파트너명" },
     { key: "requestedAt", header: "요청 시간" },
     {
       key: "status",
@@ -1929,8 +1954,8 @@ function AgreementsPage() {
               </CardHeader>
               <CardContent className="space-y-2 text-sm text-[#172B4D]">
                 <Field label="오더 ID" value={selected.orderId} />
-                <Field label="차량" value={`${selected.plate} (${selected.model})`} />
-                <Field label="파트너사" value={selected.partner} />
+                <Field label="차량번호" value={`${selected.plate} (${selected.model})`} />
+                <Field label="파트너명" value={selected.partner} />
                 <Field label="요청 사유" value={selected.reason} />
                 <Field label="세차 항목" value={selected.washItems.join(", ")} />
                 <div className="flex items-center justify-between gap-3">
@@ -1990,15 +2015,15 @@ function BillingPage() {
   const [period, setPeriod] = useState(toYmd(new Date()));
 
   const billingData = [
-    { id: "B-1001", orderId: "O-90002", partner: "B협력사", amount: 25000, status: "청구완료", date: "2026-01-12" },
-    { id: "B-1002", orderId: "O-90005", partner: "B협력사", amount: 18000, status: "대기", date: "2026-01-12" },
-    { id: "B-1003", orderId: "O-90011", partner: "C협력사", amount: 22000, status: "청구완료", date: "2026-01-11" },
+    { id: "B-1001", orderId: "O-90002", partner: "B파트너명", amount: 25000, status: "청구완료", date: "2026-01-12" },
+    { id: "B-1002", orderId: "O-90005", partner: "B파트너명", amount: 18000, status: "대기", date: "2026-01-12" },
+    { id: "B-1003", orderId: "O-90011", partner: "C파트너명", amount: 22000, status: "청구완료", date: "2026-01-11" },
   ];
 
   const policyData = [
-    { id: "P-1", partner: "A협력사", baseAmount: 15000, missionAmount: 3000 },
-    { id: "P-2", partner: "B협력사", baseAmount: 16000, missionAmount: 2500 },
-    { id: "P-3", partner: "C협력사", baseAmount: 15500, missionAmount: 3000 },
+    { id: "P-1", partner: "A파트너명", baseAmount: 15000, missionAmount: 3000 },
+    { id: "P-2", partner: "B파트너명", baseAmount: 16000, missionAmount: 2500 },
+    { id: "P-3", partner: "C파트너명", baseAmount: 15500, missionAmount: 3000 },
   ];
 
   const [selected, setSelected] = useState(null);
@@ -2034,7 +2059,7 @@ function BillingPage() {
             columns={[
               { key: "id", header: "청구 ID" },
               { key: "orderId", header: "오더 ID" },
-              { key: "partner", header: "파트너사" },
+              { key: "partner", header: "파트너명" },
               { key: "amount", header: "금액", render: (r) => `${r.amount.toLocaleString()}원` },
               { key: "status", header: "상태", render: (r) => <Badge tone={r.status === "청구완료" ? "ok" : "default"}>{r.status}</Badge> },
               { key: "date", header: "청구일" },
@@ -2047,7 +2072,7 @@ function BillingPage() {
       ) : (
         <DataTable
           columns={[
-            { key: "partner", header: "파트너사" },
+            { key: "partner", header: "파트너명" },
             { key: "baseAmount", header: "기본 단가", render: (r) => `${r.baseAmount.toLocaleString()}원` },
             { key: "missionAmount", header: "미션 단가", render: (r) => `${r.missionAmount.toLocaleString()}원` },
             {
@@ -2075,7 +2100,7 @@ function BillingPage() {
             <CardContent className="space-y-2 text-sm text-[#172B4D]">
               <Field label="청구 ID" value={selected.id} />
               <Field label="오더 ID" value={selected.orderId} />
-              <Field label="파트너사" value={selected.partner} />
+              <Field label="파트너명" value={selected.partner} />
               <Field label="청구 금액" value={`${selected.amount.toLocaleString()}원`} />
               <Field label="상태" value={selected.status} />
               <Field label="청구일" value={selected.date} />
@@ -2190,7 +2215,7 @@ function LostFoundPage() {
 function NoticesPage() {
   const notices = [
     { id: 1, title: "[필독] 1월 세차 정책 변경 안내", targetPartner: "전체", targetRegion: "전체", createdAt: "2026-01-02", author: "운영팀" },
-    { id: 2, title: "설 연휴 기간 운영 가이드", targetPartner: "A협력사", targetRegion: "서울", createdAt: "2026-01-10", author: "운영팀" },
+    { id: 2, title: "설 연휴 기간 운영 가이드", targetPartner: "A파트너명", targetRegion: "서울", createdAt: "2026-01-10", author: "운영팀" },
     { id: 3, title: "시스템 점검 안내", targetPartner: "전체", targetRegion: "전체", createdAt: "2026-01-12", author: "개발팀" },
   ];
 
@@ -2210,11 +2235,11 @@ function NoticesPage() {
       <Card>
         <CardContent className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-[#172B4D]">대상 파트너</span>
+            <span className="text-sm font-medium text-[#172B4D]">파트너명</span>
             <Select value={filter} onChange={(e) => setFilter(e.target.value)} className="w-40">
               <option value="전체">전체</option>
-              <option value="A협력사">A협력사</option>
-              <option value="B협력사">B협력사</option>
+              <option value="A파트너명">A파트너명</option>
+              <option value="B파트너명">B파트너명</option>
             </Select>
           </div>
         </CardContent>
@@ -2224,7 +2249,7 @@ function NoticesPage() {
         columns={[
           { key: "id", header: "No" },
           { key: "title", header: "제목", render: (r) => <span className="font-medium text-[#172B4D]">{r.title}</span> },
-          { key: "targetPartner", header: "대상 파트너" },
+          { key: "targetPartner", header: "파트너명" },
           { key: "targetRegion", header: "대상 지역" },
           { key: "author", header: "작성자" },
           { key: "createdAt", header: "작성일" },
@@ -2232,6 +2257,33 @@ function NoticesPage() {
         rows={filtered}
         rowKey={(r) => r.id}
       />
+    </div>
+  );
+}
+
+function UpdateHistoryPage() {
+  const sortedHistory = [...UPDATE_HISTORY].sort((a, b) => b.id - a.id);
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="text-base font-bold text-[#172B4D]">업데이트 이력</div>
+          <div className="mt-1 text-sm text-[#6B778C]">시스템 주요 변경 사항 및 배포 내역</div>
+        </div>
+      </div>
+
+      <Card>
+        <DataTable
+          columns={[
+            { key: "id", header: "ID" },
+            { key: "date", header: "일시", render: (r) => <span className="font-medium text-[#172B4D]">{r.date}</span> },
+            { key: "content", header: "변경내용" },
+          ]}
+          rows={sortedHistory}
+          rowKey={(r) => r.id}
+        />
+      </Card>
     </div>
   );
 }
