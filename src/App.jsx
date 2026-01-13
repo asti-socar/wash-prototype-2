@@ -23,6 +23,13 @@ import {
   AlertTriangle,
   FileText,
   Edit,
+  Check,
+  Clock,
+  Image as ImageIcon,
+  ExternalLink,
+  Maximize2,
+  Camera,
+  ListChecks,
 } from "lucide-react";
 
 import {
@@ -61,32 +68,32 @@ function toYmd(d) {
  */
 function Card({ className, children }) {
   return (
-    <div className={cn("rounded-2xl bg-white shadow-sm ring-1 ring-slate-200", className)}>
+    <div className={cn("rounded-lg bg-white border border-[#DFE1E6] shadow-sm", className)}>
       {children}
     </div>
   );
 }
 function CardHeader({ className, children }) {
-  return <div className={cn("p-4 pb-2", className)}>{children}</div>;
+  return <div className={cn("p-5 pb-3", className)}>{children}</div>;
 }
 function CardTitle({ className, children }) {
-  return <div className={cn("text-sm font-semibold text-slate-900", className)}>{children}</div>;
+  return <div className={cn("text-sm font-bold text-[#172B4D]", className)}>{children}</div>;
 }
 function CardDescription({ className, children }) {
-  return <div className={cn("mt-1 text-xs text-slate-600", className)}>{children}</div>;
+  return <div className={cn("mt-1 text-xs text-[#6B778C]", className)}>{children}</div>;
 }
 function CardContent({ className, children }) {
-  return <div className={cn("p-4 pt-2", className)}>{children}</div>;
+  return <div className={cn("p-5 pt-2", className)}>{children}</div>;
 }
 function Button({ className, variant = "default", size = "md", ...props }) {
   const base =
-    "inline-flex items-center justify-center rounded-xl font-medium transition focus:outline-none focus:ring-2 focus:ring-slate-400 disabled:opacity-50 disabled:pointer-events-none";
+    "inline-flex items-center justify-center rounded-lg font-medium transition focus:outline-none focus:ring-2 focus:ring-[#0052CC] focus:ring-offset-1 disabled:opacity-50 disabled:pointer-events-none";
   const variants = {
-    default: "bg-slate-900 text-white hover:bg-slate-800",
-    secondary: "bg-slate-100 text-slate-900 hover:bg-slate-200",
-    ghost: "bg-transparent text-slate-700 hover:bg-slate-100",
+    default: "bg-[#0052CC] text-white hover:bg-[#0047B3] shadow-sm",
+    secondary: "bg-white text-[#172B4D] border border-[#DFE1E6] hover:bg-[#F4F5F7] shadow-sm",
+    ghost: "bg-transparent text-[#172B4D] hover:bg-[#F4F5F7]",
     danger: "bg-rose-600 text-white hover:bg-rose-700",
-    outline: "bg-white ring-1 ring-slate-200 text-slate-900 hover:bg-slate-50",
+    outline: "bg-white border border-[#DFE1E6] text-[#172B4D] hover:bg-[#F4F5F7]",
   };
   const sizes = {
     sm: "h-9 px-3 text-sm",
@@ -99,8 +106,8 @@ function Input({ className, ...props }) {
   return (
     <input
       className={cn(
-        "h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none",
-        "focus:ring-2 focus:ring-slate-300",
+        "h-10 w-full rounded-lg border border-[#DFE1E6] bg-white px-3 text-sm text-[#172B4D] outline-none transition",
+        "focus:border-[#0052CC] focus:ring-1 focus:ring-[#0052CC]",
         className
       )}
       {...props}
@@ -111,8 +118,8 @@ function Select({ className, children, ...props }) {
   return (
     <select
       className={cn(
-        "h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none",
-        "focus:ring-2 focus:ring-slate-300",
+        "h-10 w-full rounded-lg border border-[#DFE1E6] bg-white px-3 text-sm text-[#172B4D] outline-none transition",
+        "focus:border-[#0052CC] focus:ring-1 focus:ring-[#0052CC]",
         className
       )}
       {...props}
@@ -123,7 +130,7 @@ function Select({ className, children, ...props }) {
 }
 function PillTabs({ value, onChange, items }) {
   return (
-    <div className="inline-flex rounded-2xl bg-slate-100 p-1 ring-1 ring-slate-200">
+    <div className="inline-flex rounded-lg bg-[#F4F5F7] p-1 border border-[#DFE1E6]">
       {items.map((it) => {
         const active = it.value === value;
         return (
@@ -131,8 +138,8 @@ function PillTabs({ value, onChange, items }) {
             key={it.value}
             onClick={() => onChange(it.value)}
             className={cn(
-              "h-9 rounded-xl px-3 text-sm transition",
-              active ? "bg-white text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-900"
+              "h-8 rounded-md px-3 text-sm transition font-medium",
+              active ? "bg-white text-[#0052CC] shadow-sm" : "text-[#6B778C] hover:text-[#172B4D]"
             )}
           >
             {it.label}
@@ -144,24 +151,24 @@ function PillTabs({ value, onChange, items }) {
 }
 function Badge({ children, tone = "default" }) {
   const tones = {
-    default: "bg-slate-100 text-slate-700 ring-slate-200",
-    danger: "bg-rose-50 text-rose-700 ring-rose-200",
-    warn: "bg-amber-50 text-amber-800 ring-amber-200",
-    ok: "bg-emerald-50 text-emerald-700 ring-emerald-200",
-    info: "bg-blue-50 text-blue-700 ring-blue-200",
+    default: "bg-slate-100 text-slate-800",
+    danger: "bg-rose-100 text-rose-800",
+    warn: "bg-amber-100 text-amber-800",
+    ok: "bg-emerald-100 text-emerald-800",
+    info: "bg-blue-100 text-blue-800",
   };
   return (
-    <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-xs ring-1", tones[tone])}>
+    <span className={cn("inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold", tones[tone])}>
       {children}
     </span>
   );
 }
 function Chip({ children, onRemove }) {
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-700 ring-1 ring-slate-200">
+    <span className="inline-flex items-center gap-1 rounded-lg bg-[#F4F5F7] px-2 py-1 text-xs font-medium text-[#172B4D] border border-[#DFE1E6]">
       {children}
       {onRemove ? (
-        <button className="rounded-full p-0.5 hover:bg-slate-200" onClick={onRemove} aria-label="remove">
+        <button className="rounded-full p-0.5 hover:bg-[#DFE1E6]" onClick={onRemove} aria-label="remove">
           <X className="h-3.5 w-3.5" />
         </button>
       ) : null}
@@ -181,18 +188,18 @@ function Drawer({ open, title, onClose, children, footer }) {
         onClick={onClose}
         aria-hidden="true"
       />
-      <div className="absolute right-0 top-0 h-full w-full max-w-xl bg-white shadow-2xl ring-1 ring-slate-200">
-        <div className="flex h-16 items-center justify-between border-b border-slate-200 px-4">
+      <div className="absolute right-0 top-0 h-full w-full max-w-xl bg-white shadow-2xl">
+        <div className="flex h-16 items-center justify-between border-b border-[#DFE1E6] px-6">
           <div className="min-w-0">
-            <div className="truncate text-sm font-semibold text-slate-900">{title}</div>
-            <div className="truncate text-xs text-slate-500">우측 Drawer 상세</div>
+            <div className="truncate text-sm font-bold text-[#0052CC]">{title}</div>
+            <div className="truncate text-xs text-[#6B778C]">우측 Drawer 상세</div>
           </div>
-          <Button variant="ghost" className="h-10 w-10 rounded-2xl p-0" onClick={onClose}>
-            <X className="h-5 w-5 text-slate-600" />
+          <Button variant="ghost" className="h-9 w-9 rounded-lg p-0" onClick={onClose}>
+            <X className="h-5 w-5 text-[#6B778C]" />
           </Button>
         </div>
-        <div className="h-[calc(100%-64px-72px)] overflow-y-auto p-4">{children}</div>
-        <div className="flex h-[72px] items-center justify-end gap-2 border-t border-slate-200 px-4">
+        <div className="h-[calc(100%-64px-72px)] overflow-y-auto p-6">{children}</div>
+        <div className="flex h-[72px] items-center justify-end gap-2 border-t border-[#DFE1E6] px-6 bg-[#F4F5F7]">
           {footer}
         </div>
       </div>
@@ -205,21 +212,21 @@ function Drawer({ open, title, onClose, children, footer }) {
  */
 function DataTable({ columns, rows, onRowClick, rowKey }) {
   return (
-    <div className="overflow-x-auto rounded-2xl ring-1 ring-slate-200">
+    <div className="overflow-x-auto rounded-lg border border-[#DFE1E6]">
       <table className="min-w-full bg-white text-left text-sm">
-        <thead className="bg-slate-50">
+        <thead className="bg-[#F4F5F7]">
           <tr>
             {columns.map((c) => (
-              <th key={c.key} className="whitespace-nowrap px-3 py-2 text-xs font-semibold text-slate-600">
+              <th key={c.key} className="whitespace-nowrap px-4 py-3 text-xs font-bold text-[#172B4D]">
                 {c.header}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-[#DFE1E6]">
           {rows.length === 0 ? (
             <tr>
-              <td colSpan={columns.length} className="px-3 py-10 text-center text-sm text-slate-500">
+              <td colSpan={columns.length} className="px-4 py-10 text-center text-sm text-[#6B778C]">
                 결과가 없습니다.
               </td>
             </tr>
@@ -228,13 +235,12 @@ function DataTable({ columns, rows, onRowClick, rowKey }) {
               <tr
                 key={rowKey(r)}
                 className={cn(
-                  "border-t border-slate-100",
-                  onRowClick ? "cursor-pointer hover:bg-slate-50" : ""
+                  onRowClick ? "cursor-pointer hover:bg-[#E6F0FF]" : ""
                 )}
                 onClick={() => onRowClick?.(r)}
               >
                 {columns.map((c) => (
-                  <td key={c.key} className="whitespace-nowrap px-3 py-2 text-sm text-slate-800">
+                  <td key={c.key} className="whitespace-nowrap px-4 py-3 text-sm text-[#172B4D]">
                     {typeof c.render === "function" ? c.render(r) : r[c.key]}
                   </td>
                 ))}
@@ -244,6 +250,46 @@ function DataTable({ columns, rows, onRowClick, rowKey }) {
         </tbody>
       </table>
     </div>
+  );
+}
+
+/**
+ * Tabs Components
+ */
+function Tabs({ value, onValueChange, children }) {
+  // Clone children to pass props if needed, or just rely on children using the value
+  // For simplicity in this file, we'll assume children are TabsList and TabsContent
+  // and we manage state in the parent or pass props explicitly.
+  // But to make it cleaner like a library:
+  return <div className="w-full space-y-4">{children}</div>;
+}
+
+function TabsList({ children, className }) {
+  return <div className={cn("flex border-b border-[#DFE1E6]", className)}>{children}</div>;
+}
+
+function TabsTrigger({ value, currentValue, onClick, children }) {
+  const active = value === currentValue;
+  return (
+    <button
+      onClick={() => onClick(value)}
+      className={cn(
+        "relative px-4 py-2.5 text-sm font-medium transition-all",
+        active ? "text-[#0052CC]" : "text-[#6B778C] hover:text-[#172B4D]"
+      )}
+    >
+      {children}
+      {active && (
+        <span className="absolute bottom-0 left-0 h-0.5 w-full bg-[#0052CC]" />
+      )}
+    </button>
+  );
+}
+
+function TabsContent({ value, currentValue, children, className }) {
+  if (value !== currentValue) return null;
+  return (
+    <div className={cn("animate-in fade-in slide-in-from-bottom-1 duration-200", className)}>{children}</div>
   );
 }
 
@@ -322,14 +368,14 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
+    <div className="min-h-screen bg-[#F4F5F7] text-[#172B4D]">
       <div className="flex">
         <Sidebar activeKey={activeKey} onSelect={onNavSelect} />
 
         <div className="flex min-w-0 flex-1 flex-col">
           <Header title={pageTitle} />
 
-          <main className="min-w-0 flex-1 p-4 md:p-6">
+          <main className="min-w-0 flex-1 p-6 md:p-8">
             {activeKey === "dashboard" && <Dashboard onClickKpi={goOrdersWithStatus} />}
 
             {activeKey === "vehicles" && <VehiclesPage />}
@@ -370,21 +416,21 @@ export default function App() {
  */
 function Sidebar({ activeKey, onSelect }) {
   return (
-    <aside className="sticky top-0 hidden h-screen w-72 shrink-0 border-r border-slate-200 bg-white md:block">
-      <div className="flex h-16 items-center gap-2 px-4">
-        <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-slate-900 text-white">
-          <span className="text-sm font-semibold">W</span>
+    <aside className="sticky top-0 hidden h-screen w-64 shrink-0 bg-[#091E42] text-white md:block">
+      <div className="flex h-16 items-center gap-3 px-6">
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#0052CC] text-white shadow-sm">
+          <span className="text-sm font-bold">W</span>
         </div>
         <div className="min-w-0">
-          <div className="truncate text-sm font-semibold">세차 인터널 어드민</div>
-          <div className="truncate text-xs text-slate-500">Ops Console Prototype</div>
+          <div className="truncate text-sm font-bold text-white">세차 어드민</div>
+          <div className="truncate text-xs text-[#B3BAC5]">Ops Console Prototype</div>
         </div>
       </div>
 
       <nav className="h-[calc(100vh-64px)] overflow-y-auto px-2 pb-4">
         {NAV.map((g) => (
           <div key={g.group} className="mt-3">
-            <div className="px-2 pb-2 pt-2 text-xs font-semibold text-slate-500">{g.group}</div>
+            <div className="px-4 pb-2 pt-4 text-xs font-bold text-[#8993A4] uppercase tracking-wider">{g.group}</div>
             <div className="space-y-1">
               {g.items.map((it) => (
                 <SidebarItem
@@ -408,11 +454,11 @@ function SidebarItem({ active, icon: Icon, label, onClick }) {
     <button
       onClick={onClick}
       className={cn(
-        "flex w-full items-center gap-3 rounded-2xl px-3 py-2 text-sm transition",
-        active ? "bg-slate-900 text-white" : "text-slate-700 hover:bg-slate-100"
+        "group flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-sm transition-all font-medium",
+        active ? "bg-[#0052CC] text-white shadow-md" : "text-[#B3BAC5] hover:bg-[#0052CC] hover:text-white hover:shadow-md"
       )}
     >
-      <Icon className={cn("h-4 w-4", active ? "text-white" : "text-slate-500")} />
+      <Icon className={cn("h-4 w-4 shrink-0", active ? "text-white" : "text-[#8993A4] group-hover:text-white")} />
       <span className="truncate">{label}</span>
     </button>
   );
@@ -420,29 +466,21 @@ function SidebarItem({ active, icon: Icon, label, onClick }) {
 
 function Header({ title }) {
   return (
-    <header className="sticky top-0 z-10 flex h-16 items-center gap-3 border-b border-slate-200 bg-white/80 px-4 backdrop-blur md:px-6">
+    <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b border-[#DFE1E6] bg-white px-6 md:px-8 shadow-sm">
       <div className="min-w-0 flex-1">
-        <div className="truncate text-base font-semibold">{title}</div>
-        <div className="truncate text-xs text-slate-500">운영 현황 모니터링 및 정책 제어</div>
+        <div className="truncate text-lg font-bold text-[#172B4D]">{title}</div>
       </div>
 
-      <div className="hidden w-80 items-center gap-2 md:flex">
-        <div className="relative w-full">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-          <Input placeholder="전역 검색(프로토타입)" className="pl-9" />
-        </div>
-      </div>
-
-      <Button variant="ghost" className="h-10 w-10 rounded-2xl p-0">
-        <Bell className="h-5 w-5 text-slate-600" />
+      <Button variant="ghost" className="h-10 w-10 rounded-full p-0 hover:bg-[#F4F5F7]">
+        <Bell className="h-5 w-5 text-[#6B778C]" />
       </Button>
 
-      <div className="flex items-center gap-2 rounded-2xl bg-slate-100 px-3 py-2">
-        <div className="h-7 w-7 rounded-2xl bg-white ring-1 ring-slate-200" />
-        <div className="hidden md:block">
-          <div className="text-xs font-semibold leading-4">Ops Admin</div>
-          <div className="text-[11px] text-slate-500 leading-4">Internal</div>
+      <div className="flex items-center gap-3 pl-4 border-l border-[#DFE1E6]">
+        <div className="flex flex-col items-end hidden md:block">
+          <div className="text-sm font-bold leading-tight text-[#172B4D]">Ops Admin</div>
+          <div className="text-xs text-[#6B778C] leading-tight">Internal Manager</div>
         </div>
+        <div className="h-9 w-9 rounded-full bg-[#DFE1E6] ring-2 ring-white shadow-sm" />
       </div>
     </header>
   );
@@ -497,14 +535,14 @@ function Dashboard({ onClickKpi }) {
     <div className="space-y-6">
       <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
-          <div className="text-sm font-semibold">오늘 운영 KPI</div>
-          <div className="mt-1 text-xs text-slate-600">
+          <div className="text-sm font-bold text-[#172B4D]">오늘 운영 KPI</div>
+          <div className="mt-1 text-xs text-[#6B778C]">
             합의대기 <b>{kpis.agreementPending}</b>건은 KPI 카드 외 항목으로 별도 표기합니다.
           </div>
         </div>
         <div className="flex items-center gap-2">
           <Badge tone="warn">실시간</Badge>
-          <span className="text-xs text-slate-600">데이터는 프로토타입 더미 값입니다</span>
+          <span className="text-xs text-[#6B778C]">데이터는 프로토타입 더미 값입니다</span>
         </div>
       </div>
 
@@ -573,7 +611,7 @@ function Dashboard({ onClickKpi }) {
           <CardDescription>긴급 오더 및 세차 유형 변경 요청 발생 시 Slack 알림(어드민 UI 외 구성)</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div className="text-sm text-slate-700">
+          <div className="text-sm text-[#172B4D]">
             현재는 UI에서 상태만 표시합니다. 실제 연동은 Webhook, 이벤트 라우팅, 알림 템플릿 표준화가 필요합니다.
           </div>
           <div className="flex items-center gap-2">
@@ -593,12 +631,12 @@ function KpiCard({ title, value, hint, onClick }) {
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <span>{title}</span>
-            <span className="text-[11px] text-slate-500">바로가기</span>
+            <span className="text-[11px] text-[#6B778C] font-normal">바로가기</span>
           </CardTitle>
           <CardDescription>{hint}</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="text-3xl font-semibold tracking-tight">{value}</div>
+          <div className="text-3xl font-bold tracking-tight text-[#172B4D]">{value}</div>
         </CardContent>
       </Card>
     </button>
@@ -677,8 +715,8 @@ function VehiclesPage() {
     <div className="space-y-4">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
-          <div className="text-base font-semibold">차량 관리</div>
-          <div className="mt-1 text-sm text-slate-600">수행률 낮은 차량, 존별 현황 모니터링(프로토타입)</div>
+          <div className="text-base font-bold text-[#172B4D]">차량 관리</div>
+          <div className="mt-1 text-sm text-[#6B778C]">수행률 낮은 차량, 존별 현황 모니터링(프로토타입)</div>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="secondary">
@@ -697,7 +735,7 @@ function VehiclesPage() {
           <div className="grid grid-cols-1 gap-3 md:grid-cols-12">
             <div className="md:col-span-4">
               <div className="relative">
-                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B778C]" />
                 <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="차량번호/존이름/존ID 검색" className="pl-9" />
               </div>
             </div>
@@ -748,7 +786,7 @@ function VehiclesPage() {
       </Card>
 
       <div className="flex items-center justify-between">
-        <div className="text-sm text-slate-600">검색 결과: <b>{filtered.length}</b>건</div>
+        <div className="text-sm text-[#6B778C]">검색 결과: <b className="text-[#172B4D]">{filtered.length}</b>건</div>
       </div>
 
       <DataTable
@@ -775,7 +813,7 @@ function VehiclesPage() {
                 <CardTitle>기본 정보</CardTitle>
                 <CardDescription>리스트 필드 + 차종, 연료유형(프로토타입)</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-2 text-sm text-slate-800">
+              <CardContent className="space-y-2 text-sm text-[#172B4D]">
                 <Field label="차량번호" value={selected.plate} />
                 <Field label="차종" value={selected.model} />
                 <Field label="연료유형" value={selected.fuel} />
@@ -794,7 +832,7 @@ function VehiclesPage() {
                 <CardDescription>실데이터 연동 전 UI 형태만 제공</CardDescription>
               </CardHeader>
               <CardContent>
-                <ul className="space-y-2 text-sm text-slate-700">
+                <ul className="space-y-2 text-sm text-[#172B4D]">
                   <li>2026-01-10, 라이트 세차, 완료</li>
                   <li>2025-12-28, 주기 세차, 완료</li>
                   <li>2025-12-15, 라이트 세차, 완료</li>
@@ -814,8 +852,14 @@ function VehiclesPage() {
 function OrdersPage({ quickStatus, onClearQuickStatus }) {
   const today = new Date();
 
-  const data = useMemo(() => {
-    return [
+  // 미션 관리 상태 (Car ID 대신 편의상 plate를 키로 사용)
+  const [missions, setMissions] = useState([
+    { id: "M-1001", plate: "12가3456", content: "스티커 부착", status: "pending" },
+    { id: "M-1002", plate: "34나7890", content: "내부 청소 집중", status: "completed" },
+  ]);
+
+  // 오더 데이터 상태 관리
+  const [orders, setOrders] = useState(() => [
       { orderId: "O-90001", washType: "내부", orderGroup: "주기세차", orderType: "자동", carId: "C-1001", model: "아반떼 AD", plate: "12가3456", zone: "강남역 1번존", zoneId: "Z-1001", region1: "서울", region2: "강남", partner: "A협력사", status: "예약", elapsedDays: 2, worker: "수행원 김00", comment: "오염도 3, 내부 우선" , createdAt: toYmd(today)},
       { orderId: "O-90002", washType: "내외부", orderGroup: "현장세차", orderType: "수동", carId: "C-1002", model: "K5", plate: "34나7890", zone: "잠실역 2번존", zoneId: "Z-1002", region1: "서울", region2: "송파", partner: "B협력사", status: "완료", elapsedDays: 4, worker: "수행원 이00", comment: "합의건, 추가요금 협의" , createdAt: toYmd(today)},
       { orderId: "O-90003", washType: "외부", orderGroup: "주기세차", orderType: "자동", carId: "C-1003", model: "쏘나타", plate: "56다1122", zone: "홍대입구 3번존", zoneId: "Z-1003", region1: "서울", region2: "마포", partner: "A협력사", status: "미배정", elapsedDays: 7, worker: "-", comment: "미배정 상태, 수행원 부족" , createdAt: toYmd(today)},
@@ -828,8 +872,7 @@ function OrdersPage({ quickStatus, onClearQuickStatus }) {
       { orderId: "O-90010", washType: "내부", orderGroup: "현장세차", orderType: "수동", carId: "C-6001", model: "EV6", plate: "55차5656", zone: "광주 1번존", zoneId: "Z-6001", region1: "광주", region2: "서구", partner: "A협력사", status: "예약", elapsedDays: 3, worker: "수행원 오00", comment: "내부 먼지 제거 요청" , createdAt: toYmd(today)},
       { orderId: "O-90011", washType: "내외부", orderGroup: "주기세차", orderType: "자동", carId: "C-7001", model: "티볼리", plate: "66카7878", zone: "인천공항 1번존", zoneId: "Z-7001", region1: "인천", region2: "중구", partner: "C협력사", status: "완료", elapsedDays: 4, worker: "수행원 유00", comment: "사진 업로드 완료" , createdAt: toYmd(today)},
       { orderId: "O-90012", washType: "외부", orderGroup: "주기세차", orderType: "자동", carId: "C-8001", model: "셀토스", plate: "77타9090", zone: "제주공항 1번존", zoneId: "Z-8001", region1: "제주", region2: "제주시", partner: "D협력사", status: "미배정", elapsedDays: 11, worker: "-", comment: "장기 미배정, 알림 필요" , createdAt: toYmd(today)},
-    ];
-  }, []);
+    ]);
 
   const [q, setQ] = useState("");
   const [periodFrom, setPeriodFrom] = useState(toYmd(new Date(today.getTime() - 7 * 86400000)));
@@ -845,21 +888,80 @@ function OrdersPage({ quickStatus, onClearQuickStatus }) {
   const [selected, setSelected] = useState(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleteReason, setDeleteReason] = useState("");
+  const [drawerTab, setDrawerTab] = useState("info");
+  const [previewImage, setPreviewImage] = useState(null);
+  
+  // 신규 기능용 상태
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isMissionOpen, setIsMissionOpen] = useState(false);
+  
+  // 오더 발행 폼 상태
+  const [newOrderForm, setNewOrderForm] = useState({ plate: "", zone: "", washType: "외부", model: "" });
+  // 미션 등록 폼 상태
+  const [newMissionForm, setNewMissionForm] = useState({ plate: "", content: "" });
 
-  const regions1 = useMemo(() => Array.from(new Set(data.map((d) => d.region1))), [data]);
+  const regions1 = useMemo(() => Array.from(new Set(orders.map((d) => d.region1))), [orders]);
   const regions2 = useMemo(
-    () => Array.from(new Set(data.filter((d) => (fRegion1 ? d.region1 === fRegion1 : true)).map((d) => d.region2))),
-    [data, fRegion1]
+    () => Array.from(new Set(orders.filter((d) => (fRegion1 ? d.region1 === fRegion1 : true)).map((d) => d.region2))),
+    [orders, fRegion1]
   );
-  const partners = useMemo(() => Array.from(new Set(data.map((d) => d.partner))), [data]);
+  const partners = useMemo(() => Array.from(new Set(orders.map((d) => d.partner))), [orders]);
   const statuses = ["예약", "완료", "미배정"];
-  const orderGroups = useMemo(() => Array.from(new Set(data.map((d) => d.orderGroup))), [data]);
-  const orderTypes = useMemo(() => Array.from(new Set(data.map((d) => d.orderType))), [data]);
-  const washTypes = useMemo(() => Array.from(new Set(data.map((d) => d.washType))), [data]);
+  const orderGroups = useMemo(() => Array.from(new Set(orders.map((d) => d.orderGroup))), [orders]);
+  const orderTypes = useMemo(() => Array.from(new Set(orders.map((d) => d.orderType))), [orders]);
+  const washTypes = useMemo(() => Array.from(new Set(orders.map((d) => d.washType))), [orders]);
+
+  // 오더 발행 핸들러
+  const handleCreateOrder = () => {
+    if (!newOrderForm.plate || !newOrderForm.zone) return alert("차량번호와 존 정보는 필수입니다.");
+
+    // 해당 차량의 Pending 미션 조회
+    const pendingMissions = missions.filter(m => m.plate === newOrderForm.plate && m.status === "pending");
+
+    const newOrder = {
+      orderId: `O-${Date.now()}`,
+      washType: newOrderForm.washType,
+      orderGroup: "현장세차",
+      orderType: "수동",
+      carId: `C-${Math.floor(Math.random() * 10000)}`,
+      model: newOrderForm.model || "미상",
+      plate: newOrderForm.plate,
+      zone: newOrderForm.zone,
+      zoneId: "Z-Temp",
+      region1: "서울", // 더미
+      region2: "기타", // 더미
+      partner: "A협력사", // 더미
+      status: "예약",
+      elapsedDays: 0,
+      worker: "-",
+      comment: "수동 발행 오더",
+      createdAt: toYmd(new Date()),
+      attachedMissions: pendingMissions, // 미션 스냅샷 포함
+    };
+
+    setOrders([newOrder, ...orders]);
+    setIsCreateOpen(false);
+    setNewOrderForm({ plate: "", zone: "", washType: "외부", model: "" });
+    alert(`오더가 발행되었습니다. (포함된 미션: ${pendingMissions.length}건)`);
+  };
+
+  // 미션 등록 핸들러
+  const handleRegisterMission = () => {
+    if (!newMissionForm.plate || !newMissionForm.content) return alert("차량번호와 미션 내용은 필수입니다.");
+    const newMission = {
+      id: `M-${Date.now()}`,
+      plate: newMissionForm.plate,
+      content: newMissionForm.content,
+      status: "pending",
+    };
+    setMissions([...missions, newMission]);
+    setNewMissionForm({ plate: "", content: "" });
+    alert("미션이 등록되었습니다.");
+  };
 
   const filtered = useMemo(() => {
     const qq = q.trim().toLowerCase();
-    return data.filter((d) => {
+    return orders.filter((d) => {
       const hitQ =
         !qq ||
         d.plate.toLowerCase().includes(qq) ||
@@ -880,14 +982,14 @@ function OrdersPage({ quickStatus, onClearQuickStatus }) {
 
       return hitQ && hitPeriod && hitR1 && hitR2 && hitOG && hitOT && hitWT && hitP && hitS;
     });
-  }, [data, q, periodFrom, periodTo, fRegion1, fRegion2, fOrderGroup, fOrderType, fWashType, fPartner, fStatus]);
+  }, [orders, q, periodFrom, periodTo, fRegion1, fRegion2, fOrderGroup, fOrderType, fWashType, fPartner, fStatus]);
 
   const columns = [
     { key: "orderId", header: "오더 ID" },
     {
       key: "washType",
       header: "세차타입",
-      render: (r) => <span className="text-slate-800">{r.washType}</span>,
+      render: (r) => <span className="text-[#172B4D]">{r.washType}</span>,
     },
     { key: "orderGroup", header: "오더구분" },
     { key: "orderType", header: "오더유형" },
@@ -927,10 +1029,16 @@ function OrdersPage({ quickStatus, onClearQuickStatus }) {
     <div className="space-y-4">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
-          <div className="text-base font-semibold">오더 관리</div>
-          <div className="mt-1 text-sm text-slate-600">상단 필터 및 데이터 그리드, 행 클릭 Drawer 상세(프로토타입)</div>
+          <div className="text-base font-bold text-[#172B4D]">오더 관리</div>
+          <div className="mt-1 text-sm text-[#6B778C]">상단 필터 및 데이터 그리드, 행 클릭 Drawer 상세(프로토타입)</div>
         </div>
         <div className="flex items-center gap-2">
+          <Button onClick={() => setIsMissionOpen(true)} variant="outline">
+            <ClipboardList className="mr-2 h-4 w-4" /> 미션 등록
+          </Button>
+          <Button onClick={() => setIsCreateOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" /> 오더 발행
+          </Button>
           <Button variant="secondary">
             <Download className="mr-2 h-4 w-4" />
             목록 다운로드
@@ -949,7 +1057,7 @@ function OrdersPage({ quickStatus, onClearQuickStatus }) {
           <div className="grid grid-cols-1 gap-3 md:grid-cols-12">
             <div className="md:col-span-4">
               <div className="relative">
-                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6B778C]" />
                 <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="검색(차량번호/오더ID/존/수행원/코멘트)" className="pl-9" />
               </div>
             </div>
@@ -1028,7 +1136,7 @@ function OrdersPage({ quickStatus, onClearQuickStatus }) {
       </Card>
 
       <div className="flex items-center justify-between">
-        <div className="text-sm text-slate-600">검색 결과: <b>{filtered.length}</b>건</div>
+        <div className="text-sm text-[#6B778C]">검색 결과: <b className="text-[#172B4D]">{filtered.length}</b>건</div>
       </div>
 
       <DataTable
@@ -1038,13 +1146,34 @@ function OrdersPage({ quickStatus, onClearQuickStatus }) {
         onRowClick={(r) => setSelected(r)}
       />
 
+      {/* 오더 상세 Drawer */}
       <Drawer
         open={!!selected}
         title={selected ? `오더 상세 - ${selected.orderId}` : "오더 상세"}
-        onClose={() => { setSelected(null); setDeleteModalOpen(false); setDeleteReason(""); }}
+        onClose={() => { setSelected(null); setDeleteModalOpen(false); setDeleteReason(""); setDrawerTab("info"); }}
         footer={
           <>
             <Button variant="secondary" onClick={() => setSelected(null)}>닫기</Button>
+            {selected?.status !== "완료" && drawerTab === "info" && (
+              <Button
+                onClick={() => {
+                  // 오더 완료 처리 로직
+                  const updatedOrders = orders.map(o => o.orderId === selected.orderId ? { ...o, status: "완료" } : o);
+                  setOrders(updatedOrders);
+                  
+                  // 미션 완료 처리 로직 (Global State Update)
+                  if (selected.attachedMissions?.length > 0) {
+                    const missionIds = selected.attachedMissions.map(m => m.id);
+                    setMissions(prev => prev.map(m => missionIds.includes(m.id) ? { ...m, status: "completed" } : m));
+                  }
+                  
+                  setSelected(null);
+                  alert("오더 수행 완료 처리되었습니다. 관련 미션도 완료 상태로 변경됩니다.");
+                }}
+              >
+                <CheckCircle className="mr-2 h-4 w-4" /> 수행 완료
+              </Button>
+            )}
             <Button variant="danger" onClick={() => setDeleteModalOpen(true)}>
               <Trash2 className="mr-2 h-4 w-4" />
               오더 삭제
@@ -1054,51 +1183,204 @@ function OrdersPage({ quickStatus, onClearQuickStatus }) {
       >
         {selected ? (
           <div className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>오더 요약</CardTitle>
-                <CardDescription>오더구분, 오더유형, 세차타입, 메모, 생성 경로(프로토타입)</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-2 text-sm text-slate-800">
-                <Field label="오더 ID" value={selected.orderId} />
-                <Field label="차량" value={`${selected.plate} (${selected.model}, ${selected.carId})`} />
-                <Field label="존" value={`${selected.zone} (${selected.zoneId})`} />
-                <Field label="지역" value={`${selected.region1} / ${selected.region2}`} />
-                <Field label="협력사" value={selected.partner} />
-                <Field label="오더구분" value={selected.orderGroup} />
-                <Field label="오더유형" value={selected.orderType} />
-                <Field label="세차타입" value={selected.washType} />
-                <Field label="진행상태" value={selected.status} />
-                <Field label="세차 경과일" value={`${selected.elapsedDays}일`} />
-                <Field label="수행원" value={selected.worker} />
-                <Field label="메모" value={selected.comment} />
-                <Field label="오더 생성 경로" value={selected.orderType === "수동" ? "어드민 수동 발행" : "정책 기반 자동 발행"} />
-              </CardContent>
-            </Card>
+            <Tabs value={drawerTab}>
+            <TabsList>
+              <TabsTrigger value="info" currentValue={drawerTab} onClick={setDrawerTab}>상세정보</TabsTrigger>
+              <TabsTrigger value="history" currentValue={drawerTab} onClick={setDrawerTab}>사진 및 이력</TabsTrigger>
+              <TabsTrigger value="mission" currentValue={drawerTab} onClick={setDrawerTab}>미션 및 분실물</TabsTrigger>
+            </TabsList>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>수행/예약 이력(더미)</CardTitle>
-                <CardDescription>실데이터 연동 전 UI 형태만 제공</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-2 text-sm text-slate-700">
-                  <li>예약 생성: 2026-01-12 10:10, 수행원 배정</li>
-                  <li>세차 유형 변경 요청: 내부 - 내외부</li>
-                  <li>완료 처리: 2026-01-12 12:40</li>
-                </ul>
-              </CardContent>
-            </Card>
+            <TabsContent value="info" currentValue={drawerTab} className="space-y-4 pt-4">
+              {/* 1. 기본 정보 섹션 */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>기본 정보</CardTitle>
+                  <CardDescription>오더 및 차량 주요 정보</CardDescription>
+                </CardHeader>
+                <CardContent className="grid grid-cols-2 gap-x-4 gap-y-4 text-sm text-[#172B4D]">
+                  <div className="col-span-2 flex items-center gap-2">
+                    <span className="font-bold text-[#0052CC]">{selected.orderId}</span>
+                    <Badge tone={selected.orderType === "수동" ? "warn" : "default"}>
+                      {selected.orderType === "수동" ? "수동 발행" : "자동 발행"}
+                    </Badge>
+                  </div>
+                  
+                  <div className="col-span-2 border-t border-[#DFE1E6] my-1"></div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>사진/점검/분실물/미션/금액(프로토타입)</CardTitle>
-                <CardDescription>상세 탭 구성 후보 영역. 지금은 Placeholder로 유지</CardDescription>
-              </CardHeader>
-              <CardContent className="text-sm text-slate-700">
-                수행 전후 사진, 점검 체크리스트, 분실물 신고/처리, 미션, 금액(청구 연계), 연계오더(Parent) 영역을 탭/섹션으로 확장 가능합니다.
-              </CardContent>
-            </Card>
+                  <div className="space-y-1">
+                    <div className="text-xs text-[#6B778C]">차량 정보</div>
+                    <div className="font-medium">{selected.plate} ({selected.model})</div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-xs text-[#6B778C]">쏘카존</div>
+                    <div className="font-medium">{selected.zone}</div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-xs text-[#6B778C]">오더 구분</div>
+                    <div>{selected.orderGroup}</div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-xs text-[#6B778C]">세차 타입</div>
+                    <div>{selected.washType}</div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-xs text-[#6B778C]">수행원</div>
+                    <div>{selected.worker}</div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-xs text-[#6B778C]">진행 상태</div>
+                    <Badge tone={selected.status === "미배정" ? "danger" : selected.status === "예약" ? "warn" : "ok"}>{selected.status}</Badge>
+                  </div>
+                  <div className="col-span-2 space-y-1">
+                    <div className="text-xs text-[#6B778C]">메모</div>
+                    <div className="bg-[#F4F5F7] p-2 rounded-lg text-xs">{selected.comment}</div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* 6. 금액 및 연계 정보 */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>금액 및 연계 정보</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-[#6B778C]">최종 청구 금액</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg font-bold text-[#172B4D]">25,000원</span>
+                      <Button variant="ghost" size="sm" className="h-6 px-2 text-xs">
+                        청구 내역 <ExternalLink className="ml-1 h-3 w-3" />
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between border-t border-[#DFE1E6] pt-3">
+                    <span className="text-sm text-[#6B778C]">연계 오더 (Parent)</span>
+                    <Button variant="ghost" size="sm" className="h-6 px-2 text-xs text-[#0052CC]">
+                      O-89999 <ExternalLink className="ml-1 h-3 w-3" />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="history" currentValue={drawerTab} className="space-y-4 pt-4">
+              {/* 2. 수행 및 예약 이력 (Timeline) */}
+              <Card>
+                <CardHeader><CardTitle>진행 이력</CardTitle></CardHeader>
+                <CardContent>
+                  <div className="relative space-y-4 pl-2 before:absolute before:left-[19px] before:top-2 before:h-[calc(100%-16px)] before:w-0.5 before:bg-[#DFE1E6]">
+                    {[
+                      { time: "2026-01-12 10:00", label: "예약 생성 (System)", active: true },
+                      { time: "2026-01-12 10:10", label: `배정 완료 (${selected.worker})`, active: true },
+                      { time: "2026-01-12 11:00", label: "수행 시작", active: selected.status === "완료" },
+                      { time: "2026-01-12 11:45", label: "수행 완료", active: selected.status === "완료" },
+                    ].map((item, idx) => (
+                      <div key={idx} className="relative flex items-start gap-3">
+                        <div className={cn("z-10 flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full ring-4 ring-white", item.active ? "bg-[#0052CC]" : "bg-[#DFE1E6]")} />
+                        <div className="flex flex-col">
+                          <span className="text-xs font-medium text-[#172B4D]">{item.label}</span>
+                          <span className="text-[10px] text-[#6B778C]">{item.time}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* 3. 수행 전후 사진 */}
+              <Card>
+                <CardHeader><CardTitle>수행 사진</CardTitle></CardHeader>
+                <CardContent className="space-y-4">
+                  {["수행 전", "수행 후"].map((label) => (
+                    <div key={label}>
+                      <div className="mb-2 text-xs font-semibold text-[#6B778C]">{label}</div>
+                      <div className="grid grid-cols-3 gap-2">
+                        {[1, 2].map((i) => (
+                          <button key={i} className="group relative aspect-square overflow-hidden rounded-lg bg-[#F4F5F7] border border-[#DFE1E6]" onClick={() => setPreviewImage(`https://via.placeholder.com/600?text=${label}+${i}`)}>
+                            <div className="flex h-full w-full items-center justify-center text-[#B3BAC5]">
+                              <ImageIcon className="h-6 w-6" />
+                            </div>
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+                              <Maximize2 className="h-5 w-5 text-white" />
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+
+              {/* 4. 점검 내역 */}
+              <Card>
+                <CardHeader><CardTitle>점검 리스트</CardTitle></CardHeader>
+                <CardContent className="space-y-2">
+                  {[
+                    { label: "외관 세정 상태", status: "pass" },
+                    { label: "휠/타이어 세정", status: "pass" },
+                    { label: "실내 매트 청결", status: "pass" },
+                    { label: "쓰레기 수거", status: "pass" },
+                  ].map((check, idx) => (
+                    <div key={idx} className="flex items-center justify-between rounded-lg border border-[#DFE1E6] p-3">
+                      <span className="text-sm text-[#172B4D]">{check.label}</span>
+                      <div className="flex items-center gap-1 text-[#0052CC]">
+                        <Check className="h-4 w-4" />
+                        <span className="text-xs font-bold">Pass</span>
+                      </div>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="mission" currentValue={drawerTab} className="space-y-4 pt-4">
+              {/* 5. 분실물 및 미션 관리 */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <ClipboardList className="h-4 w-4" /> 미션
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {selected.attachedMissions && selected.attachedMissions.length > 0 ? (
+                    <div className="space-y-2">
+                      {selected.attachedMissions.map(m => (
+                        <div key={m.id} className="flex items-center justify-between rounded-lg bg-amber-50 border border-amber-200 p-3">
+                          <span className="text-sm font-medium text-amber-900">{m.content}</span>
+                          <Badge tone={m.status === 'completed' ? 'ok' : 'warn'}>{m.status}</Badge>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-4 text-sm text-[#6B778C]">등록된 미션이 없습니다.</div>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <PackageSearch className="h-4 w-4" /> 분실물
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {/* Mock Data for Lost Items */}
+                  <div className="flex items-start gap-3 rounded-lg border border-[#DFE1E6] p-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#F4F5F7]">
+                      <PackageSearch className="h-5 w-5 text-[#6B778C]" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between">
+                        <div className="text-sm font-bold text-[#172B4D]">지갑 (검정색)</div>
+                        <Badge tone="ok">보관중</Badge>
+                      </div>
+                      <div className="mt-1 text-xs text-[#6B778C]">조수석 바닥 발견 (2026-01-12)</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
 
             {deleteModalOpen ? (
               <Card className="ring-rose-200">
@@ -1135,6 +1417,107 @@ function OrdersPage({ quickStatus, onClearQuickStatus }) {
             ) : null}
           </div>
         ) : null}
+      </Drawer>
+
+      {/* Image Preview Modal */}
+      {previewImage && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 p-4" onClick={() => setPreviewImage(null)}>
+          <div className="relative max-h-full max-w-full overflow-hidden rounded-lg bg-white">
+            <button className="absolute right-2 top-2 rounded-full bg-black/50 p-1 text-white hover:bg-black/70" onClick={() => setPreviewImage(null)}>
+              <X className="h-5 w-5" />
+            </button>
+            <img src={previewImage} alt="Preview" className="max-h-[80vh] w-auto object-contain" />
+          </div>
+        </div>
+      )}
+
+      {/* 오더 발행 Drawer */}
+      <Drawer
+        open={isCreateOpen}
+        title="오더 수동 발행"
+        onClose={() => setIsCreateOpen(false)}
+        footer={
+          <Button onClick={handleCreateOrder} className="w-full">발행하기</Button>
+        }
+      >
+        <div className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>발행 정보 입력</CardTitle>
+              <CardDescription>차량 번호 입력 시 대기 중인 미션이 있으면 자동 포함됩니다.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-[#6B778C]">차량번호 *</label>
+                <Input value={newOrderForm.plate} onChange={e => setNewOrderForm({...newOrderForm, plate: e.target.value})} placeholder="예: 12가3456" />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-[#6B778C]">차종</label>
+                <Input value={newOrderForm.model} onChange={e => setNewOrderForm({...newOrderForm, model: e.target.value})} placeholder="예: 아반떼" />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-[#6B778C]">존 이름 *</label>
+                <Input value={newOrderForm.zone} onChange={e => setNewOrderForm({...newOrderForm, zone: e.target.value})} placeholder="예: 강남역 1번존" />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-[#6B778C]">세차 타입</label>
+                <Select value={newOrderForm.washType} onChange={e => setNewOrderForm({...newOrderForm, washType: e.target.value})}>
+                  <option value="외부">외부</option>
+                  <option value="내부">내부</option>
+                  <option value="내외부">내외부</option>
+                </Select>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </Drawer>
+
+      {/* 미션 등록 Drawer */}
+      <Drawer
+        open={isMissionOpen}
+        title="미션 관리"
+        onClose={() => setIsMissionOpen(false)}
+        footer={
+          <Button onClick={handleRegisterMission} className="w-full">미션 등록</Button>
+        }
+      >
+        <div className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>신규 미션 등록</CardTitle>
+              <CardDescription>등록된 미션은 다음 오더 생성 시 1회 자동 반영됩니다.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-[#6B778C]">대상 차량번호 *</label>
+                <Input value={newMissionForm.plate} onChange={e => setNewMissionForm({...newMissionForm, plate: e.target.value})} placeholder="예: 12가3456" />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-[#6B778C]">미션 내용 *</label>
+                <Input value={newMissionForm.content} onChange={e => setNewMissionForm({...newMissionForm, content: e.target.value})} placeholder="예: 스티커 부착, 내부 집중 청소" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>전체 미션 현황</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2 text-sm">
+                {missions.map(m => (
+                  <li key={m.id} className="flex justify-between border-b border-[#DFE1E6] pb-2 last:border-0">
+                    <div>
+                      <div className="font-medium text-[#172B4D]">{m.plate}</div>
+                      <div className="text-[#6B778C]">{m.content}</div>
+                    </div>
+                    <Badge tone={m.status === 'pending' ? 'warn' : 'ok'}>{m.status}</Badge>
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+        </div>
       </Drawer>
     </div>
   );
@@ -1185,8 +1568,8 @@ function AgreementsPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <div className="text-base font-semibold">합의 요청 관리</div>
-          <div className="mt-1 text-sm text-slate-600">현장 추가 요금 및 특수 세차 합의 요청 건 처리</div>
+          <div className="text-base font-bold text-[#172B4D]">합의 요청 관리</div>
+          <div className="mt-1 text-sm text-[#6B778C]">현장 추가 요금 및 특수 세차 합의 요청 건 처리</div>
         </div>
       </div>
 
@@ -1213,14 +1596,14 @@ function AgreementsPage() {
               <CardHeader>
                 <CardTitle>요청 정보</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2 text-sm text-slate-800">
+              <CardContent className="space-y-2 text-sm text-[#172B4D]">
                 <Field label="오더 ID" value={selected.orderId} />
                 <Field label="차량" value={`${selected.plate} (${selected.model})`} />
                 <Field label="파트너사" value={selected.partner} />
                 <Field label="요청 사유" value={selected.reason} />
                 <Field label="세차 항목" value={selected.washItems.join(", ")} />
                 <div className="flex items-center justify-between gap-3">
-                  <div className="w-36 shrink-0 text-xs font-semibold text-slate-500">청구 금액</div>
+                  <div className="w-36 shrink-0 text-xs font-semibold text-[#6B778C]">청구 금액</div>
                   <Input
                     type="number"
                     className="h-8 w-32 text-right"
@@ -1237,7 +1620,7 @@ function AgreementsPage() {
                 <CardTitle>현장 사진</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="flex h-32 w-full items-center justify-center rounded-xl bg-slate-100 text-slate-400">
+                <div className="flex h-32 w-full items-center justify-center rounded-lg bg-[#F4F5F7] text-[#6B778C]">
                   <span className="text-xs">이미지 미리보기 (Placeholder)</span>
                 </div>
               </CardContent>
@@ -1293,8 +1676,8 @@ function BillingPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <div className="text-base font-semibold">청구 관리</div>
-          <div className="mt-1 text-sm text-slate-600">파트너사별 청구 내역 및 단가 정책 관리</div>
+          <div className="text-base font-bold text-[#172B4D]">청구 관리</div>
+          <div className="mt-1 text-sm text-[#6B778C]">파트너사별 청구 내역 및 단가 정책 관리</div>
         </div>
         <div className="flex gap-2">
           <Button variant={view === "list" ? "default" : "secondary"} onClick={() => setView("list")}>
@@ -1311,7 +1694,7 @@ function BillingPage() {
           <Card>
             <CardContent className="flex items-center gap-4">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-slate-700">기간 조회</span>
+                <span className="text-sm font-medium text-[#172B4D]">기간 조회</span>
                 <Input type="date" value={period} onChange={(e) => setPeriod(e.target.value)} className="w-40" />
               </div>
             </CardContent>
@@ -1358,7 +1741,7 @@ function BillingPage() {
             <CardHeader>
               <CardTitle>청구 정보</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-2 text-sm text-slate-800">
+            <CardContent className="space-y-2 text-sm text-[#172B4D]">
               <Field label="청구 ID" value={selected.id} />
               <Field label="오더 ID" value={selected.orderId} />
               <Field label="파트너사" value={selected.partner} />
@@ -1403,8 +1786,8 @@ function LostFoundPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <div className="text-base font-semibold">분실물 관리</div>
-          <div className="mt-1 text-sm text-slate-600">세차 중 습득된 분실물 등록 및 처리 현황</div>
+          <div className="text-base font-bold text-[#172B4D]">분실물 관리</div>
+          <div className="mt-1 text-sm text-[#6B778C]">세차 중 습득된 분실물 등록 및 처리 현황</div>
         </div>
         <Button onClick={() => setIsRegistering(true)}>
           <Plus className="mr-2 h-4 w-4" /> 분실물 등록
@@ -1432,15 +1815,15 @@ function LostFoundPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-slate-500">습득물 명</label>
+                <label className="text-xs font-semibold text-[#6B778C]">습득물 명</label>
                 <Input defaultValue={selected?.item} placeholder="예: 지갑, 차키 등" />
               </div>
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-slate-500">차량번호</label>
+                <label className="text-xs font-semibold text-[#6B778C]">차량번호</label>
                 <Input defaultValue={selected?.plate} placeholder="12가3456" />
               </div>
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-slate-500">처리 상태</label>
+                <label className="text-xs font-semibold text-[#6B778C]">처리 상태</label>
                 <Select defaultValue={selected?.status || "찾는 중"}>
                   <option>찾는 중</option>
                   <option>보관중</option>
@@ -1449,7 +1832,7 @@ function LostFoundPage() {
                 </Select>
               </div>
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-slate-500">보관 장소</label>
+                <label className="text-xs font-semibold text-[#6B778C]">보관 장소</label>
                 <Input defaultValue={selected?.location} />
               </div>
             </CardContent>
@@ -1459,7 +1842,7 @@ function LostFoundPage() {
               <CardTitle>사진</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex h-32 w-full items-center justify-center rounded-xl bg-slate-100 text-slate-400">
+              <div className="flex h-32 w-full items-center justify-center rounded-lg bg-[#F4F5F7] text-[#6B778C]">
                 <span className="text-xs">사진 업로드 / 미리보기</span>
               </div>
             </CardContent>
@@ -1488,15 +1871,15 @@ function NoticesPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <div className="text-base font-semibold">공지 관리 (CMS 연동)</div>
-          <div className="mt-1 text-sm text-slate-600">외부 CMS 게시글 조회 (Read-only)</div>
+          <div className="text-base font-bold text-[#172B4D]">공지 관리 (CMS 연동)</div>
+          <div className="mt-1 text-sm text-[#6B778C]">외부 CMS 게시글 조회 (Read-only)</div>
         </div>
       </div>
 
       <Card>
         <CardContent className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-slate-700">대상 파트너</span>
+            <span className="text-sm font-medium text-[#172B4D]">대상 파트너</span>
             <Select value={filter} onChange={(e) => setFilter(e.target.value)} className="w-40">
               <option value="전체">전체</option>
               <option value="A협력사">A협력사</option>
@@ -1509,7 +1892,7 @@ function NoticesPage() {
       <DataTable
         columns={[
           { key: "id", header: "No" },
-          { key: "title", header: "제목", render: (r) => <span className="font-medium text-slate-900">{r.title}</span> },
+          { key: "title", header: "제목", render: (r) => <span className="font-medium text-[#172B4D]">{r.title}</span> },
           { key: "targetPartner", header: "대상 파트너" },
           { key: "targetRegion", header: "대상 지역" },
           { key: "author", header: "작성자" },
@@ -1525,8 +1908,8 @@ function NoticesPage() {
 function Field({ label, value }) {
   return (
     <div className="flex items-start justify-between gap-3">
-      <div className="w-36 shrink-0 text-xs font-semibold text-slate-500">{label}</div>
-      <div className="min-w-0 flex-1 text-sm text-slate-900">{value}</div>
+      <div className="w-36 shrink-0 text-xs font-semibold text-[#6B778C]">{label}</div>
+      <div className="min-w-0 flex-1 text-sm text-[#172B4D]">{value}</div>
     </div>
   );
 }
@@ -1536,8 +1919,8 @@ function PlaceholderPage({ title, description, right }) {
     <div className="space-y-4">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
-          <div className="text-base font-semibold">{title}</div>
-          <div className="mt-1 text-sm text-slate-600">{description}</div>
+          <div className="text-base font-bold text-[#172B4D]">{title}</div>
+          <div className="mt-1 text-sm text-[#6B778C]">{description}</div>
         </div>
         {right}
       </div>
@@ -1548,7 +1931,7 @@ function PlaceholderPage({ title, description, right }) {
           <CardDescription>리스트, 그리드, Drawer는 차량/오더 화면에 먼저 적용했습니다.</CardDescription>
         </CardHeader>
         <CardContent>
-          <ul className="list-disc space-y-2 pl-5 text-sm text-slate-700">
+          <ul className="list-disc space-y-2 pl-5 text-sm text-[#172B4D]">
             <li>정책 관리: 리스트에서 다중 선택 또는 필터된 데이터 일괄 수정, Drawer 기반 편집</li>
             <li>권한: 역할별 RBAC 전제, 화면/액션 단위 가드레일 정의 필요</li>
             <li>감사로그: 삭제/수정/발행 등 주요 액션은 사유와 함께 기록 필요</li>
