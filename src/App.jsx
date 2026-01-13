@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import {
   LayoutDashboard,
   Settings,
@@ -404,7 +404,7 @@ export default function App() {
         <Sidebar activeKey={activeKey} onSelect={onNavSelect} />
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <Header title={pageTitle} />
+          <Header title={pageTitle} activeKey={activeKey} />
 
           <main className="min-w-0 flex-1 p-6 md:p-8">
             {activeKey === "dashboard" && <Dashboard onClickKpi={goOrdersWithStatus} />}
@@ -495,11 +495,173 @@ function SidebarItem({ active, icon: Icon, label, onClick }) {
   );
 }
 
-function Header({ title }) {
+/**
+ * Simple Markdown Renderer (No external lib)
+ */
+function SimpleMarkdownRenderer({ content }) {
+  if (!content) return null;
+
+  const lines = content.split('\n');
+  const elements = [];
+  let tableBuffer = [];
+
+  const parseInline = (text) => {
+    if (!text) return null;
+    const parts = text.split(/(\*\*.*?\*\*)/g);
+    return parts.map((part, index) => {
+      if (part.startsWith('**') && part.endsWith('**')) {
+        return <strong key={index} className="font-bold text-[#172B4D]">{part.slice(2, -2)}</strong>;
+      }
+      return part.split('<br>').map((subPart, subIndex) => (
+        <React.Fragment key={`${index}-${subIndex}`}>
+          {subIndex > 0 && <br />}
+          {subPart}
+        </React.Fragment>
+      ));
+    });
+  };
+
+  const flushTable = () => {
+    if (tableBuffer.length === 0) return;
+
+    const headerRow = tableBuffer[0];
+    const parseRow = (row) => row.split('|').slice(1, -1).map(c => c.trim());
+    
+    let headers = [];
+    let bodyRows = [];
+
+    if (tableBuffer.length > 1 && tableBuffer[1].includes('---')) {
+      headers = parseRow(headerRow);
+      bodyRows = tableBuffer.slice(2).map(parseRow);
+    } else {
+      headers = parseRow(headerRow);
+      bodyRows = tableBuffer.slice(1).map(parseRow);
+    }
+
+    elements.push(
+      <div key={`table-${elements.length}`} className="overflow-x-auto my-4 rounded-lg border border-[#DFE1E6]">
+        <table className="min-w-full text-sm text-left">
+          <thead className="bg-[#F4F5F7]">
+            <tr>
+              {headers.map((h, i) => (
+                <th key={i} className="px-4 py-2 font-bold text-[#172B4D] border-b border-[#DFE1E6] whitespace-nowrap">
+                  {parseInline(h)}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-[#DFE1E6]">
+            {bodyRows.map((row, rI) => (
+              <tr key={rI} className="hover:bg-[#F4F5F7]">
+                {row.map((cell, cI) => (
+                  <td key={cI} className="px-4 py-2 text-[#172B4D] align-top">
+                    {parseInline(cell)}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+    tableBuffer = [];
+  };
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+
+    if (line.startsWith('|') && line.endsWith('|')) {
+      tableBuffer.push(line);
+      continue;
+    } else {
+      flushTable();
+    }
+
+    if (!line) continue;
+
+    if (line.startsWith('# ')) {
+      elements.push(<h1 key={i} className="text-2xl font-bold mt-8 mb-4 text-[#172B4D]">{parseInline(line.slice(2))}</h1>);
+    } else if (line.startsWith('## ')) {
+      elements.push(<h2 key={i} className="text-lg font-bold mt-6 mb-3 text-[#172B4D] border-b border-[#DFE1E6] pb-2">{parseInline(line.slice(3))}</h2>);
+    } else if (line.startsWith('### ')) {
+      elements.push(<h3 key={i} className="text-base font-bold mt-4 mb-2 text-[#172B4D]">{parseInline(line.slice(4))}</h3>);
+    } else if (line.startsWith('- ')) {
+      elements.push(
+        <div key={i} className="flex items-start gap-2 mb-1 ml-1">
+          <span className="text-[#6B778C] mt-1.5">•</span>
+          <span className="text-sm text-[#172B4D] leading-relaxed">{parseInline(line.slice(2))}</span>
+        </div>
+      );
+    } else {
+      elements.push(<p key={i} className="text-sm text-[#172B4D] mb-2 leading-relaxed">{parseInline(line)}</p>);
+    }
+  }
+  flushTable();
+
+  return <div className="pb-10">{elements}</div>;
+}
+
+function PageHeaderWithSpec({ title, pageKey }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [markdown, setMarkdown] = useState("");
+
+  useEffect(() => {
+    if (isOpen && pageKey) {
+      try {
+        // Eager loading for better reliability in Vercel/Local
+        const modules = import.meta.glob("./docs/specs/*.md", { as: "raw", eager: true });
+        
+        // Robust matching logic
+        const foundKey = Object.keys(modules).find((key) => 
+          key.toLowerCase().includes(pageKey.toLowerCase())
+        );
+
+        if (foundKey) {
+          setMarkdown(modules[foundKey]);
+        } else {
+          console.warn(`[PageHeaderWithSpec] Spec matching failed for key: "${pageKey}"`);
+          console.log("Available modules:", Object.keys(modules));
+          setMarkdown(`# ${title}\n\n기능 명세 파일이 없습니다.\n\n\`src/docs/specs/${pageKey}.md\` 파일을 생성해주세요.`);
+        }
+      } catch (error) {
+        console.error("Error loading spec:", error);
+        setMarkdown("기능 명세를 불러오는 중 오류가 발생했습니다.");
+      }
+    }
+  }, [isOpen, pageKey, title]);
+
+  return (
+    <div className="flex items-center gap-3">
+      <div className="truncate text-lg font-bold text-[#172B4D]">{title}</div>
+      <Button
+        variant="outline"
+        size="sm"
+        className="h-7 px-2 text-xs font-normal text-[#6B778C] border-[#DFE1E6] hover:text-[#0052CC] hover:border-[#0052CC]"
+        onClick={() => setIsOpen(true)}
+      >
+        <FileText className="mr-1.5 h-3.5 w-3.5" />
+        기능명세 확인
+      </Button>
+
+      <Drawer
+        open={isOpen}
+        title={`${title} 기능 명세`}
+        onClose={() => setIsOpen(false)}
+        footer={<Button variant="secondary" onClick={() => setIsOpen(false)}>닫기</Button>}
+      >
+        <div className="text-[#172B4D]">
+          <SimpleMarkdownRenderer content={markdown} />
+        </div>
+      </Drawer>
+    </div>
+  );
+}
+
+function Header({ title, activeKey }) {
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b border-[#DFE1E6] bg-white px-6 md:px-8 shadow-sm">
       <div className="min-w-0 flex-1">
-        <div className="truncate text-lg font-bold text-[#172B4D]">{title}</div>
+        <PageHeaderWithSpec title={title} pageKey={activeKey} />
       </div>
 
       <Button variant="ghost" className="h-10 w-10 rounded-full p-0 hover:bg-[#F4F5F7]">
