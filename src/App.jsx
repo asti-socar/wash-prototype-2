@@ -73,6 +73,9 @@ function toYmd(d) {
 }
 
 const UPDATE_HISTORY = [
+  { id: 7, date: "2026-01-13 18:15", content: "오더 관리 내 파트너유형 필터 추가 및 유형별 진행상태 옵션 동적 노출 로직 구현" },
+  { id: 6, date: "2026-01-13 18:10", content: "차량 상세 내 모든 세차 이력 항목에 대해 오더 상세 Drawer 자동 연결 기능 보완" },
+  { id: 5, date: "2026-01-13 17:55", content: "차량 상세 세차 이력 클릭 시 새 창에서 오더 상세 자동 연결 기능 구현" },
   { id: 4, date: "2026-01-13 17:37", content: "업데이트 이력 페이지 UI 개선 (헤더 명칭 변경) 및 자동 기록 규칙 적용" },
   { id: 3, date: "2026-01-13 17:25", content: "업데이트 이력 ID 컬럼 추가 및 정렬, 사이드바 스크롤바 숨김 처리" },
   { id: 2, date: "2026-01-13 16:57", content: "전체 용어 및 데이터 표기 형식 표준화 (차량번호, 존이름, 파트너명 등)" },
@@ -437,6 +440,20 @@ export default function App() {
 
   // 대시보드 KPI 카드 클릭 시 "오더 관리"로 이동하면서 필터를 “적용한 것처럼” 표시하는 상태
   const [orderQuickFilter, setOrderQuickFilter] = useState(null); // { status: '예약' | ... }
+  const [initialOrderId, setInitialOrderId] = useState(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const page = params.get("page");
+    const orderId = params.get("orderId");
+
+    if (page) {
+      setActiveKey(page);
+    }
+    if (orderId) {
+      setInitialOrderId(orderId);
+    }
+  }, []);
 
   const pageTitle = PAGE_TITLES[activeKey] ?? "Admin";
 
@@ -468,6 +485,7 @@ export default function App() {
               <OrdersPage
                 quickStatus={orderQuickFilter?.status ?? null}
                 onClearQuickStatus={() => setOrderQuickFilter(null)}
+                initialOrderId={initialOrderId}
               />
             )}
 
@@ -1163,9 +1181,23 @@ function VehiclesPage() {
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2 text-sm text-[#172B4D]">
-                  <li>2026-01-10, 라이트 세차, 완료</li>
-                  <li>2025-12-28, 주기 세차, 완료</li>
-                  <li>2025-12-15, 라이트 세차, 완료</li>
+                  {[
+                    { date: "2026-01-10", type: "라이트 세차", status: "완료", orderId: "O-90001" },
+                    { date: "2026-01-08", type: "수시 세차", status: "완료", orderId: "O-90002" },
+                    { date: "2026-01-05", type: "주기 세차", status: "미배정", orderId: "O-90003" },
+                  ].map((h, i) => (
+                    <li
+                      key={i}
+                      className="flex cursor-pointer items-center justify-between rounded p-2 transition-colors hover:bg-[#F4F5F7]"
+                      onClick={() => window.open(`/?page=orders&orderId=${h.orderId}`, "_blank")}
+                    >
+                      <span>{h.date}, {h.type}</span>
+                      <div className="flex items-center gap-2">
+                        <Badge tone="ok">{h.status}</Badge>
+                        <ExternalLink className="h-3 w-3 text-[#6B778C]" />
+                      </div>
+                    </li>
+                  ))}
                 </ul>
               </CardContent>
             </Card>
@@ -1179,7 +1211,7 @@ function VehiclesPage() {
 /**
  * 오더 관리 (리스트 + 필터 + Drawer + Quick Filter)
  */
-function OrdersPage({ quickStatus, onClearQuickStatus }) {
+function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId }) {
   const today = new Date();
 
   // 미션 관리 상태 (Car ID 대신 편의상 plate를 키로 사용)
@@ -1213,6 +1245,7 @@ function OrdersPage({ quickStatus, onClearQuickStatus }) {
   const [fOrderType, setFOrderType] = useState("");
   const [fWashType, setFWashType] = useState("");
   const [fPartner, setFPartner] = useState("");
+  const [fPartnerType, setFPartnerType] = useState("");
   const [fStatus, setFStatus] = useState(quickStatus && quickStatus !== "전체" ? quickStatus : "");
 
   const [selected, setSelected] = useState(null);
@@ -1229,6 +1262,15 @@ function OrdersPage({ quickStatus, onClearQuickStatus }) {
   const [newOrderForm, setNewOrderForm] = useState({ plate: "", zone: "", washType: "외부", model: "" });
   // 미션 등록 폼 상태
   const [newMissionForm, setNewMissionForm] = useState({ plate: "", content: "" });
+
+  useEffect(() => {
+    if (initialOrderId) {
+      const target = orders.find((o) => o.orderId === initialOrderId);
+      if (target) {
+        setSelected(target);
+      }
+    }
+  }, [initialOrderId, orders]);
 
   const regions1 = useMemo(() => Array.from(new Set(orders.map((d) => d.region1))), [orders]);
   const regions2 = useMemo(
@@ -1290,6 +1332,15 @@ function OrdersPage({ quickStatus, onClearQuickStatus }) {
     alert("미션이 등록되었습니다.");
   };
 
+  // 파트너 유형에 따른 진행상태 옵션 동적화
+  const currentStatuses = useMemo(() => {
+    if (fPartnerType === "현장") {
+      return ["미배정", "예약", "수행 중", "완료", "취소"];
+    }
+    // 입고 또는 전체일 경우 전체 상태 노출
+    return ["미배정", "파트너 배정", "예약", "입고 중", "수행 중", "세차 완료", "출고 중", "완료", "취소"];
+  }, [fPartnerType]);
+
   const filtered = useMemo(() => {
     const qq = q.trim().toLowerCase();
     return orders.filter((d) => {
@@ -1309,11 +1360,12 @@ function OrdersPage({ quickStatus, onClearQuickStatus }) {
       const hitOT = !fOrderType || d.orderType === fOrderType;
       const hitWT = !fWashType || d.washType === fWashType;
       const hitP = !fPartner || d.partner === fPartner;
+      const hitPT = !fPartnerType || d.partnerType === fPartnerType;
       const hitS = !fStatus || d.status === fStatus;
 
-      return hitQ && hitPeriod && hitR1 && hitR2 && hitOG && hitOT && hitWT && hitP && hitS;
+      return hitQ && hitPeriod && hitR1 && hitR2 && hitOG && hitOT && hitWT && hitP && hitPT && hitS;
     });
-  }, [orders, q, periodFrom, periodTo, fRegion1, fRegion2, fOrderGroup, fOrderType, fWashType, fPartner, fStatus]);
+  }, [orders, q, periodFrom, periodTo, fRegion1, fRegion2, fOrderGroup, fOrderType, fWashType, fPartner, fPartnerType, fStatus]);
 
   // 상태 배지 색상 로직
   const getStatusBadgeTone = (status) => {
@@ -1363,6 +1415,7 @@ function OrdersPage({ quickStatus, onClearQuickStatus }) {
       {fOrderType ? <Chip onRemove={() => setFOrderType("")}>오더유형: {fOrderType}</Chip> : null}
       {fWashType ? <Chip onRemove={() => setFWashType("")}>세차타입: {fWashType}</Chip> : null}
       {fPartner ? <Chip onRemove={() => setFPartner("")}>파트너명: {fPartner}</Chip> : null}
+      {fPartnerType ? <Chip onRemove={() => setFPartnerType("")}>파트너유형: {fPartnerType}</Chip> : null}
       {fStatus ? <Chip onRemove={() => { setFStatus(""); onClearQuickStatus(); }}>상태: {fStatus}</Chip> : null}
     </div>
   );
@@ -1449,9 +1502,32 @@ function OrdersPage({ quickStatus, onClearQuickStatus }) {
               </Select>
             </div>
             <div className="md:col-span-2">
+              <Select value={fPartnerType} onChange={(e) => {
+                const newType = e.target.value;
+                setFPartnerType(newType);
+                
+                // 파트너 유형 변경 시, 현재 선택된 상태값이 유효하지 않으면 초기화
+                let validStatuses = [];
+                if (newType === "현장") {
+                  validStatuses = ["미배정", "예약", "수행 중", "완료", "취소"];
+                } else {
+                  validStatuses = ["미배정", "파트너 배정", "예약", "입고 중", "수행 중", "세차 완료", "출고 중", "완료", "취소"];
+                }
+                
+                if (fStatus && !validStatuses.includes(fStatus)) {
+                  setFStatus("");
+                  onClearQuickStatus();
+                }
+              }}>
+                <option value="">파트너유형 전체</option>
+                <option value="현장">현장</option>
+                <option value="입고">입고</option>
+              </Select>
+            </div>
+            <div className="md:col-span-2">
               <Select value={fStatus} onChange={(e) => { setFStatus(e.target.value); onClearQuickStatus(); }}>
                 <option value="">진행상태 전체</option>
-                {statuses.map((v) => <option key={v} value={v}>{v}</option>)}
+                {currentStatuses.map((v) => <option key={v} value={v}>{v}</option>)}
               </Select>
             </div>
 
@@ -1466,6 +1542,7 @@ function OrdersPage({ quickStatus, onClearQuickStatus }) {
                   setFRegion1(""); setFRegion2("");
                   setFOrderGroup(""); setFOrderType(""); setFWashType("");
                   setFPartner("");
+                  setFPartnerType("");
                   setFStatus("");
                   onClearQuickStatus();
                 }}
