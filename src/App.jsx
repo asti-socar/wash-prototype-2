@@ -188,6 +188,35 @@ function Chip({ children, onRemove }) {
  * Drawer
  */
 function Drawer({ open, title, onClose, children, footer }) {
+  const [width, setWidth] = useState(600);
+  const [isResizing, setIsResizing] = useState(false);
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!isResizing) return;
+      const newWidth = window.innerWidth - e.clientX;
+      const minWidth = window.innerWidth * 0.3;
+      const maxWidth = window.innerWidth * 0.9;
+      if (newWidth >= minWidth && newWidth <= maxWidth) {
+        setWidth(newWidth);
+      }
+    };
+    const handleMouseUp = () => {
+      setIsResizing(false);
+      document.body.style.cursor = "default";
+    };
+    if (isResizing) {
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
+      document.body.style.cursor = "col-resize";
+    }
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+      document.body.style.cursor = "default";
+    };
+  }, [isResizing]);
+
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50">
@@ -196,8 +225,18 @@ function Drawer({ open, title, onClose, children, footer }) {
         onClick={onClose}
         aria-hidden="true"
       />
-      <div className="absolute right-0 top-0 h-full w-full max-w-xl bg-white shadow-2xl">
-        <div className="flex h-16 items-center justify-between border-b border-[#DFE1E6] px-6">
+      <div
+        className="absolute right-0 top-0 h-full bg-white shadow-2xl flex flex-col"
+        style={{ width, maxWidth: "100vw" }}
+      >
+        <div
+          className="absolute left-0 top-0 bottom-0 w-1.5 cursor-col-resize hover:bg-[#0052CC] transition-colors z-50"
+          onMouseDown={(e) => {
+            e.preventDefault();
+            setIsResizing(true);
+          }}
+        />
+        <div className="flex h-16 items-center justify-between border-b border-[#DFE1E6] px-6 shrink-0">
           <div className="min-w-0">
             <div className="truncate text-sm font-bold text-[#0052CC]">{title}</div>
             <div className="truncate text-xs text-[#6B778C]">우측 Drawer 상세</div>
@@ -206,8 +245,8 @@ function Drawer({ open, title, onClose, children, footer }) {
             <X className="h-5 w-5 text-[#6B778C]" />
           </Button>
         </div>
-        <div className="h-[calc(100%-64px-72px)] overflow-y-auto p-6">{children}</div>
-        <div className="flex h-[72px] items-center justify-end gap-2 border-t border-[#DFE1E6] px-6 bg-[#F4F5F7]">
+        <div className="flex-1 overflow-y-auto p-6">{children}</div>
+        <div className="flex h-[72px] items-center justify-end gap-2 border-t border-[#DFE1E6] px-6 bg-[#F4F5F7] shrink-0">
           {footer}
         </div>
       </div>
@@ -541,10 +580,10 @@ function SimpleMarkdownRenderer({ content }) {
     elements.push(
       <div key={`table-${elements.length}`} className="overflow-x-auto my-4 rounded-lg border border-[#DFE1E6]">
         <table className="min-w-full text-sm text-left">
-          <thead className="bg-[#F4F5F7]">
+          <thead className="bg-[#EBECF0]">
             <tr>
               {headers.map((h, i) => (
-                <th key={i} className="px-4 py-2 font-bold text-[#172B4D] border-b border-[#DFE1E6] whitespace-nowrap">
+                <th key={i} className="px-4 py-3 font-bold text-[#172B4D] border-b border-[#DFE1E6] whitespace-nowrap">
                   {parseInline(h)}
                 </th>
               ))}
@@ -554,7 +593,7 @@ function SimpleMarkdownRenderer({ content }) {
             {bodyRows.map((row, rI) => (
               <tr key={rI} className="hover:bg-[#F4F5F7]">
                 {row.map((cell, cI) => (
-                  <td key={cI} className="px-4 py-2 text-[#172B4D] align-top">
+                  <td key={cI} className="px-4 py-3 text-[#172B4D] align-top">
                     {parseInline(cell)}
                   </td>
                 ))}
@@ -585,6 +624,8 @@ function SimpleMarkdownRenderer({ content }) {
       elements.push(<h2 key={i} className="text-lg font-bold mt-6 mb-3 text-[#172B4D] border-b border-[#DFE1E6] pb-2">{parseInline(line.slice(3))}</h2>);
     } else if (line.startsWith('### ')) {
       elements.push(<h3 key={i} className="text-base font-bold mt-4 mb-2 text-[#172B4D]">{parseInline(line.slice(4))}</h3>);
+    } else if (line.startsWith('#### ')) {
+      elements.push(<h4 key={i} className="text-sm font-bold mt-3 mb-1 text-[#172B4D]">{parseInline(line.slice(5))}</h4>);
     } else if (line.startsWith('- ')) {
       elements.push(
         <div key={i} className="flex items-start gap-2 mb-1 ml-1">
