@@ -609,7 +609,7 @@ function PageHeaderWithSpec({ title, pageKey }) {
     if (isOpen && pageKey) {
       try {
         // Eager loading for better reliability in Vercel/Local
-        const modules = import.meta.glob("./docs/specs/*.md", { as: "raw", eager: true });
+        const modules = import.meta.glob("./docs/specs/*.md", { query: "?raw", import: "default", eager: true });
         
         // Robust matching logic
         const foundKey = Object.keys(modules).find((key) => 
