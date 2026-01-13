@@ -345,7 +345,7 @@ const NAV = [
     items: [
       { key: "vehicles", label: "차량 관리", icon: Car },
       { key: "orders", label: "오더 관리", icon: ClipboardList },
-      { key: "agreements", label: "합의 요청 관리", icon: Handshake },
+      { key: "settlement", label: "합의 요청 관리", icon: Handshake },
       { key: "billing", label: "청구 관리", icon: Receipt },
       { key: "lostfound", label: "분실물 관리", icon: PackageSearch },
       { key: "notices", label: "공지 관리(CMS)", icon: Megaphone },
@@ -368,7 +368,7 @@ const PAGE_TITLES = {
   "region-policy": "지역 정책 관리",
   vehicles: "차량 관리",
   orders: "오더 관리",
-  agreements: "합의 요청 관리",
+  settlement: "합의 요청 관리",
   billing: "청구 관리",
   lostfound: "분실물 관리",
   notices: "공지 관리(CMS)",
@@ -418,7 +418,7 @@ export default function App() {
               />
             )}
 
-            {activeKey === "agreements" && <AgreementsPage />}
+            {activeKey === "settlement" && <AgreementsPage />}
             {activeKey === "billing" && <BillingPage />}
             {activeKey === "lostfound" && <LostFoundPage />}
             {activeKey === "notices" && <NoticesPage />}
@@ -426,7 +426,7 @@ export default function App() {
             {activeKey !== "dashboard" &&
               activeKey !== "vehicles" &&
               activeKey !== "orders" &&
-              activeKey !== "agreements" &&
+              activeKey !== "settlement" &&
               activeKey !== "billing" &&
               activeKey !== "lostfound" &&
               activeKey !== "notices" && (
