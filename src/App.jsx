@@ -73,7 +73,8 @@ function toYmd(d) {
 }
 
 const UPDATE_HISTORY = [
-  { id: 10, date: "2026-01-13 18:50", content: "업데이트 이력 데이터 구조 개선(링크 추가) 및 UI 컬럼 반영", links: [{ label: "업데이트 이력", page: "update-history" }] },
+  { id: 11, date: "2026-01-14 09:09", content: "업데이트 이력 자동 기록 규칙 최종 수정 (실시간 KST 반영) 및 UI 점검", links: [{ label: "업데이트 이력", page: "update-history" }] },
+  { id: 10, date: "2026-01-14 09:07", content: "업데이트 이력 데이터 구조 개선(링크 추가) 및 UI 컬럼 반영", links: [{ label: "업데이트 이력", page: "update-history" }] },
   { id: 9, date: "2026-01-13 18:40", content: "미션 관리 리스트 필터 고도화 및 상세 Drawer 내 타임라인/삭제 기능 구현", links: [{ label: "미션 관리", page: "missions" }, { label: "오더 관리", page: "orders" }] },
   { id: 8, date: "2026-01-13 18:25", content: "미션 관리 메뉴 독립 분리 및 오더-미션 상태 연동 로직 고도화", links: [{ label: "미션 관리", page: "missions" }, { label: "오더 관리", page: "orders" }] },
   { id: 7, date: "2026-01-13 18:15", content: "오더 관리 내 파트너유형 필터 추가 및 유형별 진행상태 옵션 동적 노출 로직 구현", links: [{ label: "오더 관리", page: "orders" }] },
