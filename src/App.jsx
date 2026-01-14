@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useRef, useCallback } from "react";
 import {
   LayoutDashboard,
   Settings,
@@ -73,6 +73,8 @@ function toYmd(d) {
 }
 
 const UPDATE_HISTORY = [
+  { id: 25, date: "2026-01-15 09:10", content: "[시스템] Vercel 트랜잭션 최적화: 업무시간 외 체크 제한 및 활동 기반 버전 업데이트 로직 고도화", isPolicyChange: false, links: [] },
+  { id: 24, date: "2026-01-15 08:50", content: "[시스템] 실시간 버전 업데이트 감지 및 브라우저 캐시 무효화 기능 구현", isPolicyChange: false, links: [] },
   { id: 23, date: "2026-01-14 18:10", content: "미션 상세 화면 내 수행 증빙 사진 필수 여부 정보 노출", isPolicyChange: false, links: [{ label: "미션 관리", page: "missions" }] },
   { id: 22, date: "2026-01-14 18:00", content: "[정책] 미션 등록 시 차량번호 일괄 입력(최대 1,000건) 및 수행 증빙 사진 촬영 옵션 도입", isPolicyChange: true, links: [{ label: "미션 관리", page: "missions" }] },
   { id: 21, date: "2026-01-14 17:40", content: "[정책] 미션 관리 내 차량 상세 정보(차종/지역) 연동 및 다차원 필터링 기능 강화", isPolicyChange: true, links: [{ label: "미션 관리", page: "missions" }] },
@@ -472,6 +474,56 @@ const PAGE_TITLES = {
 export default function App() {
   const [activeKey, setActiveKey] = useState("dashboard");
 
+  // 버전 업데이트 감지 로직
+  const [updateAvailable, setUpdateAvailable] = useState(false);
+  const lastCheckTimeRef = useRef(0);
+
+  const checkVersion = useCallback(async () => {
+    const now = new Date();
+    // KST 기준 시간 계산 (UTC+9)
+    const kstOffset = 9 * 60 * 60 * 1000;
+    const kstDate = new Date(now.getTime() + kstOffset);
+    const day = kstDate.getUTCDay(); // 0: 일, 1: 월 ... 6: 토
+    const hour = kstDate.getUTCHours(); // 0~23
+
+    // 1. 업무시간 제한 (월~금, 09:00 ~ 18:00)
+    const isBusinessHours = day >= 1 && day <= 5 && hour >= 9 && hour < 18;
+    if (!isBusinessHours) return;
+
+    // 2. 중복 요청 방지 (Throttle: 10분)
+    const THROTTLE_MS = 10 * 60 * 1000;
+    if (now.getTime() - lastCheckTimeRef.current < THROTTLE_MS) return;
+
+    try {
+      lastCheckTimeRef.current = now.getTime(); // 요청 시점 기록
+      // 캐시 방지를 위해 timestamp 추가
+      const res = await fetch(`/version.json?t=${Date.now()}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      const currentLatestId = UPDATE_HISTORY[0].id;
+      
+      if (data.latestId > currentLatestId) {
+        setUpdateAvailable(true);
+      }
+    } catch (error) {
+      console.error("Version check failed:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    checkVersion(); // 1) 마운트 시
+
+    const interval = setInterval(checkVersion, 10 * 60 * 1000); // 2) 10분 주기 타이머
+
+    const onFocus = () => checkVersion(); // 3) 창 포커스 시
+    window.addEventListener("focus", onFocus);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("focus", onFocus);
+    };
+  }, [checkVersion]);
+
   // 대시보드 KPI 카드 클릭 시 "오더 관리"로 이동하면서 필터를 “적용한 것처럼” 표시하는 상태
   const [orderQuickFilter, setOrderQuickFilter] = useState(null); // { status: '예약' | ... }
   const [initialOrderId, setInitialOrderId] = useState(null);
@@ -572,6 +624,33 @@ export default function App() {
           </main>
         </div>
       </div>
+
+      {/* 버전 업데이트 알림 Toast */}
+      {updateAvailable && (
+        <div className="fixed bottom-6 right-6 z-50 flex w-96 flex-col gap-3 rounded-xl bg-[#172B4D] p-4 text-white shadow-2xl animate-in slide-in-from-bottom-5">
+          <div className="flex items-start gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#0052CC] text-white">
+              <Megaphone className="h-5 w-5" />
+            </div>
+            <div className="flex-1">
+              <div className="text-sm font-bold">새로운 업데이트가 있습니다</div>
+              <div className="mt-1 text-xs text-gray-300 leading-relaxed">
+                최신 기능과 정책이 반영된 버전이 배포되었습니다.<br/>
+                안정적인 서비스 이용을 위해 업데이트해주세요.
+              </div>
+            </div>
+            <button onClick={() => setUpdateAvailable(false)} className="text-gray-400 hover:text-white">
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button size="sm" variant="secondary" className="h-8 bg-white/10 text-white border-none hover:bg-white/20" onClick={() => setUpdateAvailable(false)}>나중에</Button>
+            <Button size="sm" className="h-8 bg-[#0052CC] text-white hover:bg-[#0047B3] border-none" onClick={() => window.location.reload(true)}>
+              업데이트 적용
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
