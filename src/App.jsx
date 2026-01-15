@@ -52,6 +52,8 @@ import {
   Legend,
 } from "recharts";
 
+import { BROWN_HISTORY, ASTI_HISTORY } from "./constants/updateHistory";
+
 /**
  * util
  */
@@ -71,35 +73,6 @@ function toYmd(d) {
   const day = String(dt.getDate()).padStart(2, "0");
   return `${y}-${m}-${day}`;
 }
-
-const UPDATE_HISTORY = [
-  { id: 26, date: "2026-01-15 09:15", content: "[시스템] 모바일 반응형 레이아웃 대응: 햄버거 메뉴 및 사이드바 드로어 구현", isPolicyChange: false, links: [] },
-  { id: 25, date: "2026-01-15 09:10", content: "[시스템] Vercel 트랜잭션 최적화: 업무시간 외 체크 제한 및 활동 기반 버전 업데이트 로직 고도화", isPolicyChange: false, links: [] },
-  { id: 24, date: "2026-01-15 08:50", content: "[시스템] 실시간 버전 업데이트 감지 및 브라우저 캐시 무효화 기능 구현", isPolicyChange: false, links: [] },
-  { id: 23, date: "2026-01-14 18:10", content: "미션 상세 화면 내 수행 증빙 사진 필수 여부 정보 노출", isPolicyChange: false, links: [{ label: "미션 관리", page: "missions" }] },
-  { id: 22, date: "2026-01-14 18:00", content: "[정책] 미션 등록 시 차량번호 일괄 입력(최대 1,000건) 및 수행 증빙 사진 촬영 옵션 도입", isPolicyChange: true, links: [{ label: "미션 관리", page: "missions" }] },
-  { id: 21, date: "2026-01-14 17:40", content: "[정책] 미션 관리 내 차량 상세 정보(차종/지역) 연동 및 다차원 필터링 기능 강화", isPolicyChange: true, links: [{ label: "미션 관리", page: "missions" }] },
-  { id: 20, date: "2026-01-14 16:30", content: "[정책] 세차유형 옵션 정렬 기준 변경(내외부 우선) 및 미사용 옵션(물세차) 제거", isPolicyChange: true, links: [{ label: "오더 관리", page: "orders" }] },
-  { id: 19, date: "2026-01-14 16:25", content: "[정책] LNB 메뉴 순서 변경(미션 관리 하향 조정) 및 수행완료 미션 삭제 제한 정책 적용", isPolicyChange: true, links: [{ label: "미션 관리", page: "missions" }] },
-  { id: 18, date: "2026-01-14 16:16", content: "[정책] 필드 순서 표준화(오더구분/유형/세차유형) 및 미션-오더 연동 상세 로직 고도화", isPolicyChange: true, links: [{ label: "미션 관리", page: "missions" }, { label: "오더 관리", page: "orders" }] },
-  { id: 17, date: "2026-01-14 16:01", content: "업데이트 이력 시간 기록 규칙 확정 (KST 16:01 기준) 및 기존 이력 시간 교정", isPolicyChange: false, links: [{ label: "업데이트 이력", page: "update-history" }] },
-  { id: 16, date: "2026-01-14 15:50", content: "[정책] 관리자-수행원 간 정보 관심사 분리 정책에 따라 어드민 내 현장 가이드 및 유종 정보 전면 제거", isPolicyChange: true, links: [{ label: "차량 관리", page: "vehicles" }] },
-  { id: 15, date: "2026-01-14 15:40", content: "[정책] 세차 업무 무관 정보(유종) 제거 및 충전보장형 차량 대상 특수 반납 가이드 노출 정책 적용", isPolicyChange: true, links: [{ label: "차량 관리", page: "vehicles" }] },
-  { id: 14, date: "2026-01-14 15:25", content: "[정책] 세차 대상 차량 기준(sharing_type) 정의 및 진행중 오더의 실시간 상태 노출 로직 적용", isPolicyChange: true, links: [{ label: "차량 관리", page: "vehicles" }] },
-  { id: 13, date: "2026-01-14 15:10", content: "[정책] 업데이트 이력 관리 체계 개편: 제품 정책 변경 여부 식별 및 기록 의무화", isPolicyChange: true, links: [{ label: "업데이트 이력", page: "update-history" }] },
-  { id: 12, date: "2026-01-14 14:50", content: "디자인 가이드(PNG) 분석 기반 UI 컴포넌트 스타일 고도화 및 디자인 토큰 반영", isPolicyChange: false, links: [{ label: "차량 관리", page: "vehicles" }, { label: "오더 관리", page: "orders" }] },
-  { id: 11, date: "2026-01-14 14:35", content: "업데이트 이력 자동 기록 규칙 최종 수정 (실시간 KST 반영) 및 UI 점검", isPolicyChange: false, links: [{ label: "업데이트 이력", page: "update-history" }] },
-  { id: 10, date: "2026-01-14 14:30", content: "업데이트 이력 데이터 구조 개선(링크 추가) 및 UI 컬럼 반영", isPolicyChange: false, links: [{ label: "업데이트 이력", page: "update-history" }] },
-  { id: 9, date: "2026-01-13 18:40", content: "[정책] 미션 삭제 시 사유 입력 강제 및 감사 로그 기록 정책 적용", isPolicyChange: true, links: [{ label: "미션 관리", page: "missions" }, { label: "오더 관리", page: "orders" }] },
-  { id: 8, date: "2026-01-13 18:25", content: "[정책] 세차 오더-미션 간 상태 라이프사이클 동기화 로직 정의", isPolicyChange: true, links: [{ label: "미션 관리", page: "missions" }, { label: "오더 관리", page: "orders" }] },
-  { id: 7, date: "2026-01-13 18:15", content: "[정책] 파트너 유형별(현장/입고) 프로세스 분리에 따른 진행상태 선택값 제한 규칙 적용", isPolicyChange: true, links: [{ label: "오더 관리", page: "orders" }] },
-  { id: 6, date: "2026-01-13 18:10", content: "차량 상세 내 모든 세차 이력 항목에 대해 오더 상세 Drawer 자동 연결 기능 보완", isPolicyChange: false, links: [{ label: "차량 관리", page: "vehicles" }, { label: "오더 관리", page: "orders" }] },
-  { id: 5, date: "2026-01-13 17:55", content: "차량 상세 세차 이력 클릭 시 새 창에서 오더 상세 자동 연결 기능 구현", isPolicyChange: false, links: [{ label: "차량 관리", page: "vehicles" }, { label: "오더 관리", page: "orders" }] },
-  { id: 4, date: "2026-01-13 17:37", content: "업데이트 이력 페이지 UI 개선 (헤더 명칭 변경) 및 자동 기록 규칙 적용", isPolicyChange: false, links: [] },
-  { id: 3, date: "2026-01-13 17:25", content: "업데이트 이력 ID 컬럼 추가 및 정렬, 사이드바 스크롤바 숨김 처리", isPolicyChange: false, links: [] },
-  { id: 2, date: "2026-01-13 16:57", content: "전체 용어 및 데이터 표기 형식 표준화 (차량번호, 존이름, 파트너명 등)", isPolicyChange: false, links: [] },
-  { id: 1, date: "2026-01-13 15:53", content: "기능 명세(Markdown) Drawer 연동 및 렌더러 구현", isPolicyChange: false, links: [] },
-];
 
 /**
  * shadcn-ish minimal UI (Tailwind only)
@@ -502,9 +475,10 @@ export default function App() {
       const res = await fetch(`/version.json?t=${Date.now()}`);
       if (!res.ok) return;
       const data = await res.json();
-      const currentLatestId = UPDATE_HISTORY[0].id;
+      // 현재 버전 = 브라운 최신 ID + 아스티 최신 ID (합산)
+      const currentVersion = (BROWN_HISTORY[0]?.id || 0) + (ASTI_HISTORY[0]?.id || 0);
       
-      if (data.latestId > currentLatestId) {
+      if (data.latestId > currentVersion) {
         setUpdateAvailable(true);
       }
     } catch (error) {
@@ -2734,16 +2708,25 @@ function NoticesPage() {
 }
 
 function UpdateHistoryPage() {
-  const sortedHistory = [...UPDATE_HISTORY].sort((a, b) => b.id - a.id);
+  const [activeTab, setActiveTab] = useState("brown");
+  const historyData = activeTab === "brown" ? BROWN_HISTORY : ASTI_HISTORY;
+  const sortedHistory = [...historyData].sort((a, b) => b.id - a.id);
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <div className="text-base font-bold text-[#172B4D]">업데이트 이력</div>
-          <div className="mt-1 text-sm text-[#6B778C]">제품 기획 변경 및 배포 내역</div>
+          <div className="text-base font-bold text-[#172B4D]">업데이트 이력 (협업 모드)</div>
+          <div className="mt-1 text-sm text-[#6B778C]">브라운/아스티 작업 내역 이원화 관리</div>
         </div>
       </div>
+
+      <Tabs value={activeTab}>
+        <TabsList>
+          <TabsTrigger value="brown" currentValue={activeTab} onClick={setActiveTab}>브라운 (Brown)</TabsTrigger>
+          <TabsTrigger value="asti" currentValue={activeTab} onClick={setActiveTab}>아스티 (Asti)</TabsTrigger>
+        </TabsList>
+      </Tabs>
 
       <Card>
         <DataTable
