@@ -32,6 +32,7 @@ import {
   ArrowRight,
   History,
   Menu,
+  Folder,
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
@@ -57,6 +58,7 @@ import {
 } from "recharts";
 
 import { BROWN_HISTORY, ASTI_HISTORY } from "./constants/updateHistory";
+import PartnersPage from "./PartnersPage";
 
 /**
  * util
@@ -266,6 +268,46 @@ function Drawer({ open, title, onClose, children, footer }) {
 }
 
 /**
+ * Accordion (for Sidebar)
+ */
+function Accordion({ type, children, ...props }) {
+  return <div {...props}>{children}</div>;
+}
+
+function AccordionItem({ value, children }) {
+  // In a real implementation, we'd use context to manage state.
+  // For this prototype, we pass props down.
+  return <div className="border-b border-transparent">{children}</div>;
+}
+
+function AccordionTrigger({ children, isOpen, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      className="group flex w-full items-center justify-between gap-3 rounded-lg px-4 py-2.5 text-sm font-medium text-[#B3BAC5] transition-all hover:bg-[#0052CC] hover:text-white hover:shadow-md"
+    >
+      <div className="flex items-center gap-3">
+        {children}
+      </div>
+      <ChevronRight
+        className={cn(
+          "h-4 w-4 shrink-0 text-[#8993A4] transition-transform duration-200 group-hover:text-white",
+          isOpen && "rotate-90"
+        )}
+      />
+    </button>
+  );
+}
+
+function AccordionContent({ children, isOpen }) {
+  return (
+    <div className={cn("overflow-hidden text-sm transition-all", isOpen ? "max-h-96" : "max-h-0")}>
+      <div className="pt-1 pb-2 pl-6">{children}</div>
+    </div>
+  );
+}
+
+/**
  * Pagination Components & Hooks
  */
 function usePagination(data, itemsPerPage = 40) {
@@ -458,36 +500,48 @@ const NAV = [
     items: [{ key: "update-history", label: "업데이트 이력", icon: History }],
   },
   {
-    group: "관제",
+    group: "인터널 어드민 기능",
     items: [{ key: "dashboard", label: "대시보드(HOME)", icon: LayoutDashboard }],
   },
   {
     group: "오더 정책 관리",
+    type: 'group',
+    key: 'order-policy',
+    label: '오더 정책 관리',
+    icon: Settings,
     items: [
-      { key: "ai-policy", label: "AI 모델 정책 관리", icon: Settings },
-      { key: "zone-policy", label: "존 정책 관리", icon: MapPinned },
-      { key: "region-policy", label: "지역 정책 관리", icon: MapPinned },
+      { key: "ai-policy", label: "AI 모델 정책 관리", icon: Settings, parentKey: 'order-policy' },
+      { key: "zone-policy", label: "존 정책 관리", icon: MapPinned, parentKey: 'order-policy' },
+      { key: "region-policy", label: "지역 정책 관리", icon: MapPinned, parentKey: 'order-policy' },
     ],
   },
   {
     group: "업무 관리",
+    type: 'group',
+    key: 'work-management',
+    label: '업무 관리',
+    icon: ClipboardList,
     items: [
-      { key: "vehicles", label: "차량 관리", icon: Car },
-      { key: "orders", label: "오더 관리", icon: ClipboardList },
-      { key: "missions", label: "미션 관리", icon: ClipboardList },
-      { key: "settlement", label: "합의 요청 관리", icon: Handshake },
-      { key: "billing", label: "청구 관리", icon: Receipt },
-      { key: "lostfound", label: "분실물 관리", icon: PackageSearch },
-      { key: "notices", label: "공지 관리(CMS)", icon: Megaphone },
+      { key: "vehicles", label: "차량 관리", icon: Car, parentKey: 'work-management' },
+      { key: "orders", label: "오더 관리", icon: ClipboardList, parentKey: 'work-management' },
+      { key: "missions", label: "미션 관리", icon: ClipboardList, parentKey: 'work-management' },
+      { key: "settlement", label: "합의 요청 관리", icon: Handshake, parentKey: 'work-management' },
+      { key: "billing", label: "청구 관리", icon: Receipt, parentKey: 'work-management' },
+      { key: "lostfound", label: "분실물 관리", icon: PackageSearch, parentKey: 'work-management' },
+      { key: "notices", label: "공지 관리(CMS)", icon: Megaphone, parentKey: 'work-management' },
     ],
   },
   {
     group: "정보 관리",
+    type: 'group',
+    key: 'info-management',
+    label: '정보 관리',
+    icon: Folder,
     items: [
-      { key: "partners", label: "파트너 관리", icon: Building2 },
-      { key: "partner-managers", label: "파트너 담당자 조회", icon: Users },
-      { key: "workers", label: "수행원 조회", icon: UserCog },
-    ],
+      { key: "partners", label: "파트너 관리", icon: Building2, parentKey: 'info-management' },
+      { key: "partner-managers", label: "파트너 담당자 조회", icon: Users, parentKey: 'info-management' },
+      { key: "workers", label: "수행원 조회", icon: UserCog, parentKey: 'info-management' },
+    ]
   },
 ];
 
@@ -515,6 +569,7 @@ const PAGE_TITLES = {
 export default function App() {
   const [activeKey, setActiveKey] = useState("dashboard");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [openAccordion, setOpenAccordion] = useState(() => NAV.find(g => g.items?.some(it => it.key === activeKey))?.key || "");
 
   // 버전 업데이트 감지 로직
   const [updateAvailable, setUpdateAvailable] = useState(false);
@@ -615,23 +670,25 @@ export default function App() {
 
   const onNavSelect = (key) => {
     setActiveKey(key);
+    const parentGroup = NAV.find(g => g.items?.some(it => it.key === key));
+    if (parentGroup && parentGroup.type === 'group') {
+      setOpenAccordion(parentGroup.key);
+    }
     // 차량/오더에서 다른 화면으로 이동해도 quickFilter는 유지(프로토타입). 필요 시 여기서 clear 정책 정의 가능.
   };
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-[#172B4D]">
       {/* Mobile Sidebar Drawer */}
-      {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-50 flex md:hidden">
-          <div className="fixed inset-0 bg-black/50 transition-opacity" onClick={() => setIsMobileMenuOpen(false)} />
-          <div className="relative flex h-full w-64 flex-col bg-[#0F172A] text-white shadow-xl animate-in slide-in-from-left duration-200">
-            <SidebarContent activeKey={activeKey} onSelect={(key) => { onNavSelect(key); setIsMobileMenuOpen(false); }} />
-          </div>
+      <div className={cn("fixed inset-0 z-50 flex md:hidden", isMobileMenuOpen ? "pointer-events-auto" : "pointer-events-none")}>
+        <div className="fixed inset-0 bg-black/50 transition-opacity" onClick={() => setIsMobileMenuOpen(false)} />
+        <div className={cn("relative flex h-full w-64 flex-col bg-[#0F172A] text-white shadow-xl transition-transform duration-300 ease-in-out", isMobileMenuOpen ? "translate-x-0" : "-translate-x-full")}>
+          <SidebarContent activeKey={activeKey} onSelect={(key) => { onNavSelect(key); setIsMobileMenuOpen(false); }} openAccordion={openAccordion} setOpenAccordion={setOpenAccordion} />
         </div>
-      )}
+      </div>
 
       <div className="flex">
-        <Sidebar activeKey={activeKey} onSelect={onNavSelect} />
+        <Sidebar activeKey={activeKey} onSelect={onNavSelect} openAccordion={openAccordion} setOpenAccordion={setOpenAccordion} />
 
         <div className="flex min-w-0 flex-1 flex-col">
           <Header title={pageTitle} activeKey={activeKey} onMenuClick={() => setIsMobileMenuOpen(true)} />
@@ -659,6 +716,10 @@ export default function App() {
             {activeKey === "billing" && <BillingPage />}
             {activeKey === "lostfound" && <LostFoundPage />}
             {activeKey === "notices" && <NoticesPage />}
+            
+            {activeKey === "partners" && <PartnersPage />}
+            {activeKey === "partner-managers" && <PartnerManagersPage />}
+            {activeKey === "workers" && <WorkersPage />}
 
             {activeKey !== "dashboard" &&
               activeKey !== "vehicles" &&
@@ -668,7 +729,11 @@ export default function App() {
               activeKey !== "settlement" &&
               activeKey !== "billing" &&
               activeKey !== "lostfound" &&
-              activeKey !== "notices" && (
+              activeKey !== "notices" && 
+              activeKey !== "partners" &&
+              activeKey !== "partner-managers" &&
+              activeKey !== "workers" && 
+              (
                 <PlaceholderPage
                   title={pageTitle}
                   description="MVP 범위에서는 리스트 조회, 상단 검색/필터, 우측 Drawer 기반 상세 및 정책 수정 흐름으로 정리하는 것이 효율적입니다."
@@ -711,15 +776,15 @@ export default function App() {
 /**
  * Layout components
  */
-function Sidebar({ activeKey, onSelect }) {
+function Sidebar({ activeKey, onSelect, openAccordion, setOpenAccordion }) {
   return (
     <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col bg-[#0F172A] text-white md:flex">
-      <SidebarContent activeKey={activeKey} onSelect={onSelect} />
+      <SidebarContent activeKey={activeKey} onSelect={onSelect} openAccordion={openAccordion} setOpenAccordion={setOpenAccordion} />
     </aside>
   );
 }
 
-function SidebarContent({ activeKey, onSelect }) {
+function SidebarContent({ activeKey, onSelect, openAccordion, setOpenAccordion }) {
   return (
     <>
       <div className="flex h-16 shrink-0 items-center gap-3 px-6">
@@ -743,33 +808,55 @@ function SidebarContent({ activeKey, onSelect }) {
           }
         `}</style>
         {NAV.map((g) => (
-          <div key={g.group} className="mt-3">
-            <div className="px-4 pb-2 pt-4 text-xs font-bold text-[#8993A4] uppercase tracking-wider">{g.group}</div>
-            <div className="space-y-1">
-              {g.items.map((it) => (
-                <SidebarItem
-                  key={it.key}
-                  active={it.key === activeKey}
-                  icon={it.icon}
-                  label={it.label}
-                  onClick={() => onSelect(it.key)}
-                />
-              ))}
+          g.type === 'group' ? (
+            <Accordion key={g.key} type="single" collapsible>
+              <AccordionItem value={g.key}>
+                <AccordionTrigger
+                  isOpen={openAccordion === g.key}
+                  onClick={() => setOpenAccordion(openAccordion === g.key ? "" : g.key)}
+                >
+                  <g.icon className="h-4 w-4 shrink-0 text-[#8993A4] group-hover:text-white" />
+                  <span className="truncate">{g.label}</span>
+                </AccordionTrigger>
+                <AccordionContent isOpen={openAccordion === g.key}>
+                  <div className="space-y-1">
+                    {g.items.map((it) => (
+                      <SidebarItem key={it.key} active={it.key === activeKey} icon={it.icon} label={it.label} onClick={() => onSelect(it.key)} isSubItem />
+                    ))}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          ) : (
+            <div key={g.group} className="mt-3">
+              <div className="px-4 pb-2 pt-4 text-xs font-bold text-[#8993A4] uppercase tracking-wider">{g.group}</div>
+              <div className="space-y-1">
+                {g.items.map((it) => (
+                  <SidebarItem
+                    key={it.key}
+                    active={it.key === activeKey}
+                    icon={it.icon}
+                    label={it.label}
+                    onClick={() => onSelect(it.key)}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
+          )
         ))}
       </nav>
     </>
   );
 }
 
-function SidebarItem({ active, icon: Icon, label, onClick }) {
+function SidebarItem({ active, icon: Icon, label, onClick, isSubItem = false }) {
   return (
     <button
       onClick={onClick}
       className={cn(
-        "group flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-sm transition-all font-medium",
-        active ? "bg-[#0052CC] text-white shadow-md" : "text-[#B3BAC5] hover:bg-[#0052CC] hover:text-white hover:shadow-md"
+        "group flex w-full items-center gap-3 rounded-lg px-4 text-sm transition-all font-medium",
+        isSubItem ? "py-2" : "py-2.5",
+        active ? "bg-[#0052CC] text-white shadow-md" : "text-[#B3BAC5] hover:bg-slate-700/50 hover:text-white"
       )}
     >
       <Icon className={cn("h-4 w-4 shrink-0", active ? "text-white" : "text-[#8993A4] group-hover:text-white")} />
@@ -2779,6 +2866,220 @@ function MissionsPage({ missions, setMissions, orders }) {
                 </CardContent>
               </Card>
             )}
+          </div>
+        )}
+      </Drawer>
+    </div>
+  );
+}
+
+/**
+ * 파트너 담당자 조회
+ */
+function PartnerManagersPage() {
+  const [managers, setManagers] = useState([
+    { id: 'PM-001', name: '김담당', partner: 'A파트너명', type: '관리자', status: '활성', lastLogin: '2026-01-14', assignedZones: ['Z-1001', 'Z-1003', 'Z-6001'] },
+    { id: 'PM-002', name: '이담당', partner: 'B파트너명', type: '관리자', status: '활성', lastLogin: '2026-01-15', assignedZones: ['Z-1002', 'Z-2002', 'Z-5002'] },
+    { id: 'PM-003', name: '박수행', partner: 'A파트너명', type: '수행원', status: '활성', lastLogin: '2026-01-13', assignedZones: ['Z-1001'] },
+    { id: 'PM-004', name: '최매니저', partner: 'C파트너명', type: '관리자', status: '정지', lastLogin: '2025-12-20', assignedZones: ['Z-2001', 'Z-4001', 'Z-7001'] },
+  ]);
+
+  const [selected, setSelected] = useState(null);
+  const [fPartner, setFPartner] = useState("");
+  const [fType, setFType] = useState("");
+  const [fStatus, setFStatus] = useState("");
+
+  const partners = useMemo(() => Array.from(new Set(managers.map(m => m.partner))), [managers]);
+  const types = ['관리자', '수행원'];
+  const statuses = ['활성', '정지'];
+
+  const filteredData = useMemo(() => {
+    return managers.filter(m => {
+      const matchPartner = !fPartner || m.partner === fPartner;
+      const matchType = !fType || m.type === fType;
+      const matchStatus = !fStatus || m.status === fStatus;
+      return matchPartner && matchType && matchStatus;
+    });
+  }, [managers, fPartner, fType, fStatus]);
+
+  const { currentData, currentPage, totalPages, setCurrentPage, totalItems } = usePagination(filteredData, 40);
+
+  const columns = [
+    { key: 'name', header: '성명' },
+    { key: 'partner', header: '소속 파트너사' },
+    { key: 'type', header: '유형' },
+    { key: 'status', header: '계정 상태', render: r => <Badge tone={r.status === '활성' ? 'ok' : 'danger'}>{r.status}</Badge> },
+    { key: 'assignedZones', header: '배정된 쏘카존', render: r => `${r.assignedZones.length}개` },
+    { key: 'lastLogin', header: '마지막 접속일' },
+  ];
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <div className="text-base font-bold text-[#172B4D]">파트너 담당자 조회</div>
+        <div className="mt-1 text-sm text-[#6B778C]">파트너사에 소속된 인력 규모와 조직 구조를 파악합니다.</div>
+      </div>
+
+      <Card>
+        <CardHeader><CardTitle>필터</CardTitle></CardHeader>
+        <CardContent className="grid grid-cols-1 gap-3 md:grid-cols-12">
+          <div className="md:col-span-4">
+            <Select value={fPartner} onChange={e => setFPartner(e.target.value)}>
+              <option value="">소속 파트너사 전체</option>
+              {partners.map(p => <option key={p} value={p}>{p}</option>)}
+            </Select>
+          </div>
+          <div className="md:col-span-3">
+            <Select value={fType} onChange={e => setFType(e.target.value)}>
+              <option value="">계정 유형 전체</option>
+              {types.map(t => <option key={t} value={t}>{t}</option>)}
+            </Select>
+          </div>
+          <div className="md:col-span-3">
+            <Select value={fStatus} onChange={e => setFStatus(e.target.value)}>
+              <option value="">계정 상태 전체</option>
+              {statuses.map(s => <option key={s} value={s}>{s}</option>)}
+            </Select>
+          </div>
+          <div className="md:col-span-2 flex justify-end">
+            <Button variant="secondary" onClick={() => { setFPartner(""); setFType(""); setFStatus(""); }}>초기화</Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="flex items-center justify-between mb-2">
+        <div className="text-sm text-[#6B778C]">전체 건수 <b className="text-[#172B4D]">{totalItems.toLocaleString()}</b>건</div>
+        <div className="text-xs text-[#6B778C]">현재 페이지 ({currentPage}/{totalPages})</div>
+      </div>
+      <DataTable columns={columns} rows={currentData} rowKey={r => r.id} onRowClick={setSelected} />
+      <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+
+      <Drawer open={!!selected} title="담당자 상세" onClose={() => setSelected(null)} footer={<Button variant="secondary" onClick={() => setSelected(null)}>닫기</Button>}>
+        {selected && (
+          <div className="space-y-4">
+            <Card>
+              <CardHeader><CardTitle>프로필 정보</CardTitle></CardHeader>
+              <CardContent className="space-y-2 text-sm">
+                <Field label="성명" value={selected.name} />
+                <Field label="소속" value={selected.partner} />
+                <Field label="유형" value={selected.type} />
+                <Field label="계정 상태" value={<Badge tone={selected.status === '활성' ? 'ok' : 'danger'}>{selected.status}</Badge>} />
+                <Field label="마지막 접속" value={selected.lastLogin} />
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader><CardTitle>배정된 쏘카존 목록 ({selected.assignedZones.length}개)</CardTitle></CardHeader>
+              <CardContent>
+                {selected.assignedZones.length > 0 ? (
+                  <ul className="max-h-96 overflow-y-auto space-y-1 rounded-lg border border-[#E2E8F0] p-2 bg-slate-50">
+                    {selected.assignedZones.map(zoneId => {
+                      const zone = MOCK_VEHICLES.find(v => v.zoneId === zoneId);
+                      return (
+                        <li key={zoneId} className="px-2 py-1.5 text-sm text-[#172B4D]">
+                          {zone ? `${zone.zoneName} (${zoneId})` : zoneId}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                ) : (
+                  <div className="text-center text-sm text-[#6B778C] py-4">배정된 쏘카존이 없습니다.</div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        )}
+      </Drawer>
+    </div>
+  );
+}
+
+/**
+ * 수행원 조회
+ */
+function WorkersPage() {
+  const [workers, setWorkers] = useState([
+    { id: 'W-001', name: '최수행', partner: 'A파트너명', zoneName: '강남역 1번존', zoneId: 'Z-1001', region: '서울', score: 95 },
+    { id: 'W-002', name: '강수행', partner: 'B파트너명', zoneName: '잠실역 2번존', zoneId: 'Z-1002', region: '서울', score: 88 },
+    { id: 'W-003', name: '한수행', partner: 'C파트너명', zoneName: '판교 1번존', zoneId: 'Z-2001', region: '경기', score: 92 },
+    { id: 'W-004', name: '오수행', partner: 'D파트너명', zoneName: '해운대 2번존', zoneId: 'Z-3002', region: '부산', score: 98 },
+  ]);
+
+  const [selected, setSelected] = useState(null);
+  const [fRegion, setFRegion] = useState("");
+  const [fPartner, setFPartner] = useState("");
+
+  const regions = useMemo(() => Array.from(new Set(workers.map(w => w.region))), [workers]);
+  const partners = useMemo(() => Array.from(new Set(workers.map(w => w.partner))), [workers]);
+
+  const filteredData = useMemo(() => {
+    return workers.filter(w => {
+      const matchRegion = !fRegion || w.region === fRegion;
+      const matchPartner = !fPartner || w.partner === fPartner;
+      return matchRegion && matchPartner;
+    });
+  }, [workers, fRegion, fPartner]);
+
+  const { currentData, currentPage, totalPages, setCurrentPage, totalItems } = usePagination(filteredData, 40);
+
+  const columns = [
+    { key: 'name', header: '수행원 성명' },
+    { key: 'partner', header: '소속 파트너사' },
+    { key: 'zoneName', header: '배정된 쏘카존' },
+    { key: 'score', header: '수행 점수' },
+  ];
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <div className="text-base font-bold text-[#172B4D]">수행원 조회 (View Only)</div>
+        <div className="mt-1 text-sm text-[#6B778C]">현장 수행원의 배치 현황을 모니터링하고 품질 이슈 발생 시 피드백 근거로 활용합니다.</div>
+      </div>
+
+      <Card>
+        <CardHeader><CardTitle>필터</CardTitle></CardHeader>
+        <CardContent className="grid grid-cols-1 gap-3 md:grid-cols-12">
+          <div className="md:col-span-5">
+            <Select value={fRegion} onChange={e => setFRegion(e.target.value)}>
+              <option value="">지역별 조회 전체</option>
+              {regions.map(r => <option key={r} value={r}>{r}</option>)}
+            </Select>
+          </div>
+          <div className="md:col-span-5">
+            <Select value={fPartner} onChange={e => setFPartner(e.target.value)}>
+              <option value="">소속 파트너사 전체</option>
+              {partners.map(p => <option key={p} value={p}>{p}</option>)}
+            </Select>
+          </div>
+          <div className="md:col-span-2 flex justify-end">
+            <Button variant="secondary" onClick={() => { setFRegion(""); setFPartner(""); }}>초기화</Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="flex items-center justify-between mb-2">
+        <div className="text-sm text-[#6B778C]">전체 건수 <b className="text-[#172B4D]">{totalItems.toLocaleString()}</b>건</div>
+        <div className="text-xs text-[#6B778C]">현재 페이지 ({currentPage}/{totalPages})</div>
+      </div>
+      <DataTable columns={columns} rows={currentData} rowKey={r => r.id} onRowClick={setSelected} />
+      <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+
+      <Drawer open={!!selected} title="수행원 상세 (View Only)" onClose={() => setSelected(null)} footer={<Button variant="secondary" onClick={() => setSelected(null)}>닫기</Button>}>
+        {selected && (
+          <div className="space-y-4">
+            <Card>
+              <CardHeader><CardTitle>기본 정보</CardTitle></CardHeader>
+              <CardContent className="space-y-2 text-sm">
+                <Field label="수행원 성명" value={selected.name} />
+                <Field label="소속 파트너사" value={selected.partner} />
+                <Field label="수행 점수" value={`${selected.score}점`} />
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader><CardTitle>배정된 쏘카존</CardTitle></CardHeader>
+              <CardContent>
+                <div className="rounded-lg bg-slate-50 p-3 text-sm text-[#172B4D]">{selected.zoneName} ({selected.zoneId})</div>
+              </CardContent>
+            </Card>
           </div>
         )}
       </Drawer>

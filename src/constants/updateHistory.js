@@ -1,4 +1,11 @@
 export const BROWN_HISTORY = [
+  { id: 40, date: "2026-01-15 15:20", content: "[Hotfix] 파트너 관리 페이지 파일 누락 수정 (PartnersPage.jsx 생성)", isPolicyChange: false, links: [{ label: "파트너 관리", page: "partners" }] },
+  { id: 39, date: "2026-01-15 15:15", content: "[버그수정] 파트너 관리 컴포넌트 경로 정상화 및 신규 재구현 기능 UI 연동 완료", isPolicyChange: false, links: [{ label: "파트너 관리", page: "partners" }] },
+  { id: 38, date: "2026-01-15 15:06", content: "[기능] 파트너 관리 고도화: 필드 명칭 표준화(파트너명) 및 신규 등록/수정 기능 구현, UI 불필요 항목 제거", isPolicyChange: false, links: [{ label: "파트너 관리", page: "partners" }] },
+  { id: 37, date: "2026-01-15 14:53", content: "[기능] 파트너 관리 재구현: 상세 계약 정보 및 대규모 존 배정(지역정보 병기) 기능 적용", isPolicyChange: true, links: [{ label: "파트너 관리", page: "partners" }] },
+  { id: 36, date: "2026-01-15 14:38", content: "[기능] 담당자/수행원 조회: 파트너사별 인력 현황 및 존 배정 모니터링 기능 구현", isPolicyChange: false, links: [{ label: "담당자 조회", page: "partner-managers" }, { label: "수행원 조회", page: "workers" }] },
+  { id: 35, date: "2026-01-15 14:36", content: "[기능] 파트너 관리: 파트너사 등록/수정 및 복수 지역(Zone) 할당 로직 구현", isPolicyChange: false, links: [{ label: "파트너 관리", page: "partners" }] },
+  { id: 34, date: "2026-01-15 14:32", content: "[UI] LNB 메뉴 그룹 동작 표준화: 오더 정책 및 업무 관리 그룹 아코디언 기능 적용", isPolicyChange: false, links: [] },
   { id: 33, date: "2026-01-15 14:15", content: "[UI] 사이드바(LNB) 내부 스크롤 적용 및 스크롤바 UI 숨김 처리", isPolicyChange: false, links: [] },
   { id: 32, date: "2026-01-15 13:30", content: "[UI] Drawer 닫기 버튼 스타일 조정: 배경 제거 및 Hover 효과 유지", isPolicyChange: false, links: [] },
   { id: 31, date: "2026-01-15 13:25", content: "[UI] 업데이트 이력 내 '제품 정책 변경' 건 선별 필터 기능 추가", isPolicyChange: false, links: [{ label: "업데이트 이력", page: "update-history" }] },
