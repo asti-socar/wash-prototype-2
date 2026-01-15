@@ -1,6 +1,7 @@
 export const BROWN_HISTORY = [
-  { id: 48, date: "2026-01-15 22:00", content: "[Hotfix] 검색 필터 UI 스타일 충돌 수정: Select/Input 너비 강제 적용 (!important)", isPolicyChange: false, links: [] },
-  { id: 47, date: "2026-01-15 21:30", content: "[UI/버그수정] 검색 필터 레이아웃 중첩 문제 해결 및 카테고리별 검색 UI 정교화", isPolicyChange: false, links: [] },
+  { id: 49, date: "2026-01-15 21:20", content: "[버그수정] 모바일 브라우저 초기 DIM 중첩 현상 해결 및 레이아웃 z-index 최적화", isPolicyChange: false, links: [] },
+  { id: 48, date: "2026-01-15 18:27", content: "[Hotfix] 검색 필터 UI 스타일 충돌 수정: Select/Input 너비 강제 적용 (!important)", isPolicyChange: false, links: [] },
+  { id: 47, date: "2026-01-15 18:25", content: "[UI/버그수정] 검색 필터 레이아웃 중첩 문제 해결 및 카테고리별 검색 UI 정교화", isPolicyChange: false, links: [] },
   { id: 46, date: "2026-01-15 18:23", content: "[시스템] 담당자 정보 간소화(상태 제거/삭제 추가), CMS 외부 링크 연동 및 청구서 엑셀 다운로드 기능 추가", isPolicyChange: false, links: [{ label: "담당자 조회", page: "partner-managers" }, { label: "청구 관리", page: "billing" }] },
   { id: 45, date: "2026-01-15 18:20", content: "[정책] 단가 관리 기능을 파트너 상세 정보로 통합 및 CRUD 기능 구현", isPolicyChange: true, links: [{ label: "파트너 관리", page: "partners" }] },
   { id: 44, date: "2026-01-15 18:17", content: "[고도화] 미션 관리: 일괄 삭제 시 사유 입력 모달 적용 (Audit Log 강화)", isPolicyChange: true, links: [{ label: "미션 관리", page: "missions" }] },

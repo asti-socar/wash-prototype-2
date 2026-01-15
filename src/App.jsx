@@ -1118,7 +1118,7 @@ function Dashboard({ onClickKpi }) {
   const performanceFlow = [
     { label: "발행", value: 248, color: "text-[#172B4D]" },
     { label: "예약 완료", value: 164, color: "text-[#0052CC]" },
-    { label: "수행 완료", value: 58, color: "text-[#0052CC]" },
+    { label: "수행 완료", value: 79, color: "text-[#0052CC]" },
     { label: "취소", value: 5, color: "text-rose-600" },
   ];
 
