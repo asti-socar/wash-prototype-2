@@ -13,7 +13,6 @@ import {
   Users,
   UserCog,
   Search,
-  Bell,
   X,
   Download,
   Trash2,
@@ -32,6 +31,7 @@ import {
   ListChecks,
   ArrowRight,
   History,
+  Menu,
 } from "lucide-react";
 
 import {
@@ -73,6 +73,7 @@ function toYmd(d) {
 }
 
 const UPDATE_HISTORY = [
+  { id: 26, date: "2026-01-15 09:15", content: "[시스템] 모바일 반응형 레이아웃 대응: 햄버거 메뉴 및 사이드바 드로어 구현", isPolicyChange: false, links: [] },
   { id: 25, date: "2026-01-15 09:10", content: "[시스템] Vercel 트랜잭션 최적화: 업무시간 외 체크 제한 및 활동 기반 버전 업데이트 로직 고도화", isPolicyChange: false, links: [] },
   { id: 24, date: "2026-01-15 08:50", content: "[시스템] 실시간 버전 업데이트 감지 및 브라우저 캐시 무효화 기능 구현", isPolicyChange: false, links: [] },
   { id: 23, date: "2026-01-14 18:10", content: "미션 상세 화면 내 수행 증빙 사진 필수 여부 정보 노출", isPolicyChange: false, links: [{ label: "미션 관리", page: "missions" }] },
@@ -473,6 +474,7 @@ const PAGE_TITLES = {
  */
 export default function App() {
   const [activeKey, setActiveKey] = useState("dashboard");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // 버전 업데이트 감지 로직
   const [updateAvailable, setUpdateAvailable] = useState(false);
@@ -577,11 +579,21 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-[#172B4D]">
+      {/* Mobile Sidebar Drawer */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-50 flex md:hidden">
+          <div className="fixed inset-0 bg-black/50 transition-opacity" onClick={() => setIsMobileMenuOpen(false)} />
+          <div className="relative flex h-full w-64 flex-col bg-[#0F172A] text-white shadow-xl animate-in slide-in-from-left duration-200">
+            <SidebarContent activeKey={activeKey} onSelect={(key) => { onNavSelect(key); setIsMobileMenuOpen(false); }} />
+          </div>
+        </div>
+      )}
+
       <div className="flex">
         <Sidebar activeKey={activeKey} onSelect={onNavSelect} />
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <Header title={pageTitle} activeKey={activeKey} />
+          <Header title={pageTitle} activeKey={activeKey} onMenuClick={() => setIsMobileMenuOpen(true)} />
 
           <main className="min-w-0 flex-1 p-6 md:p-8">
             {activeKey === "dashboard" && <Dashboard onClickKpi={goOrdersWithStatus} />}
@@ -661,7 +673,15 @@ export default function App() {
 function Sidebar({ activeKey, onSelect }) {
   return (
     <aside className="sticky top-0 hidden h-screen w-64 shrink-0 bg-[#0F172A] text-white md:block">
-      <div className="flex h-16 items-center gap-3 px-6">
+      <SidebarContent activeKey={activeKey} onSelect={onSelect} />
+    </aside>
+  );
+}
+
+function SidebarContent({ activeKey, onSelect }) {
+  return (
+    <>
+      <div className="flex h-16 items-center gap-3 px-6 shrink-0">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#0052CC] text-white shadow-sm">
           <span className="text-sm font-bold">W</span>
         </div>
@@ -671,7 +691,7 @@ function Sidebar({ activeKey, onSelect }) {
         </div>
       </div>
 
-      <nav className="h-[calc(100vh-64px)] overflow-y-auto px-2 pb-4 no-scrollbar">
+      <nav className="flex-1 overflow-y-auto px-2 pb-4 no-scrollbar">
         <style>{`
           .no-scrollbar::-webkit-scrollbar {
             display: none;
@@ -698,7 +718,7 @@ function Sidebar({ activeKey, onSelect }) {
           </div>
         ))}
       </nav>
-    </aside>
+    </>
   );
 }
 
@@ -871,7 +891,7 @@ function PageHeaderWithSpec({ title, pageKey }) {
 
   return (
     <div className="flex items-center gap-3">
-      <div className="truncate text-lg font-bold text-[#172B4D]">{title}</div>
+      <div className="truncate text-base md:text-lg font-bold text-[#172B4D]">{title}</div>
       <Button
         variant="outline"
         size="sm"
@@ -896,16 +916,15 @@ function PageHeaderWithSpec({ title, pageKey }) {
   );
 }
 
-function Header({ title, activeKey }) {
+function Header({ title, activeKey, onMenuClick }) {
   return (
-    <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b border-[#E2E8F0] bg-white px-6 md:px-8 shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
+    <header className="sticky top-0 z-10 flex h-14 md:h-16 items-center gap-4 border-b border-[#E2E8F0] bg-white px-4 md:px-8 shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
+      <Button variant="ghost" size="sm" className="md:hidden -ml-2" onClick={onMenuClick}>
+        <Menu className="h-5 w-5 text-[#6B778C]" />
+      </Button>
       <div className="min-w-0 flex-1">
         <PageHeaderWithSpec title={title} pageKey={activeKey} />
       </div>
-
-      <Button variant="ghost" className="h-10 w-10 rounded-full p-0 hover:bg-[#F4F5F7]">
-        <Bell className="h-5 w-5 text-[#6B778C]" />
-      </Button>
 
       <div className="flex items-center gap-3 pl-4 border-l border-[#DFE1E6]">
         <div className="flex flex-col items-end hidden md:block">
