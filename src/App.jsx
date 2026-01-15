@@ -713,7 +713,7 @@ export default function App() {
  */
 function Sidebar({ activeKey, onSelect }) {
   return (
-    <aside className="sticky top-0 hidden h-screen w-64 shrink-0 bg-[#0F172A] text-white md:block">
+    <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col bg-[#0F172A] text-white md:flex">
       <SidebarContent activeKey={activeKey} onSelect={onSelect} />
     </aside>
   );
@@ -722,7 +722,7 @@ function Sidebar({ activeKey, onSelect }) {
 function SidebarContent({ activeKey, onSelect }) {
   return (
     <>
-      <div className="flex h-16 items-center gap-3 px-6 shrink-0">
+      <div className="flex h-16 shrink-0 items-center gap-3 px-6">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#0052CC] text-white shadow-sm">
           <span className="text-sm font-bold">W</span>
         </div>
@@ -732,7 +732,7 @@ function SidebarContent({ activeKey, onSelect }) {
         </div>
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-2 pb-4 no-scrollbar">
+      <nav className="flex-1 overflow-y-auto px-2 pb-10 no-scrollbar">
         <style>{`
           .no-scrollbar::-webkit-scrollbar {
             display: none;

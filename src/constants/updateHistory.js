@@ -1,4 +1,5 @@
 export const BROWN_HISTORY = [
+  { id: 33, date: "2026-01-15 14:15", content: "[UI] 사이드바(LNB) 내부 스크롤 적용 및 스크롤바 UI 숨김 처리", isPolicyChange: false, links: [] },
   { id: 32, date: "2026-01-15 13:30", content: "[UI] Drawer 닫기 버튼 스타일 조정: 배경 제거 및 Hover 효과 유지", isPolicyChange: false, links: [] },
   { id: 31, date: "2026-01-15 13:25", content: "[UI] 업데이트 이력 내 '제품 정책 변경' 건 선별 필터 기능 추가", isPolicyChange: false, links: [{ label: "업데이트 이력", page: "update-history" }] },
   { id: 30, date: "2026-01-15 13:20", content: "[시스템] 빌드 파이프라인 최적화: prebuild 스크립트를 통한 version.json 자동 갱신 로직 적용", isPolicyChange: false, links: [] },
