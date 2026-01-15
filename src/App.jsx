@@ -248,9 +248,13 @@ function Drawer({ open, title, onClose, children, footer }) {
             <div className="truncate text-sm font-bold text-[#0052CC]">{title}</div>
             <div className="truncate text-xs text-[#6B778C]">우측 Drawer 상세</div>
           </div>
-          <Button variant="ghost" className="h-9 w-9 rounded-lg p-0" onClick={onClose}>
-            <X className="h-5 w-5 text-[#6B778C]" />
-          </Button>
+          <button
+            className="p-2 text-gray-500 rounded-full hover:bg-gray-100 focus:outline-none transition-colors"
+            onClick={onClose}
+            aria-label="Close"
+          >
+            <X className="h-6 w-6" />
+          </button>
         </div>
         <div className="flex-1 overflow-y-auto p-6">{children}</div>
         <div className="flex h-[72px] items-center justify-end gap-2 border-t border-[#DFE1E6] px-6 bg-[#F4F5F7] shrink-0">
