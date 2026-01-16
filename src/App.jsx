@@ -559,7 +559,7 @@ const PAGE_TITLES = {
  * App
  */
 export default function App() {
-  const [activeKey, setActiveKey] = useState("dashboard");
+  const [activeKey, setActiveKey] = useState("update-history");
   const isMobile = useIsMobile(); // 1. useIsMobile 훅 사용
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openAccordion, setOpenAccordion] = useState(() => NAV.find(g => g.items?.some(it => it.key === activeKey))?.key || "");
