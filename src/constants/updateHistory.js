@@ -1,4 +1,5 @@
 export const BROWN_HISTORY = [
+  { id: 56, date: "2026-01-19 12:28", content: "[기능] QnA 댓글(피드백) 입력 기능 추가", isPolicyChange: true, links: [] },
   { id: 55, date: "2026-01-16 13:04", content: "[UI/UX] 주요 Drawer 하이브리드 레이아웃 적용: 데스크톱 너비 조절 기능 복구 및 모바일 반응형 최적화", isPolicyChange: false, links: [] },
   { id: 54, date: "2026-01-16 12:23", content: "[리팩토링] App.jsx 비대화 해결 완료: 모든 페이지 분리", isPolicyChange: false, links: [] },
   { id: 53, date: "2026-01-16 12:10", content: "[UI/UX] 오더 관리: 상세 Drawer 내 지역(지역1, 2) 및 일시(발행, 수행) 정보 추가", isPolicyChange: true, links: [{ label: "오더 관리", page: "orders" }] },
