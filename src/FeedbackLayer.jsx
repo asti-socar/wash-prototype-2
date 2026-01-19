@@ -194,7 +194,7 @@ export default function FeedbackLayer({ isModeActive, pageId, isHideComments }) 
               key={fb.id}
               className={cn(
                 "qna-pin group absolute -translate-x-1/2 -translate-y-1/2 pointer-events-auto",
-                isLocked ? "z-[10001]" : "z-[10000]"
+                isLocked ? "z-[50000]" : "z-[10000] group-hover:z-[50000]"
               )}
               style={{ left: `${fb.x_percent * 100}%`, top: `${fb.y_percent * 100}%` }}
             >
@@ -229,7 +229,7 @@ export default function FeedbackLayer({ isModeActive, pageId, isHideComments }) 
               <div
                 onClick={(e) => e.stopPropagation()}
                 className={cn(
-                "qna-popup absolute left-1/2 -translate-x-1/2 w-72 rounded-lg bg-slate-800 p-4 text-sm text-white shadow-2xl transition-opacity",
+                "qna-popup absolute left-1/2 -translate-x-1/2 w-72 rounded-lg bg-slate-800 p-4 text-sm text-white shadow-2xl transition-opacity border border-slate-600",
                 isLocked ? "opacity-100 pointer-events-auto" : "opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto",
                 isNearTop ? "top-full mt-3" : "bottom-full mb-3" // 상단이면 아래로, 아니면 위로
               )}>

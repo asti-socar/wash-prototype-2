@@ -81,9 +81,9 @@ function Dashboard() {
 
   const emergencyMetrics = [
     { label: "위생 장애 인입", value: "12건" },
-    { label: "긴급 오더 발행", value: "12건" },
-    { label: "적시 수행", value: "10건" },
-    { label: "평균 리드타임", value: "45분" },
+    { label: "긴급 세차 오더", value: "12건" },
+    { label: "적시 수행 (3일 이내)", value: "10건" },
+    { label: "평균 장애 처리 리드타임", value: "45시간" },
   ];
 
   return (
@@ -94,7 +94,6 @@ function Dashboard() {
         <Card>
           <CardHeader>
             <CardTitle>세차 수행 현황 (Today)</CardTitle>
-            <CardDescription>실시간 오더 라이프사이클</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
@@ -117,7 +116,6 @@ function Dashboard() {
         <Card>
           <CardHeader>
             <CardTitle>긴급 세차 처리 현황 (최근 1주일)</CardTitle>
-            <CardDescription>위생 이슈 대응 지표</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-4 gap-4 text-center">
@@ -134,7 +132,6 @@ function Dashboard() {
 
       {/* Charts Section */}
       <div>
-        <h3 className="mb-4 text-lg font-bold text-[#172B4D]">요약 그래프</h3>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           
           {/* Daily Orders */}
@@ -155,7 +152,7 @@ function Dashboard() {
 
           {/* Partner Performance */}
           <Card>
-            <CardHeader><CardTitle>파트너별 수행률</CardTitle></CardHeader>
+            <CardHeader><CardTitle>파트너별 수행률 (최근 1주일)</CardTitle></CardHeader>
             <CardContent className="h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart layout="vertical" data={partnerData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
@@ -171,7 +168,7 @@ function Dashboard() {
 
           {/* Hourly Concentration */}
           <Card>
-            <CardHeader><CardTitle>시간대별 세차 집중도</CardTitle></CardHeader>
+            <CardHeader><CardTitle>시간대별 세차 집중도 (최근 1주일, 세차 시작시간 기준)</CardTitle></CardHeader>
             <CardContent className="h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={hourlyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -193,7 +190,7 @@ function Dashboard() {
 
           {/* Issue Resolution Rate */}
           <Card>
-            <CardHeader><CardTitle>장애 처리율</CardTitle></CardHeader>
+            <CardHeader><CardTitle>장애 처리율 (최근 1주일)</CardTitle></CardHeader>
             <CardContent className="h-64 flex items-center justify-center">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
