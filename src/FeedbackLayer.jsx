@@ -128,7 +128,9 @@ export default function FeedbackLayer({ isModeActive, pageId, isHideComments }) 
   };
 
   // 6. 댓글 해결(완료) 처리
-  const handleResolve = async (id) => {
+  const handleResolve = async (e, id) => {
+    e.stopPropagation(); // 1. 이벤트 전파를 막아 부모의 onClick이 실행되지 않도록 합니다.
+    setLockedPinId(null); // 4. UI가 즉시 반응하도록 locked 상태를 해제합니다.
     await supabase.from('prototype_comments').update({ is_resolved: true }).eq('id', id);
   };
 
@@ -179,7 +181,10 @@ export default function FeedbackLayer({ isModeActive, pageId, isHideComments }) 
               )}>
                 <div className="font-bold text-blue-300 mb-1">{fb.author}</div>
                 <p className="mb-3 whitespace-pre-wrap break-words">{fb.message}</p>
-                <button onClick={() => handleResolve(fb.id)} className="w-full text-center py-1.5 px-3 text-xs font-semibold bg-blue-600 hover:bg-blue-700 rounded-md transition-colors">
+                <button 
+                  onClick={(e) => handleResolve(e, fb.id)} 
+                  className="w-full cursor-pointer text-center py-1.5 px-3 text-xs font-semibold bg-blue-600 hover:bg-blue-700 rounded-md transition-colors"
+                >
                   해결(완료)
                 </button>
                 <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-x-8 border-x-transparent border-t-8 border-t-slate-800"></div>
