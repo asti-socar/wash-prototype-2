@@ -656,7 +656,6 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
             </div>
 
             <div className="w-full lg:flex-1 lg:min-w-[320px] flex flex-wrap items-center gap-x-4 gap-y-2">
-              <label htmlFor="periodFrom" className="text-sm font-medium text-[#475569] shrink-0">발행일</label>
               <div className="flex items-center gap-2 w-full sm:w-auto flex-1">
                 <Input id="periodFrom" type="date" value={periodFrom} onChange={(e) => setPeriodFrom(e.target.value)} className="min-w-0"/>
                 <span className="text-gray-500">~</span>

@@ -202,7 +202,12 @@ export default function BillingPage() {
         </div>
         <Button 
           variant="outline" 
-          onClick={() => console.log("SAP 엑셀 추출 중...")}
+          onClick={() => {
+            // 1. 콘솔 로그 출력
+            console.log("SAP 엑셀 추출 중..."); 
+            // 2. 링크를 새 창으로 열기
+            window.open("https://docs.google.com/spreadsheets/d/16jMIaSzOMakrXEniyZShFOUdHeSTaslfGOG52ArzZ2w/edit?usp=sharing", "_blank");
+          }}
         >
           <FileSpreadsheet className="mr-2 h-4 w-4 text-green-600" />
           SAP 양식 엑셀 다운로드
