@@ -81,9 +81,9 @@ function Dashboard() {
   ];
 
   const emergencyMetrics = [
+    { label: "긴급 세차 오더", value: "15건" },
     { label: "위생 장애 인입", value: "12건" },
-    { label: "긴급 세차 오더", value: "12건" },
-    { label: "적시 수행 (3일 이내)", value: "10건" },
+    { label: "적시 수행 (72시간 이내)", value: "10건" },
     { label: "평균 장애 처리 리드타임", value: "45시간" },
   ];
 
