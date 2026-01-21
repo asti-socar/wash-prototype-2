@@ -217,12 +217,15 @@ function Drawer({ open, title, onClose, children, footer }) {
   useEffect(() => {
     if (open) {
       document.body.style.overflow = 'hidden';
+      document.body.classList.add('drawer-open');
     } else {
       document.body.style.overflow = 'auto';
+      document.body.classList.remove('drawer-open');
     }
     // Cleanup function
     return () => {
       document.body.style.overflow = 'auto';
+      document.body.classList.remove('drawer-open');
     };
   }, [open]);
 
@@ -575,6 +578,19 @@ export default function App() {
   const isMobile = useIsMobile(); // 1. useIsMobile 훅 사용
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openAccordion, setOpenAccordion] = useState(() => NAV.find(g => g.items?.some(it => it.key === activeKey))?.key || "");
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  useEffect(() => {
+    const observer = new MutationObserver((mutationsList) => {
+      for (const mutation of mutationsList) {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+          setIsDrawerOpen(document.body.classList.contains('drawer-open'));
+        }
+      }
+    });
+    observer.observe(document.body, { attributes: true });
+    return () => observer.disconnect();
+  }, []);
 
   // 버전 업데이트 감지 로직
   const [updateAvailable, setUpdateAvailable] = useState(false);
@@ -838,7 +854,11 @@ export default function App() {
       <FeedbackLayer isModeActive={isFeedbackMode} pageId={activeKey} isHideComments={isHideComments} />
       </div>
 
-      <div className="fixed bottom-5 right-5 z-[10000] flex items-center gap-2">
+      <div className={cn(
+        "fixed bottom-5 z-[10000] flex items-center gap-2 transition-all duration-300",
+        isDrawerOpen && !isMobile ? "right-auto left-5" : "right-5",
+        isDrawerOpen && isMobile ? "opacity-0 pointer-events-none" : "opacity-100"
+      )}>
         <button
           onClick={() => setIsHideComments(prev => !prev)}
           className={`flex h-12 w-auto items-center justify-center rounded-full px-5 font-bold text-white shadow-lg transition-colors duration-200

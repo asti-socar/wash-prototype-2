@@ -120,11 +120,14 @@ function Drawer({ open, title, onClose, children, footer }) {
   useEffect(() => {
     if (open) {
       document.body.style.overflow = 'hidden';
+      document.body.classList.add('drawer-open');
     } else {
       document.body.style.overflow = 'auto';
+      document.body.classList.remove('drawer-open');
     }
     return () => {
       document.body.style.overflow = 'auto';
+      document.body.classList.remove('drawer-open');
     };
   }, [open]);
 
