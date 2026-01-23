@@ -66,7 +66,6 @@ const checklistItems = {
         { id: 'exteriorDamage', label: '외관 파손', type: 'multiselect', options: ['이상없음', '정면', '운전석측면', '조수석측면', '후면', '유리', '기타'] },
     ],
     C: [
-        { id: 'emergencyAction', label: '긴급 조치 내용', type: 'textarea' },
         { id: 'airFreshener', label: '방향제', type: 'toggle', options: ['정상', '분실'] },
         { id: 'wiper', label: '와이퍼', type: 'toggle', options: ['정상', '이상'] },
         { id: 'seatFolding', label: '시트/폴딩', type: 'toggle', options: ['정상', '이상'] },
@@ -74,13 +73,6 @@ const checklistItems = {
         { id: 'exteriorDamage', label: '외관 파손', type: 'multiselect', options: ['이상없음', '정면', '운전석측면', '조수석측면', '후면', '유리', '기타'] },
     ],
     D: [
-        { id: 'airFreshener', label: '방향제', type: 'toggle', options: ['정상', '분실'] },
-        { id: 'wiper', label: '와이퍼', type: 'toggle', options: ['정상', '이상'] },
-        { id: 'seatFolding', label: '시트/폴딩', type: 'toggle', options: ['정상', '이상'] },
-        { id: 'warningLight', label: '차량 경고등', type: 'multiselect', options: ['공기압', '엔진경고', '라이트'] },
-        { id: 'exteriorDamage', label: '외관 파손', type: 'multiselect', options: ['이상없음', '정면', '운전석측면', '조수석측면', '후면', '유리', '기타'] },
-    ],
-    E: [
         { id: 'exteriorCheckArea', label: '외관 점검 부위선택', type: 'toggle', options: ['이상없음', '정면', '운전석 측면', '조수석 측면', '후면', '유리&기타'] },
         { id: 'exteriorDamageType', label: '(선택부위) 외관 이상 유형', type: 'dropdown', options: ['이상없음', '경미(운행 가능)', '파손(운행 불가)'] },
         { id: 'exteriorContamination', label: '(세차 전) 외관 오염도', type: 'toggle', options: ['상', '중', '하'] },
@@ -123,8 +115,8 @@ export const getPostWashPhotos = (order) => {
 };
 
 export const getChecklistItems = (inspectionType) => {
-    if (inspectionType === 'E') {
-        return checklistItems.E;
+    if (inspectionType === 'D') {
+        return checklistItems.D;
     }
     const common = checklistItems.common;
     const specific = checklistItems[inspectionType] || [];
@@ -143,16 +135,16 @@ export const mockOrderTypes = [
     { key: 'B_수시_내외부', inspectionType: "B", orderType: "수시", washType: "내외부", partnerType: "입고" },
     { key: 'B_수시_내부', inspectionType: "B", orderType: "수시", washType: "내부", partnerType: "입고" },
     { key: 'B_수시_외부', inspectionType: "B", orderType: "수시", washType: "외부", partnerType: "입고" },
-    { key: 'C_긴급_내외부', inspectionType: "C", orderType: "긴급", washType: "내외부", partnerType: "현장" },
-    { key: 'D_정규_내외부', inspectionType: "D", orderType: "정규", washType: "내외부", partnerType: "현장" },
-    { key: 'D_정규_내부', inspectionType: "D", orderType: "정규", washType: "내부", partnerType: "현장" },
-    { key: 'D_정규_외부', inspectionType: "D", orderType: "정규", washType: "외부", partnerType: "현장" },
-    { key: 'D_수시_내외부', inspectionType: "D", orderType: "수시", washType: "내외부", partnerType: "현장" },
-    { key: 'D_수시_내부', inspectionType: "D", orderType: "수시", washType: "내부", partnerType: "현장" },
-    { key: 'D_수시_외부', inspectionType: "D", orderType: "수시", washType: "외부", partnerType: "현장" },
-    { key: 'D_수시_특수', inspectionType: "D", orderType: "수시", washType: "특수", partnerType: "현장" },
-    { key: 'D_특별_내외부', inspectionType: "D", orderType: "특별", washType: "내외부", partnerType: "현장" },
-    { key: 'E_정규_라이트', inspectionType: "E", orderType: "정규", washType: "라이트", partnerType: "현장" },
+    { key: 'C_긴급_내외부', inspectionType: "B", orderType: "긴급", washType: "내외부", partnerType: "현장" },
+    { key: 'D_정규_내외부', inspectionType: "C", orderType: "정규", washType: "내외부", partnerType: "현장" },
+    { key: 'D_정규_내부', inspectionType: "C", orderType: "정규", washType: "내부", partnerType: "현장" },
+    { key: 'D_정규_외부', inspectionType: "C", orderType: "정규", washType: "외부", partnerType: "현장" },
+    { key: 'D_수시_내외부', inspectionType: "C", orderType: "수시", washType: "내외부", partnerType: "현장" },
+    { key: 'D_수시_내부', inspectionType: "C", orderType: "수시", washType: "내부", partnerType: "현장" },
+    { key: 'D_수시_외부', inspectionType: "C", orderType: "수시", washType: "외부", partnerType: "현장" },
+    { key: 'D_수시_특수', inspectionType: "C", orderType: "수시", washType: "특수", partnerType: "현장" },
+    { key: 'D_특별_내외부', inspectionType: "C", orderType: "특별", washType: "내외부", partnerType: "현장" },
+    { key: 'E_정규_라이트', inspectionType: "D", orderType: "정규", washType: "라이트", partnerType: "현장" },
 ].map(order => ({
     ...order,
     // Add vehicle info for photo logic
