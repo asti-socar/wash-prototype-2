@@ -425,7 +425,7 @@ export default function ChecklistPage() {
         </div>
 
         {/* Footer */}
-        <div className="absolute bottom-0 left-0 w-full shrink-0 border-t border-slate-200 bg-white/90 backdrop-blur-sm p-4 z-10">
+        <div className="absolute bottom-0 left-0 w-full shrink-0 border-t border-slate-200 bg-white/90 backdrop-blur-sm p-4">
           <div className="grid grid-cols-2 gap-3">
             <Button variant="secondary" size="lg" onClick={goToPrev} disabled={currentStep === 0}>
               <ChevronLeft className="w-5 h-5 mr-1" />

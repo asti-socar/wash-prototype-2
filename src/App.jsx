@@ -263,13 +263,13 @@ function Drawer({ open, title, onClose, children, footer }) {
     <>
       {/* Drawer Backdrop (DIM) */}
       <div
-        className="fixed inset-0 bg-black/30 z-40" // z-index 40: 메인 콘텐츠보다 높지만 Drawer 컴포넌트보다는 낮게
+        className="fixed inset-0 bg-black/30 z-[10001]" // z-index 40: 메인 콘텐츠보다 높지만 Drawer 컴포넌트보다는 낮게
         onClick={onClose}
         aria-hidden="true"
       />
       {/* Drawer Panel */}
       <div
-        className="fixed top-0 right-0 h-full bg-white shadow-2xl flex flex-col z-50" // z-index 50: Drawer 컴포넌트
+        className="fixed top-0 right-0 h-full bg-white shadow-2xl flex flex-col z-[10002]" // z-index 50: Drawer 컴포넌트
         style={{ width, maxWidth: "100vw" }}
       >
         <div
@@ -1174,7 +1174,7 @@ function PageHeaderWithSpec({ title, pageKey }) {
 
 function Header({ title, activeKey, onMenuClick }) {
   return (
-    <header className="sticky top-0 z-10 flex h-14 md:h-16 items-center gap-4 border-b border-[#E2E8F0] bg-white px-4 md:px-8 shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
+    <header className="sticky top-0 z-[100] flex h-14 md:h-16 items-center gap-4 border-b border-[#E2E8F0] bg-white px-4 md:px-8 shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
       <Button variant="ghost" size="sm" className="md:hidden -ml-2" onClick={onMenuClick}>
         <Menu className="h-5 w-5 text-[#6B778C]" />
       </Button>
