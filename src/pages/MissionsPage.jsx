@@ -267,6 +267,7 @@ const MissionsPage = ({ missionPolicies, setMissionPolicies, policyVehicles, set
   
   const [periodFrom, setPeriodFrom] = useState("");
   const [periodTo, setPeriodTo] = useState("");
+  const [fStatus, setFStatus] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: 'createdAt', direction: 'desc' });
   
   const [selectedPolicy, setSelectedPolicy] = useState(null);
@@ -290,9 +291,10 @@ const MissionsPage = ({ missionPolicies, setMissionPolicies, policyVehicles, set
   const filteredPolicies = useMemo(() => {
     return enrichedPolicies.filter(p => {
       const hitPeriod = (!periodFrom || p.createdAt >= periodFrom) && (!periodTo || p.createdAt <= periodTo);
-      return hitPeriod;
+      const hitStatus = !fStatus || p.status === fStatus;
+      return hitPeriod && hitStatus;
     });
-  }, [enrichedPolicies, periodFrom, periodTo]);
+  }, [enrichedPolicies, periodFrom, periodTo, fStatus]);
   
   const sortedData = useMemo(() => {
     if (!sortConfig.key) return filteredPolicies;
@@ -311,6 +313,12 @@ const MissionsPage = ({ missionPolicies, setMissionPolicies, policyVehicles, set
 
   const { currentData, currentPage, totalPages, setCurrentPage, totalItems } = usePagination(sortedData, 40);
 
+  const handleResetFilters = () => {
+    setPeriodFrom("");
+    setPeriodTo("");
+    setFStatus("");
+  };
+
   const handleRegisterPolicy = () => {
     if (!newPolicyForm.content) return alert("미션 내용은 필수입니다.");
     
@@ -322,7 +330,7 @@ const MissionsPage = ({ missionPolicies, setMissionPolicies, policyVehicles, set
     };
     
     setMissionPolicies([newPolicy, ...missionPolicies]);
-    setNewPolicyForm({ content: "", amount: 0, requiresPhoto: true });
+    setNewPolicyForm({ content: "", amount: 0, requiresPhoto: true, status: "활성" });
     setIsRegisterOpen(false);
     alert("새 미션 정책이 등록되었습니다.");
   };
@@ -366,6 +374,7 @@ const MissionsPage = ({ missionPolicies, setMissionPolicies, policyVehicles, set
   
   const policyColumns = [
     { key: "id", header: "ID" },
+    { key: "status", header: "상태", render: r => <Badge tone={r.status === '활성' ? 'ok' : 'default'}>{r.status}</Badge> },
     { key: "content", header: "미션 내용" },
     { key: "amount", header: "금액", render: r => `${r.amount.toLocaleString()}원` },
     { key: "targetVehicleCount", header: "대상 차량수", render: r => `${r.targetVehicleCount}대` },
@@ -415,7 +424,7 @@ const MissionsPage = ({ missionPolicies, setMissionPolicies, policyVehicles, set
       <Card>
         <CardHeader><CardTitle>검색 및 필터</CardTitle></CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-12">
+          <div className="grid grid-cols-1 gap-x-4 gap-y-5 md:grid-cols-12">
             <div className="md:col-span-2">
               <label htmlFor="periodFrom" className="block text-xs font-semibold text-[#6B778C] mb-1.5">등록일 시작</label>
               <Input id="periodFrom" type="date" value={periodFrom} onChange={(e) => setPeriodFrom(e.target.value)} />
@@ -424,6 +433,27 @@ const MissionsPage = ({ missionPolicies, setMissionPolicies, policyVehicles, set
               <label htmlFor="periodTo" className="block text-xs font-semibold text-[#6B778C] mb-1.5">등록일 종료</label>
               <Input id="periodTo" type="date" value={periodTo} onChange={(e) => setPeriodTo(e.target.value)} />
             </div>
+            <div className="md:col-span-2">
+              <label htmlFor="fStatus" className="block text-xs font-semibold text-[#6B778C] mb-1.5">상태</label>
+              <Select id="fStatus" value={fStatus} onChange={(e) => setFStatus(e.target.value)}>
+                <option value="">전체</option>
+                <option value="활성">활성</option>
+                <option value="비활성">비활성</option>
+              </Select>
+            </div>
+          </div>
+          <div className="md:col-span-12 flex flex-wrap items-center justify-between gap-2 pt-4">
+            <div className="flex flex-wrap gap-2">
+              {periodFrom ? <Chip onRemove={() => setPeriodFrom("")}>시작일: {periodFrom}</Chip> : null}
+              {periodTo ? <Chip onRemove={() => setPeriodTo("")}>종료일: {periodTo}</Chip> : null}
+              {fStatus ? <Chip onRemove={() => setFStatus("")}>상태: {fStatus}</Chip> : null}
+            </div>
+            <Button
+              variant="secondary"
+              onClick={handleResetFilters}
+            >
+              필터 초기화
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -444,6 +474,13 @@ const MissionsPage = ({ missionPolicies, setMissionPolicies, policyVehicles, set
               <label className="text-xs font-semibold text-[#6B778C]">미션 금액</label>
               <Input type="number" min="0" value={newPolicyForm.amount} onChange={e => setNewPolicyForm({...newPolicyForm, amount: e.target.value})} placeholder="0" />
             </div>
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-[#6B778C]">상태</label>
+              <Select value={newPolicyForm.status} onChange={e => setNewPolicyForm({...newPolicyForm, status: e.target.value})}>
+                <option value="활성">활성</option>
+                <option value="비활성">비활성</option>
+              </Select>
+            </div>
             <div className="flex items-center gap-2 pt-2">
               <input type="checkbox" id="reqPhoto" className="h-4 w-4 rounded border-gray-300 text-[#0052CC] focus:ring-[#0052CC]" checked={newPolicyForm.requiresPhoto} onChange={e => setNewPolicyForm({...newPolicyForm, requiresPhoto: e.target.checked})} />
               <label htmlFor="reqPhoto" className="text-sm text-[#172B4D]">수행 시 증빙 사진 필수</label>
@@ -463,14 +500,21 @@ const MissionsPage = ({ missionPolicies, setMissionPolicies, policyVehicles, set
             <Card>
               <CardHeader><CardTitle>정책 정보 수정</CardTitle></CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-1">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-1 md:col-span-2">
                     <label className="text-xs font-semibold text-[#6B778C]">미션 내용 *</label>
                     <Input value={selectedPolicy.content} onChange={e => setSelectedPolicy({...selectedPolicy, content: e.target.value})} />
                   </div>
                   <div className="space-y-1">
                     <label className="text-xs font-semibold text-[#6B778C]">미션 금액</label>
                     <Input type="number" min="0" value={selectedPolicy.amount} onChange={e => setSelectedPolicy({...selectedPolicy, amount: Number(e.target.value)})} />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-[#6B778C]">상태</label>
+                    <Select value={selectedPolicy.status} onChange={e => setSelectedPolicy({...selectedPolicy, status: e.target.value})}>
+                      <option value="활성">활성</option>
+                      <option value="비활성">비활성</option>
+                    </Select>
                   </div>
                 </div>
                  <div className="flex items-center gap-2 pt-2">
