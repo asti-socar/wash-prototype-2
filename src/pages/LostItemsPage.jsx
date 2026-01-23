@@ -117,12 +117,62 @@ const Badge = ({ text, status }) => {
   return <span style={{ backgroundColor: style.bg, color: style.text, padding: '0.25rem 0.75rem', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 500 }}>{text}</span>
 };
 
-const Drawer = ({ title, visible, onClose, children, footer }) => {
-  if (!visible) return null;
+const Drawer = ({ title, open, onClose, children, footer }) => {
+  const [width, setWidth] = useState(600);
+  const [isResizing, setIsResizing] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = 'hidden';
+      document.body.classList.add('drawer-open');
+    } else {
+      document.body.style.overflow = 'auto';
+      document.body.classList.remove('drawer-open');
+    }
+    return () => {
+      document.body.style.overflow = 'auto';
+      document.body.classList.remove('drawer-open');
+    };
+  }, [open]);
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!isResizing) return;
+      const newWidth = window.innerWidth - e.clientX;
+      const minWidth = window.innerWidth * 0.3;
+      const maxWidth = window.innerWidth * 0.9;
+      if (newWidth >= minWidth && newWidth <= maxWidth) {
+        setWidth(newWidth);
+      }
+    };
+    const handleMouseUp = () => {
+      setIsResizing(false);
+      document.body.style.cursor = "default";
+    };
+    if (isResizing) {
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
+      document.body.style.cursor = "col-resize";
+    }
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+      document.body.style.cursor = "default";
+    };
+  }, [isResizing]);
+
+  if (!open) return null;
   return (
     <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1000 }}>
       <div onClick={onClose} style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)' }}></div>
-      <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: 'clamp(300px, 60vw, 720px)', backgroundColor: '#f9fafb', display: 'flex', flexDirection: 'column' }}>
+       <div style={{ position: 'fixed', top: 0, right: 0, height: '100%', backgroundColor: '#f9fafb', display: 'flex', flexDirection: 'column', zIndex: 1000, boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', width, maxWidth: '100vw' }}>
+        <div
+          style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '6px', cursor: 'col-resize', zIndex: 1001 }}
+          onMouseDown={(e) => {
+            e.preventDefault();
+            setIsResizing(true);
+          }}
+        />
         <div style={{ padding: '1rem', borderBottom: `1px solid ${styleVariables.borderColor}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 600 }}>{title}</h2>
           <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem' }}><X size={20} /></button>
@@ -424,7 +474,7 @@ const LostItemsPage = ({ setActiveKey }) => {
 
       <Drawer
         title={isEditing ? "분실물 정보 수정" : "분실물 상세 정보"}
-        visible={drawerVisible}
+        open={drawerVisible}
         onClose={closeDrawer}
         footer={
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>

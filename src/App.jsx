@@ -859,7 +859,7 @@ function AdminApp() {
           </div>
         </div>
       )}
-      <FeedbackLayer isModeActive={isFeedbackMode} pageId={activeKey} isHideComments={isHideComments} />
+      <FeedbackLayer isModeActive={isFeedbackMode} pageId={activeKey} isHideComments={isDrawerOpen || isHideComments} />
       </div>
 
       <div className={cn(
