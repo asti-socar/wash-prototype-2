@@ -379,11 +379,15 @@ export default function ChecklistPage() {
   const CurrentIcon = steps[currentStep].icon;
 
   return (
-    <div className="w-full min-h-screen bg-slate-100 flex justify-center font-sans">
-      <div className="w-full max-w-md bg-slate-50 flex flex-col shadow-2xl">
+    <div className="w-full min-h-screen bg-slate-100 flex justify-center items-start py-5 font-sans">
+      <div className="w-full max-w-md bg-slate-50 flex flex-col shadow-2xl rounded-2xl h-[800px] relative overflow-hidden">
+        <style>{`
+          .no-scrollbar::-webkit-scrollbar { display: none; }
+          .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        `}</style>
         
         {/* Header */}
-        <div className="shrink-0 bg-white/80 backdrop-blur-lg border-b border-slate-200 p-4">
+        <div className="shrink-0 bg-white/80 backdrop-blur-lg border-b border-slate-200 p-4 z-10">
             {/* Order Switcher for testing */}
             <div className="flex items-center gap-2 mb-3">
               <label htmlFor="order-select" className="text-xs font-bold text-slate-500">TEST ORDER:</label>
@@ -416,12 +420,12 @@ export default function ChecklistPage() {
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto no-scrollbar pb-24">
           {StepComponent}
         </div>
 
         {/* Footer */}
-        <div className="shrink-0 border-t border-slate-200 bg-white p-4">
+        <div className="absolute bottom-0 left-0 w-full shrink-0 border-t border-slate-200 bg-white/90 backdrop-blur-sm p-4 z-10">
           <div className="grid grid-cols-2 gap-3">
             <Button variant="secondary" size="lg" onClick={goToPrev} disabled={currentStep === 0}>
               <ChevronLeft className="w-5 h-5 mr-1" />
