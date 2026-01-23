@@ -225,6 +225,8 @@ const Field = ({ label, children, isBlock = false }) => (
 
 
 // --- INITIAL MOCK DATA ---
+const newStatusOptions = ['배송지 미입력', '발송 대기', '발송 완료', '폐기 완료', '경찰서인계'];
+
 const initialMockLostItems = [
     // ... (data is the same)
       {
@@ -269,11 +271,15 @@ const initialMockLostItems = [
   },
 ];
 
-const statusOptions = ['접수', '보관중', '경찰서 인계', '배송 요청', '배송 완료'];
+const statusOptions = newStatusOptions;
 const itemClassificationOptions = ['일반', '귀중품'];
 
 const statusBadgeMap = {
-  '접수': 'processing', '보관중': 'warning', '경찰서 인계': 'error', '배송 요청': 'processing', '배송 완료': 'success',
+  '배송지 미입력': 'warning',
+  '발송 대기': 'processing', // 'info'에 해당하는 'processing' 사용 (청색 계열)
+  '발송 완료': 'success',
+  '폐기 완료': 'default',
+  '경찰서인계': 'default',
 };
 
 const valuableCategories = ['전자기기', '지갑'];
@@ -320,19 +326,15 @@ const LostItemsPage = ({ setActiveKey }) => {
   const handleCancel = () => setIsEditing(false);
 
   const handleSave = () => {
+    if (formData.status === '발송 완료' && !formData.trackingNumber) {
+        alert("발송 완료 처리를 위해 송장번호를 입력해주세요.");
+        return;
+    }
     const newItems = items.map(item => (item.id === formData.id ? formData : item));
     setItems(newItems);
     setSelectedItem(formData);
     alert("옥스트라 시스템과 정보가 동기화되었습니다");
     setIsEditing(false);
-  };
-
-  const handleDelete = () => {
-    if (window.confirm("정말로 이 항목을 삭제하시겠습니까?")) {
-        const newItems = items.filter(item => item.id !== selectedItem.id);
-        setItems(newItems);
-        closeDrawer();
-    }
   };
 
   const handleFormChange = (key, value) => setFormData(prev => ({ ...prev, [key]: value }));
@@ -380,6 +382,14 @@ const LostItemsPage = ({ setActiveKey }) => {
                 <Field label="접수 일시">{data.createdAt}</Field>
                 <Field label="분실물 구분"><Select value={isValuable(data.itemCategory) ? '귀중품' : '일반'} onChange={handleItemClassificationChange}>{itemClassificationOptions.map(opt => <Select.Option key={opt} value={opt}>{opt}</Select.Option>)}</Select></Field>
                 <Field label="처리상태"><Select value={data.status} onChange={(e) => handleFormChange('status', e.target.value)}>{statusOptions.map(opt => <Select.Option key={opt} value={opt}>{opt}</Select.Option>)}</Select></Field>
+                 <Field label="송장번호">
+                    <Input
+                        value={data.trackingNumber}
+                        onChange={(e) => handleFormChange('trackingNumber', e.target.value)}
+                        disabled={data.status !== '발송 완료'}
+                        placeholder={data.status === '발송 완료' ? '송장번호를 입력하세요' : ''}
+                    />
+                </Field>
                 <Field label="상세 정보" isBlock><Textarea rows={3} value={data.itemDetails} onChange={(e) => handleFormChange('itemDetails', e.target.value)} /></Field>
                 <Field label="사진" isBlock>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
@@ -399,6 +409,7 @@ const LostItemsPage = ({ setActiveKey }) => {
                 {renderFieldView("접수 일시", data.createdAt)}
                 {renderFieldView("분실물 구분", isValuable(data.itemCategory) ? '귀중품' : '일반')}
                 {renderFieldView("처리상태", <Badge status={statusBadgeMap[data.status]} text={data.status} />)}
+                {data.status === '발송 완료' && renderFieldView("송장번호", data.trackingNumber)}
                 {renderFieldView("상세 정보", data.itemDetails)}
                 {renderFieldView("사진", data.itemPhotos?.length > 0 ? data.itemPhotos.map((p, i) => <img key={i} src={p} style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: '0.25rem', marginRight: '0.5rem' }}/>) : '사진 없음')}
               </>
@@ -477,12 +488,7 @@ const LostItemsPage = ({ setActiveKey }) => {
         open={drawerVisible}
         onClose={closeDrawer}
         footer={
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <div>
-              {!isEditing && (
-                 <Button variant="danger" onClick={handleDelete}><Trash2 size={16} style={{marginRight: '0.25rem'}}/> 삭제</Button>
-              )}
-            </div>
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
             <div style={{display: 'flex'}}>
               {isEditing ? (
                 <>
