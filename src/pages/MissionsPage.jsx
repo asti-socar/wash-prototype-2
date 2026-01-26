@@ -11,259 +11,27 @@ import {
   ChevronsRight,
   X,
 } from "lucide-react";
+import {
+  cn,
+  toYmd,
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  Button,
+  Input,
+  Select,
+  Badge,
+  Chip,
+  Drawer,
+  usePagination,
+  DataTable,
+} from "../components/ui";
 
-// Helper components from the old file.
-// In a real app, these would be in separate files.
-function cn(...classes) {
-  return classes.filter(Boolean).join(" ");
-}
-
-function toYmd(d) {
-  if (!d) return "";
-  const dt = new Date(d);
-  const y = dt.getFullYear();
-  const m = String(dt.getMonth() + 1).padStart(2, "0");
-  const day = String(dt.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
-}
-
-function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
-  useEffect(() => {
-    const checkIsMobile = () => setIsMobile(window.innerWidth < 640);
-    window.addEventListener('resize', checkIsMobile);
-    return () => window.removeEventListener('resize', checkIsMobile);
-  }, []);
-  return isMobile;
-}
-
-function Card({ className, children }) {
-  return (
-    <div className={cn("rounded-xl bg-white border border-[#E2E8F0] shadow-[0_2px_4px_rgba(0,0,0,0.02)]", className)}>
-      {children}
-    </div>
-  );
-}
-function CardHeader({ className, children }) {
-  return <div className={cn("p-5 pb-3", className)}>{children}</div>;
-}
-function CardTitle({ className, children }) {
-  return <div className={cn("text-sm font-bold text-[#172B4D]", className)}>{children}</div>;
-}
-function CardDescription({ className, children }) {
-  return <div className={cn("mt-1 text-xs text-[#6B778C]", className)}>{children}</div>;
-}
-function CardContent({ className, children }) {
-  return <div className={cn("p-5 pt-2", className)}>{children}</div>;
-}
-function Button({ className, variant = "default", size = "md", ...props }) {
-  const base =
-    "inline-flex items-center justify-center rounded-lg font-semibold transition-all focus:outline-none focus:ring-2 focus:ring-[#0052CC] focus:ring-offset-1 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98]";
-  const variants = {
-    default: "bg-[#0052CC] text-white hover:bg-[#0047B3] shadow-sm",
-    secondary: "bg-white text-[#172B4D] border border-[#E2E8F0] hover:bg-[#F8FAFC] shadow-sm text-[#334155]",
-    ghost: "bg-transparent text-[#172B4D] hover:bg-[#F4F5F7]",
-    danger: "bg-rose-600 text-white hover:bg-rose-700",
-    outline: "bg-white border border-[#DFE1E6] text-[#172B4D] hover:bg-[#F4F5F7]",
-  };
-  const sizes = {
-    sm: "h-9 px-3 text-sm",
-    md: "h-10 px-3.5 text-sm",
-    lg: "h-11 px-4 text-sm",
-  };
-  return <button className={cn(base, variants[variant], sizes[size], className)} {...props} />;
-}
-function Input({ className, ...props }) {
-  return (
-    <input
-      className={cn(
-        "h-10 w-full rounded-lg border border-[#E2E8F0] bg-white px-3 text-sm text-[#172B4D] outline-none transition placeholder:text-[#94A3B8]",
-        "focus:border-[#0052CC] focus:ring-1 focus:ring-[#0052CC]",
-        className
-      )}
-      {...props}
-    />
-  );
-}
-function Select({ className, children, ...props }) {
-  return (
-    <select
-      className={cn(
-        "h-10 w-full rounded-lg border border-[#E2E8F0] bg-white px-3 text-sm text-[#172B4D] outline-none transition",
-        "focus:border-[#0052CC] focus:ring-1 focus:ring-[#0052CC]",
-        className
-      )}
-      {...props}
-    >
-      {children}
-    </select>
-  );
-}
-function Badge({ children, tone = "default" }) {
-  const tones = {
-    default: "bg-slate-100 text-slate-800",
-    danger: "bg-rose-100 text-rose-800",
-    warn: "bg-amber-100 text-amber-800",
-    ok: "bg-emerald-100 text-emerald-800",
-    info: "bg-blue-100 text-blue-800",
-  };
-  return (
-    <span className={cn("inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold", tones[tone])}>
-      {children}
-    </span>
-  );
-}
-
-function Chip({ children, onRemove }) {
-  return (
-    <span className="inline-flex items-center gap-1 rounded-lg bg-[#F4F5F7] px-2 py-1 text-xs font-medium text-[#172B4D] border border-[#DFE1E6]">
-      {children}
-      {onRemove ? (
-        <button className="rounded-full p-0.5 hover:bg-[#DFE1E6]" onClick={onRemove} aria-label="remove">
-          <X className="h-3.5 w-3.5" />
-        </button>
-      ) : null}
-    </span>
-  );
-}
-
-function Drawer({ open, title, onClose, children, footer }) {
-  const isMobile = useIsMobile();
-  const [width, setWidth] = useState(800);
-  const [isResizing, setIsResizing] = useState(false);
-
-  useEffect(() => {
-    if (open) {
-      document.body.style.overflow = 'hidden';
-      document.body.classList.add('drawer-open');
-    } else {
-      document.body.style.overflow = 'auto';
-      document.body.classList.remove('drawer-open');
-    }
-    return () => {
-      document.body.style.overflow = 'auto';
-      document.body.classList.remove('drawer-open');
-    };
-  }, [open]);
-
-  useEffect(() => {
-    if (isMobile) return;
-    const handleMouseMove = (e) => {
-      if (!isResizing) return;
-      const newWidth = window.innerWidth - e.clientX;
-      if (newWidth >= 500 && newWidth <= 1200) setWidth(newWidth);
-    };
-    const handleMouseUp = () => {
-      setIsResizing(false);
-      document.body.style.cursor = "default";
-    };
-    if (isResizing) {
-      document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("mouseup", handleMouseUp);
-      document.body.style.cursor = "col-resize";
-    }
-    return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-      document.body.style.cursor = "default";
-    };
-  }, [isResizing, isMobile]);
-
-  if (!open) return null;
-
-  return (
-    <div className="fixed inset-0 z-40">
-      <div className="absolute inset-0 bg-black/30" onClick={onClose} />
-      <div className="fixed top-0 right-0 z-50 h-full w-full bg-white shadow-2xl flex flex-col sm:w-auto" style={!isMobile ? { width } : {}}>
-        {!isMobile && (
-          <div className="absolute left-0 top-0 bottom-0 w-1.5 cursor-col-resize hover:bg-[#0052CC] transition-colors z-50" onMouseDown={(e) => { e.preventDefault(); setIsResizing(true); }} />
-        )}
-        <div className="flex h-16 items-center justify-between border-b border-[#DFE1E6] px-4 sm:px-6 shrink-0">
-          <div className="min-w-0 flex-1 pr-4">
-            <div className="truncate text-sm font-bold text-[#0052CC]">{title}</div>
-            <div className="truncate text-xs text-[#6B778C]">미션 정책 상세 및 차량 관리</div>
-          </div>
-          <button className="p-2 text-gray-500 rounded-full hover:bg-gray-100" onClick={onClose}><X className="h-6 w-6" /></button>
-        </div>
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6">{children}</div>
-        <div className="shrink-0 border-t border-[#DFE1E6] bg-gray-50 p-4 sm:px-6 sm:py-4">{footer}</div>
-      </div>
-    </div>
-  );
-}
-
-function usePagination(data, itemsPerPage = 40) {
-  const [currentPage, setCurrentPage] = useState(1);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [data]);
-
-  const totalItems = data.length;
-  const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
-
-  const currentData = useMemo(() => {
-    const start = (currentPage - 1) * itemsPerPage;
-    return data.slice(start, start + itemsPerPage);
-  }, [data, currentPage, itemsPerPage]);
-
-  return { currentPage, setCurrentPage, totalPages, currentData, totalItems };
-}
-
-function Pagination({ currentPage, totalPages, onPageChange }) {
-  if (totalPages <= 0) return null;
-  const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
-
-  return (
-    <div className="flex items-center justify-center gap-1 py-4">
-      <Button variant="ghost" size="sm" onClick={() => onPageChange(1)} disabled={currentPage === 1}><ChevronsLeft className="h-4 w-4" /></Button>
-      <Button variant="ghost" size="sm" onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1}><ChevronLeft className="h-4 w-4" /></Button>
-      {pages.map(p => (
-        <Button key={p} variant={p === currentPage ? "default" : "ghost"} size="sm" className={cn("w-8 h-8 p-0", p === currentPage ? "" : "font-normal text-[#6B778C]")} onClick={() => onPageChange(p)}>{p}</Button>
-      ))}
-      <Button variant="ghost" size="sm" onClick={() => onPageChange(currentPage + 1)} disabled={currentPage === totalPages}><ChevronRight className="h-4 w-4" /></Button>
-      <Button variant="ghost" size="sm" onClick={() => onPageChange(totalPages)} disabled={currentPage === totalPages}><ChevronsRight className="h-4 w-4" /></Button>
-    </div>
-  );
-}
-
-function DataTable({ columns, rows, onRowClick, rowKey, sortConfig, onSort }) {
-  return (
-    <div className="overflow-x-auto rounded-xl border border-[#E2E8F0]">
-      <table className="min-w-full bg-white text-left text-sm">
-        <thead className="bg-[#F8FAFC] border-b border-[#E2E8F0]">
-          <tr>
-            {columns.map((c) => (
-              <th key={c.key} className="whitespace-nowrap px-4 py-3.5 text-[13px] font-semibold text-[#475569] cursor-pointer hover:bg-slate-100" onClick={() => onSort && onSort(c.key)}>
-                <div className="flex items-center gap-1">
-                  {c.header}
-                  {sortConfig?.key === c.key && (<ArrowUpDown className={cn("h-3 w-3", sortConfig.direction === 'asc' ? "text-[#0052CC]" : "text-[#0052CC] rotate-180")} />)}
-                </div>
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-[#E2E8F0]">
-          {rows.length === 0 ? (
-            <tr><td colSpan={columns.length} className="px-4 py-10 text-center text-sm text-[#6B778C]">결과가 없습니다.</td></tr>
-          ) : (
-            rows.map((r) => (
-              <tr key={rowKey(r)} className={cn(onRowClick ? "cursor-pointer hover:bg-[#F1F5F9]" : "hover:bg-[#F8FAFC]")} onClick={() => onRowClick?.(r)}>
-                {columns.map((c) => (
-                  <td key={c.key} className="whitespace-nowrap px-4 py-3.5 text-sm text-[#1E293B]">{typeof c.render === "function" ? c.render(r) : r[c.key]}</td>
-                ))}
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
-    </div>
-  );
-}
 
 const MissionsPage = ({ missionPolicies, setMissionPolicies, policyVehicles, setPolicyVehicles, orders }) => {
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
-  const [newPolicyForm, setNewPolicyForm] = useState({ content: "", amount: 0, requiresPhoto: true });
+  const [newPolicyForm, setNewPolicyForm] = useState({ title: "", content: "", amount: 0, requiresPhoto: true, status: "활성" });
   
   const [periodFrom, setPeriodFrom] = useState("");
   const [periodTo, setPeriodTo] = useState("");
@@ -320,7 +88,7 @@ const MissionsPage = ({ missionPolicies, setMissionPolicies, policyVehicles, set
   };
 
   const handleRegisterPolicy = () => {
-    if (!newPolicyForm.content) return alert("미션 내용은 필수입니다.");
+    if (!newPolicyForm.title) return alert("미션 제목은 필수입니다.");
     
     const newPolicy = {
       id: `MP-${Date.now()}`,
@@ -330,7 +98,7 @@ const MissionsPage = ({ missionPolicies, setMissionPolicies, policyVehicles, set
     };
     
     setMissionPolicies([newPolicy, ...missionPolicies]);
-    setNewPolicyForm({ content: "", amount: 0, requiresPhoto: true, status: "활성" });
+    setNewPolicyForm({ title: "", content: "", amount: 0, requiresPhoto: true, status: "활성" });
     setIsRegisterOpen(false);
     alert("새 미션 정책이 등록되었습니다.");
   };
@@ -374,12 +142,12 @@ const MissionsPage = ({ missionPolicies, setMissionPolicies, policyVehicles, set
   
   const policyColumns = [
     { key: "id", header: "ID" },
-    { key: "status", header: "상태", render: r => <Badge tone={r.status === '활성' ? 'ok' : 'default'}>{r.status}</Badge> },
-    { key: "content", header: "미션 내용" },
+    { key: "title", header: "미션 제목", render: r => r.title || r.content },
     { key: "amount", header: "금액", render: r => `${r.amount.toLocaleString()}원` },
     { key: "targetVehicleCount", header: "대상 차량수", render: r => `${r.targetVehicleCount}대` },
     { key: "completedVehicleCount", header: "수행 완료수", render: r => `${r.completedVehicleCount}대` },
     { key: "progress", header: "진행률(%)", render: r => `${Math.round(r.progress * 100)}%` },
+    { key: "status", header: "상태", render: r => <Badge tone={r.status === '활성' ? 'ok' : 'default'}>{r.status}</Badge> },
     { key: "createdAt", header: "등록일시" },
   ];
   
@@ -495,11 +263,15 @@ const MissionsPage = ({ missionPolicies, setMissionPolicies, policyVehicles, set
       </div>
 
       {/* Register Policy Drawer */}
-      <Drawer open={isRegisterOpen} title="신규 미션 정책 등록" onClose={() => setIsRegisterOpen(false)} footer={<Button onClick={handleRegisterPolicy} className="w-full">등록하기</Button>}>
+      <Drawer open={isRegisterOpen} title="신규 미션 정책 등록" subtitle="신규 미션 정책의 상세 정보를 입력합니다." onClose={() => setIsRegisterOpen(false)} footer={<Button onClick={handleRegisterPolicy} className="w-full">등록하기</Button>}>
         <div className="space-y-4">
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-[#6B778C]">미션 내용 *</label>
-              <Input value={newPolicyForm.content} onChange={e => setNewPolicyForm({...newPolicyForm, content: e.target.value})} placeholder="예: 스티커 부착" />
+              <label className="text-xs font-semibold text-[#6B778C]">미션 제목 *</label>
+              <Input value={newPolicyForm.title} onChange={e => setNewPolicyForm({...newPolicyForm, title: e.target.value})} placeholder="예: 스티커 부착" maxLength={20} />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-[#6B778C]">미션 내용</label>
+              <textarea className="w-full rounded-lg border border-[#E2E8F0] p-2 text-sm min-h-[100px]" value={newPolicyForm.content} onChange={e => setNewPolicyForm({...newPolicyForm, content: e.target.value})} placeholder="미션에 대한 상세 내용을 입력하세요." maxLength={500}></textarea>
             </div>
             <div className="space-y-1">
               <label className="text-xs font-semibold text-[#6B778C]">미션 금액</label>
@@ -520,7 +292,7 @@ const MissionsPage = ({ missionPolicies, setMissionPolicies, policyVehicles, set
       </Drawer>
 
       {/* Policy Detail Drawer */}
-      <Drawer open={!!selectedPolicy} title={`정책 상세: ${selectedPolicy?.id}`} onClose={() => setSelectedPolicy(null)} footer={
+      <Drawer open={!!selectedPolicy} title="미션 정책 상세" subtitle="미션 정책 상세 및 차량 관리" onClose={() => setSelectedPolicy(null)} footer={
           <div className="flex w-full justify-between gap-2">
             <Button variant="danger" onClick={() => handleDeletePolicy(selectedPolicy.id)}><Trash2 className="mr-2 h-4 w-4" /> 정책 삭제</Button>
             <Button variant="secondary" onClick={() => setSelectedPolicy(null)} className="w-full sm:w-auto">닫기</Button>
@@ -531,21 +303,27 @@ const MissionsPage = ({ missionPolicies, setMissionPolicies, policyVehicles, set
             <Card>
               <CardHeader><CardTitle>정책 정보 수정</CardTitle></CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="space-y-1 md:col-span-2">
-                    <label className="text-xs font-semibold text-[#6B778C]">미션 내용 *</label>
-                    <Input value={selectedPolicy.content} onChange={e => setSelectedPolicy({...selectedPolicy, content: e.target.value})} />
+                <div className="space-y-4">
+                  <div className="space-y-1">
+                    <label className="text-xs font-semibold text-[#6B778C]">미션 제목 *</label>
+                    <Input value={selectedPolicy.title || ''} onChange={e => setSelectedPolicy({...selectedPolicy, title: e.target.value})} maxLength={20} />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs font-semibold text-[#6B778C]">미션 금액</label>
-                    <Input type="number" min="0" value={selectedPolicy.amount} onChange={e => setSelectedPolicy({...selectedPolicy, amount: Number(e.target.value)})} />
+                    <label className="text-xs font-semibold text-[#6B778C]">미션 내용</label>
+                    <textarea className="w-full rounded-lg border border-[#E2E8F0] p-2 text-sm min-h-[100px]" value={selectedPolicy.content || ''} onChange={e => setSelectedPolicy({...selectedPolicy, content: e.target.value})} maxLength={500}></textarea>
                   </div>
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-[#6B778C]">상태</label>
-                    <Select value={selectedPolicy.status} onChange={e => setSelectedPolicy({...selectedPolicy, status: e.target.value})}>
-                      <option value="활성">활성</option>
-                      <option value="비활성">비활성</option>
-                    </Select>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-[#6B778C]">미션 금액</label>
+                      <Input type="number" min="0" value={selectedPolicy.amount} onChange={e => setSelectedPolicy({...selectedPolicy, amount: Number(e.target.value)})} />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-xs font-semibold text-[#6B778C]">상태</label>
+                      <Select value={selectedPolicy.status} onChange={e => setSelectedPolicy({...selectedPolicy, status: e.target.value})}>
+                        <option value="활성">활성</option>
+                        <option value="비활성">비활성</option>
+                      </Select>
+                    </div>
                   </div>
                 </div>
                  <div className="flex items-center gap-2 pt-2">

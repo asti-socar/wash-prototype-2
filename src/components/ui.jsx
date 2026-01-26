@@ -159,7 +159,7 @@ export function Chip({ children, onRemove }) {
 /**
  * Drawer
  */
-export function Drawer({ open, title, onClose, children, footer }) {
+export function Drawer({ open, title, subtitle, onClose, children, footer }) {
   const [width, setWidth] = useState(600);
   const [isResizing, setIsResizing] = useState(false);
 
@@ -226,7 +226,7 @@ export function Drawer({ open, title, onClose, children, footer }) {
         <div className="flex h-16 items-center justify-between border-b border-[#DFE1E6] px-6 shrink-0">
           <div className="min-w-0">
             <div className="truncate text-sm font-bold text-[#0052CC]">{title}</div>
-            <div className="truncate text-xs text-[#6B778C]">우측 Drawer 상세</div>
+            <div className="truncate text-xs text-[#6B778C]">{subtitle || '우측 Drawer 상세'}</div>
           </div>
           <button
             className="p-2 text-gray-500 rounded-full hover:bg-gray-100 focus:outline-none transition-colors"
