@@ -1,4 +1,5 @@
 export const BROWN_HISTORY = [
+  { id: 65, date: "2026-01-23 17:09", content: "오더 관리 목업 데이터 외부 파일 분리 및 200개로 증량, 필터 기본값 1개월로 변경", isPolicyChange: true, links: [{ label: "오더 관리", page: "orders" }] },
   { id: 64, date: "2026-01-23 14:06", content: "[기능] 미션 관리 - 상태(활성/비활성) 추가", isPolicyChange: true, links: [{ label: "미션 관리", page: "missions" }] },
   { id: 63, date: "2026-01-23 13:26", content: "[정책] 미션 관리 기능 정책 변경", isPolicyChange: true, links: [{ label: "미션 관리", page: "missions" }] },
   { id: 62, date: "2026-01-23 11:15", content: "[정책] 오더별 수행 목업, 오더 유형별 수행(사진 촬영, 점검) 기능명세 작성", isPolicyChange: true, links: [{ label: "오더별 수행 목업", page: "checklist-mockup" }] },

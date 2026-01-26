@@ -83,7 +83,11 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
   const [q, setQ] = useState("");
   const [searchField, setSearchField] = useState("plate");
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
-  const [periodFrom, setPeriodFrom] = useState(toYmd(new Date(today.getTime() - 7 * 86400000)));
+  const [periodFrom, setPeriodFrom] = useState(() => {
+    const d = new Date();
+    d.setMonth(d.getMonth() - 1);
+    return toYmd(d);
+  });
   const [periodTo, setPeriodTo] = useState(toYmd(today));
   const [fRegion1, setFRegion1] = useState("");
   const [fRegion2, setFRegion2] = useState("");
@@ -442,7 +446,11 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
                 variant="secondary"
                 onClick={() => {
                   setQ("");
-                  setPeriodFrom(toYmd(new Date(today.getTime() - 7 * 86400000)));
+                  setPeriodFrom(() => {
+                    const d = new Date();
+                    d.setMonth(d.getMonth() - 1);
+                    return toYmd(d);
+                  });
                   setPeriodTo(toYmd(today));
                   setFRegion1(""); setFRegion2("");
                   setFOrderGroup(""); setFOrderType(""); setFWashType("");
@@ -459,11 +467,6 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
         </CardContent>
       </Card>
 
-      <div className="flex items-center justify-between mb-2">
-        <div className="text-sm text-[#6B778C]">전체 건수 <b className="text-[#172B4D]">{totalItems.toLocaleString()}</b>건</div>
-        <div className="text-xs text-[#6B778C]">현재 페이지 ({currentPage}/{totalPages})</div>
-      </div>
-
       <DataTable
         columns={columns}
         rows={currentData}
@@ -472,7 +475,39 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
         sortConfig={sortConfig}
         onSort={handleSort}
       />
-      <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+      <div className="flex items-center pt-2">
+        <div className="flex items-center gap-2 text-sm text-[#6B778C]">
+          <span>
+            {totalItems > 0
+              ? `${(currentPage - 1) * 40 + 1} - ${Math.min(
+                  currentPage * 40,
+                  totalItems
+                )} / ${totalItems.toLocaleString()}`
+              : "0 - 0 / 0"}
+          </span>
+          <div className="flex items-center">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setCurrentPage(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="p-1 h-auto"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setCurrentPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="p-1 h-auto"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+
+      </div>
 
       {/* 오더 상세 Drawer */}
       <Drawer

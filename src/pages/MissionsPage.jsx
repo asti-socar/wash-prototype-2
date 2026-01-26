@@ -460,8 +460,39 @@ const MissionsPage = ({ missionPolicies, setMissionPolicies, policyVehicles, set
       
       <Card>
         <DataTable columns={policyColumns} rows={currentData} rowKey={(r) => r.id} onRowClick={setSelectedPolicy} sortConfig={sortConfig} onSort={handleSort} />
-        <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
       </Card>
+      <div className="flex items-center pt-2">
+        <div className="flex items-center gap-2 text-sm text-[#6B778C]">
+          <span>
+            {totalItems > 0
+              ? `${(currentPage - 1) * 40 + 1} - ${Math.min(
+                  currentPage * 40,
+                  totalItems
+                )} / ${totalItems.toLocaleString()}`
+              : "0 - 0 / 0"}
+          </span>
+          <div className="flex items-center">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setCurrentPage(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="p-1 h-auto"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setCurrentPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="p-1 h-auto"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </div>
 
       {/* Register Policy Drawer */}
       <Drawer open={isRegisterOpen} title="신규 미션 정책 등록" onClose={() => setIsRegisterOpen(false)} footer={<Button onClick={handleRegisterPolicy} className="w-full">등록하기</Button>}>
