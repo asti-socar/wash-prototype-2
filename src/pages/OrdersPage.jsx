@@ -121,6 +121,127 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
     return `${order.createdAt} ${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
   };
 
+  /**
+   * 세차 유형에 따라 표시할 사진 목록을 반환하는 헬퍼 함수.
+   * @param {object} order - 현재 선택된 오더 객체.
+   * @returns {{pre: array, post: array}} - 세차 전/후 사진 목록.
+   */
+  const getPhotosByWashType = (order) => {
+    if (!order) return { pre: [], post: [] };
+    // D유형(라이트)은 세차 전 사진을 표시하지 않음.
+    const pre = order.inspectionType === 'D' ? [] : order.preWashPhotos || [];
+    const post = order.postWashPhotos || [];
+    return { pre, post };
+  };
+
+  /**
+   * 점검 유형(inspectionType)에 따라 표시할 점검 항목 목록과 레이블을 반환하는 헬퍼 함수.
+   * @param {string} type - 점검 유형 (A, B, C, D).
+   * @returns {Array<object>} - 점검 항목의 키, 레이블, 커스텀 렌더러 등이 포함된 객체 배열.
+   */
+  const getInspectionItemsByType = (type) => {
+    // 모든 유형에 대한 점검 항목 정의
+    const allItems = {
+      // 5.1 공통 점검 항목
+      mileage: { label: '적산거리 (km)' },
+      tireTread: { label: '타이어트레드', renderer: 'TireGrid' },
+      windowStatus: { label: '유리창' },
+      batteryVoltage: { label: '배터리전압' },
+      safetyTriangle: { label: '안전삼각대' },
+      fireExtinguisher: { label: '차량용 소화기' },
+      washerFluidTank: { label: '워셔액통' },
+      floorMat: { label: '발판매트' },
+      tirePuncture: { label: '타이어파스/펑크' },
+      engineStart: { label: '시동불가' },
+      hood: { label: '본넷' },
+      tireWear: { label: '타이어마모' },
+      
+      // 5.2 A유형
+      emergencyAction: { label: '긴급 조치 내용' },
+      seatRemoval: { label: '시트 탈거' },
+      partReplacementCost: { label: '부품교체 금액' },
+      airFreshener: { label: '방향제' },
+      wiper: { label: '와이퍼' },
+      seatFolding: { label: '시트/폴딩' },
+      warningLight: { label: '차량 경고등', renderer: 'MultiBadge' },
+      exteriorDamage: { label: '외관 파손', renderer: 'MultiBadge' },
+      
+      // 5.5 D유형
+      exteriorCheckPart: { label: '외관 점검 부위' },
+      exteriorIssueType: { label: '외관 이상 유형' },
+      preWashExteriorContamination: { label: '(세차 전) 외관 오염도' },
+      tireCondition: { label: '타이어 상태', renderer: 'TireGrid' },
+      preWashInteriorContamination: { label: '(세차 전) 내부 오염 위치', renderer: 'MultiBadge' },
+      batteryCondition: { label: '배터리 상태', renderer: 'Dropdown' },
+      wiperWasher: { label: '와이퍼/워셔액', renderer: 'Dropdown' },
+      followUpAction: { label: '후속 조치', renderer: 'Dropdown' },
+    };
+
+    // 각 점검 유형별로 표시할 항목 키 목록 정의
+    const typeKeys = {
+      A: ['mileage', 'tireTread', 'windowStatus', 'batteryVoltage', 'safetyTriangle', 'fireExtinguisher', 'washerFluidTank', 'floorMat', 'tirePuncture', 'engineStart', 'hood', 'tireWear', 'emergencyAction', 'seatRemoval', 'partReplacementCost', 'airFreshener', 'wiper', 'seatFolding', 'warningLight', 'exteriorDamage'],
+      B: ['mileage', 'tireTread', 'windowStatus', 'batteryVoltage', 'safetyTriangle', 'fireExtinguisher', 'washerFluidTank', 'floorMat', 'tirePuncture', 'engineStart', 'hood', 'tireWear', 'emergencyAction', 'airFreshener', 'wiper', 'seatFolding', 'warningLight', 'exteriorDamage'],
+      C: ['mileage', 'tireTread', 'windowStatus', 'batteryVoltage', 'safetyTriangle', 'fireExtinguisher', 'washerFluidTank', 'floorMat', 'tirePuncture', 'engineStart', 'hood', 'tireWear', 'airFreshener', 'wiper', 'seatFolding', 'warningLight', 'exteriorDamage'],
+      D: ['exteriorCheckPart', 'exteriorIssueType', 'preWashExteriorContamination', 'tireCondition', 'preWashInteriorContamination', 'batteryCondition', 'wiperWasher', 'followUpAction'],
+    };
+
+    const keys = typeKeys[type] || [];
+    // 키 목록을 기반으로 전체 항목 정의에서 해당 항목들을 찾아 반환
+    return keys.map(key => ({ key, ...allItems[key] }));
+  };
+
+  const renderInspectionValue = (item, value) => {
+    if (value === undefined || value === null) return <span className="text-gray-400">N/A</span>;
+  
+    switch (item.renderer) {
+      case 'TireGrid':
+        return (
+          <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
+            <div><span className="text-[#6B778C]">FL:</span> {value.frontLeft}</div>
+            <div><span className="text-[#6B778C]">FR:</span> {value.frontRight}</div>
+            <div><span className="text-[#6B778C]">RL:</span> {value.rearLeft}</div>
+            <div><span className="text-[#6B778C]">RR:</span> {value.rearRight}</div>
+          </div>
+        );
+      case 'MultiBadge':
+        return (
+          <div className="flex flex-wrap gap-1">
+            {(Array.isArray(value) ? value : [value]).map((v, i) => <Badge key={i}>{v}</Badge>)}
+          </div>
+        );
+      case 'Dropdown':
+        const tone = (value === '이상없음' || value === '완료') ? 'ok' : 'warn';
+        return <Badge tone={tone}>{value}</Badge>;
+      default:
+        return String(value);
+    }
+  };
+
+  const PhotoGrid = ({ title, photos }) => {
+    if (!photos || photos.length === 0) return null;
+    return (
+      <Card>
+        <CardHeader><CardTitle>{title}</CardTitle></CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+            {photos.map((photo, i) => (
+              <button key={i} className="group relative aspect-square overflow-hidden rounded-lg bg-[#F4F5F7] border border-[#DFE1E6]" onClick={() => setPreviewImage(photo.url)}>
+                <img src={photo.url} alt={photo.name} className="h-full w-full object-cover"/>
+                <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
+                  <Maximize2 className="h-5 w-5 text-white" />
+                </div>
+                 <div className="absolute bottom-0 left-0 right-0 bg-black/50 p-1 text-center">
+                  <p className="text-white text-[10px] truncate">{photo.name}</p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
+
   useEffect(() => {
     if (newOrderForm.plate.trim()) {
       const vehicle = MOCK_VEHICLES.find(v => v.plate === newOrderForm.plate.trim());
@@ -550,7 +671,7 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
             <Tabs value={drawerTab}>
             <TabsList>
               <TabsTrigger value="info" currentValue={drawerTab} onClick={setDrawerTab}>상세정보</TabsTrigger>
-              <TabsTrigger value="history" currentValue={drawerTab} onClick={setDrawerTab}>사진 및 이력</TabsTrigger>
+              <TabsTrigger value="history" currentValue={drawerTab} onClick={setDrawerTab}>사진 및 점검</TabsTrigger>
               <TabsTrigger value="mission" currentValue={drawerTab} onClick={setDrawerTab}>미션 및 분실물</TabsTrigger>
             </TabsList>
 
@@ -567,6 +688,7 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
                     <Badge tone={selected.orderGroup === "긴급" ? "danger" : "default"}>
                       {selected.orderGroup}
                     </Badge>
+                     <Badge tone="info">{selected.inspectionType}유형</Badge>
                   </div>
                   
                   <div className="col-span-2 border-t border-[#DFE1E6] my-1"></div>
@@ -647,29 +769,16 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
             </TabsContent>
 
             <TabsContent value="history" currentValue={drawerTab} className="space-y-4 pt-4">
-              {/* 2. 수행 및 예약 이력 (Timeline) */}
               <Card>
                 <CardHeader><CardTitle>진행 이력</CardTitle></CardHeader>
                 <CardContent>
                   <div className="relative space-y-4 pl-2 before:absolute before:left-[19px] before:top-2 before:h-[calc(100%-16px)] before:w-0.5 before:bg-[#DFE1E6]">
                     {(selected.partnerType === "입고" 
-                      ? [
-                          { time: "2026-01-12 10:00", label: "미배정", active: true },
-                          { time: "2026-01-12 10:05", label: "파트너 배정", active: true },
-                          { time: "2026-01-12 10:10", label: "예약", active: true },
-                          { time: "2026-01-12 10:30", label: "입고 중", active: true },
-                          { time: "2026-01-12 11:00", label: "수행 중", active: selected.status === "완료" },
-                          { time: "2026-01-12 11:45", label: "출고 중", active: selected.status === "완료" },
-                          { time: "2026-01-12 12:00", label: "완료", active: selected.status === "완료" },
-                        ]
-                      : [
-                          { time: "2026-01-12 10:00", label: "미배정", active: true },
-                          { time: "2026-01-12 10:10", label: "예약", active: true },
-                          { time: "2026-01-12 11:00", label: "수행 중", active: selected.status === "완료" },
-                          { time: "2026-01-12 11:45", label: "완료", active: selected.status === "완료" },
-                        ]).map((item, idx) => (
+                      ? [{ time: "2026-01-12 10:00", label: "미배정" },{ time: "2026-01-12 10:05", label: "파트너 배정" },{ time: "2026-01-12 10:10", label: "예약" },{ time: "2026-01-12 10:30", label: "입고 중" },{ time: "2026-01-12 11:00", label: "수행 중" },{ time: "2026-01-12 11:45", label: "세차 완료" },{ time: "2026-01-12 11:50", label: "출고 중" },{ time: "2026-01-12 12:00", label: "완료" }]
+                      : [{ time: "2026-01-12 10:00", label: "미배정" },{ time: "2026-01-12 10:10", label: "예약" },{ time: "2026-01-12 11:00", label: "수행 중" },{ time: "2026-01-12 11:45", label: "완료" }]
+                    ).map((item, idx) => (
                       <div key={idx} className="relative flex items-start gap-3">
-                        <div className={cn("z-10 flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full ring-4 ring-white", item.active ? "bg-[#0052CC]" : "bg-[#DFE1E6]")} />
+                        <div className={cn("z-10 flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full ring-4 ring-white", selected.status === item.label ? "bg-[#0052CC]" : "bg-[#DFE1E6]")} />
                         <div className="flex flex-col">
                           <span className="text-xs font-medium text-[#172B4D]">{item.label}</span>
                           <span className="text-[10px] text-[#6B778C]">{item.time}</span>
@@ -680,50 +789,44 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
                 </CardContent>
               </Card>
 
-              {/* 3. 수행 전후 사진 */}
+              <PhotoGrid title="세차 전 사진" photos={selected.preWashPhotos} />
+              <PhotoGrid title="세차 후 사진" photos={selected.postWashPhotos} />
+              
               <Card>
-                <CardHeader><CardTitle>수행 사진</CardTitle></CardHeader>
-                <CardContent className="space-y-4">
-                  {["수행 전", "수행 후"].map((label) => (
-                    <div key={label}>
-                      <div className="mb-2 text-xs font-semibold text-[#6B778C]">{label}</div>
-                      <div className="grid grid-cols-3 gap-2">
-                        {[1, 2].map((i) => (
-                          <button key={i} className="group relative aspect-square overflow-hidden rounded-lg bg-[#F4F5F7] border border-[#DFE1E6]" onClick={() => setPreviewImage(`https://via.placeholder.com/600?text=${label}+${i}`)}>
-                            <div className="flex h-full w-full items-center justify-center text-[#B3BAC5]">
-                              <ImageIcon className="h-6 w-6" />
+                <CardHeader><CardTitle>점검 리스트</CardTitle></CardHeader>
+                <CardContent className="divide-y divide-[#E2E8F0] -mt-2">
+                  {getInspectionItemsByType(selected.inspectionType).map((item) => {
+                     const result = selected.inspectionResults[item.key];
+                     if (!result) return null;
+
+                     return (
+                        <div key={item.key} className="grid grid-cols-3 gap-4 py-3 text-sm">
+                          <div className="font-semibold text-[#6B778C] col-span-1">{item.label}</div>
+                          <div className="col-span-2 space-y-2">
+                            <div className="flex items-center gap-2 text-[#172B4D]">
+                              {renderInspectionValue(item, result.value)}
+                              {result.status === '이상' && <Badge tone="danger">이상</Badge>}
                             </div>
-                            <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
-                              <Maximize2 className="h-5 w-5 text-white" />
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
+                            {result.photoUrls && result.photoUrls.length > 0 && (
+                              <div className="flex flex-wrap gap-2">
+                                {result.photoUrls.map((photo, i) => (
+                                  <button key={i} className="group relative h-16 w-16 overflow-hidden rounded-lg bg-[#F4F5F7] border border-[#DFE1E6]" onClick={() => setPreviewImage(photo.url)}>
+                                     <img src={photo.url} alt={photo.name} className="h-full w-full object-cover"/>
+                                     <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+                                        <Maximize2 className="h-4 w-4 text-white" />
+                                     </div>
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                     )
+                  })}
                 </CardContent>
               </Card>
 
-              {/* 4. 점검 내역 */}
-              <Card>
-                <CardHeader><CardTitle>점검 리스트</CardTitle></CardHeader>
-                <CardContent className="space-y-2">
-                  {[
-                    { label: "외관 세정 상태", status: "pass" },
-                    { label: "휠/타이어 세정", status: "pass" },
-                    { label: "실내 매트 청결", status: "pass" },
-                    { label: "쓰레기 수거", status: "pass" },
-                  ].map((check, idx) => (
-                    <div key={idx} className="flex items-center justify-between rounded-lg border border-[#DFE1E6] p-3">
-                      <span className="text-sm text-[#172B4D]">{check.label}</span>
-                      <div className="flex items-center gap-1 text-[#0052CC]">
-                        <Check className="h-4 w-4" />
-                        <span className="text-xs font-bold">Pass</span>
-                      </div>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
+              <PhotoGrid title="기타 사진" photos={selected.additionalPhotos} />
             </TabsContent>
 
             <TabsContent value="mission" currentValue={drawerTab} className="space-y-4 pt-4">
