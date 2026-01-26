@@ -497,7 +497,7 @@ function SidebarContent({ activeKey, onSelect, openAccordion, setOpenAccordion }
           <span className="text-sm font-bold">W</span>
         </div>
         <div className="min-w-0">
-          <div className="truncate text-sm font-bold text-white">세차 어드민</div>
+          <div className="truncate text-sm font-bold text-white">세차 인터널 어드민</div>
           <div className="truncate text-xs text-[#B3BAC5]">Ops Console Prototype</div>
         </div>
       </div>
