@@ -110,7 +110,7 @@ function CarsPage() {
     { key: "partner", header: "파트너명" },
     {
       key: "activeOrderId",
-      header: "진행중 오더",
+      header: "발행된 오더",
       render: (r) => r.activeOrderId ? (
         <div className="flex items-center gap-1">
           <Button variant="ghost" size="sm" className="h-6 px-1 text-xs text-[#0052CC]" onClick={(e) => { e.stopPropagation(); window.open(`/?page=orders&orderId=${r.activeOrderId}`, "_blank"); }}>{r.activeOrderId}</Button>
@@ -277,7 +277,7 @@ function CarsPage() {
                 <Field label="지역1" value={selected.region1} />
                 <Field label="지역2" value={selected.region2} />
                 <Field label="파트너명" value={selected.partner} />
-                <Field label="진행중 오더" value={selected.activeOrderId ? `${selected.activeOrderId} (${selected.activeOrderStatus})` : "없음"} />
+                <Field label="발행된 오더" value={selected.activeOrderId ? `${selected.activeOrderId} (${selected.activeOrderStatus})` : "없음"} />
                 <Field label="마지막 세차일" value={selected.lastWash} />
                 <Field label="세차 경과일" value={`${getElapsedDays(selected.lastWash)}일`} />
               </CardContent>
