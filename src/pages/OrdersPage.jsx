@@ -63,18 +63,18 @@ const ORDER_TYPES = [
 const WASH_TYPES = ["내외부", "내부", "외부", "특수", "협의", "라이트"];
 
 const MOCK_VEHICLES = [
-  { plate: "12가3456", zoneName: "강남역 1번존", zoneId: "Z-1001", region1: "서울", region2: "강남", partner: "A파트너명", activeOrderId: "O-90001", activeOrderStatus: "예약", lastWash: "2026-01-10", model: "아반떼 AD", isRechargeGuaranteed: false },
-  { plate: "34나7890", zoneName: "잠실역 2번존", zoneId: "Z-1002", region1: "서울", region2: "송파", partner: "B파트너명", activeOrderId: null, activeOrderStatus: null, lastWash: "2026-01-08", model: "K5", isRechargeGuaranteed: false },
-  { plate: "56다1122", zoneName: "홍대입구 3번존", zoneId: "Z-1003", region1: "서울", region2: "마포", partner: "A파트너명", activeOrderId: "O-90003", activeOrderStatus: "미배정", lastWash: "2026-01-05", model: "쏘나타", isRechargeGuaranteed: false },
-  { plate: "78라3344", zoneName: "판교 1번존", zoneId: "Z-2001", region1: "경기", region2: "성남", partner: "C파트너명", activeOrderId: "O-90004", activeOrderStatus: "입고 중", lastWash: "2026-01-09", model: "아이오닉5", isRechargeGuaranteed: true },
-  { plate: "90마5566", zoneName: "수원역 2번존", zoneId: "Z-2002", region1: "경기", region2: "수원", partner: "B파트너명", activeOrderId: null, activeOrderStatus: null, lastWash: "2026-01-07", model: "스포티지", isRechargeGuaranteed: false },
-  { plate: "11바7788", zoneName: "부산역 1번존", zoneId: "Z-3001", region1: "부산", region2: "동구", partner: "D파트너명", activeOrderId: "O-90006", activeOrderStatus: "미배정", lastWash: "2026-01-03", model: "그랜저", isRechargeGuaranteed: false },
-  { plate: "22사9900", zoneName: "해운대 2번존", zoneId: "Z-3002", region1: "부산", region2: "해운대", partner: "D파트너명", activeOrderId: "O-90007", activeOrderStatus: "예약", lastWash: "2026-01-11", model: "레이", isRechargeGuaranteed: false },
-  { plate: "33아1212", zoneName: "대전역 1번존", zoneId: "Z-4001", region1: "대전", region2: "동구", partner: "C파트너명", activeOrderId: null, activeOrderStatus: null, lastWash: "2026-01-06", model: "카니발", isRechargeGuaranteed: false },
-  { plate: "44자3434", zoneName: "청주 2번존", zoneId: "Z-5002", region1: "충북", region2: "청주", partner: "B파트너명", activeOrderId: "O-90009", activeOrderStatus: "미배정", lastWash: "2026-01-02", model: "모닝", isRechargeGuaranteed: false },
-  { plate: "55차5656", zoneName: "광주 1번존", zoneId: "Z-6001", region1: "광주", region2: "서구", partner: "A파트너명", activeOrderId: "O-90010", activeOrderStatus: "예약", lastWash: "2026-01-09", model: "EV6", isRechargeGuaranteed: false },
-  { plate: "66카7878", zoneName: "인천공항 1번존", zoneId: "Z-7001", region1: "인천", region2: "중구", partner: "C파트너명", activeOrderId: null, activeOrderStatus: null, lastWash: "2026-01-08", model: "티볼리", isRechargeGuaranteed: false },
-  { plate: "77타9090", zoneName: "제주공항 1번존", zoneId: "Z-8001", region1: "제주", region2: "제주시", partner: "D파트너명", activeOrderId: "O-90012", activeOrderStatus: "미배정", lastWash: "2026-01-01", model: "셀토스", isRechargeGuaranteed: false },
+  { plate: "12가3456", zoneName: "강남역 1번존", zoneId: "Z-1001", region1: "서울", region2: "강남", partner: "A파트너", activeOrderId: "O-90001", activeOrderStatus: "예약", lastWash: "2026-01-10", model: "아반떼 AD", isRechargeGuaranteed: false },
+  { plate: "34나7890", zoneName: "잠실역 2번존", zoneId: "Z-1002", region1: "서울", region2: "송파", partner: "B파트너", activeOrderId: null, activeOrderStatus: null, lastWash: "2026-01-08", model: "K5", isRechargeGuaranteed: false },
+  { plate: "56다1122", zoneName: "홍대입구 3번존", zoneId: "Z-1003", region1: "서울", region2: "마포", partner: "A파트너", activeOrderId: "O-90003", activeOrderStatus: "미배정", lastWash: "2026-01-05", model: "쏘나타", isRechargeGuaranteed: false },
+  { plate: "78라3344", zoneName: "판교 1번존", zoneId: "Z-2001", region1: "경기", region2: "성남", partner: "C파트너", activeOrderId: "O-90004", activeOrderStatus: "입고 중", lastWash: "2026-01-09", model: "아이오닉5", isRechargeGuaranteed: true },
+  { plate: "90마5566", zoneName: "수원역 2번존", zoneId: "Z-2002", region1: "경기", region2: "수원", partner: "B파트너", activeOrderId: null, activeOrderStatus: null, lastWash: "2026-01-07", model: "스포티지", isRechargeGuaranteed: false },
+  { plate: "11바7788", zoneName: "부산역 1번존", zoneId: "Z-3001", region1: "부산", region2: "동구", partner: "D파트너", activeOrderId: "O-90006", activeOrderStatus: "미배정", lastWash: "2026-01-03", model: "그랜저", isRechargeGuaranteed: false },
+  { plate: "22사9900", zoneName: "해운대 2번존", zoneId: "Z-3002", region1: "부산", region2: "해운대", partner: "D파트너", activeOrderId: "O-90007", activeOrderStatus: "예약", lastWash: "2026-01-11", model: "레이", isRechargeGuaranteed: false },
+  { plate: "33아1212", zoneName: "대전역 1번존", zoneId: "Z-4001", region1: "대전", region2: "동구", partner: "C파트너", activeOrderId: null, activeOrderStatus: null, lastWash: "2026-01-06", model: "카니발", isRechargeGuaranteed: false },
+  { plate: "44자3434", zoneName: "청주 2번존", zoneId: "Z-5002", region1: "충북", region2: "청주", partner: "B파트너", activeOrderId: "O-90009", activeOrderStatus: "미배정", lastWash: "2026-01-02", model: "모닝", isRechargeGuaranteed: false },
+  { plate: "55차5656", zoneName: "광주 1번존", zoneId: "Z-6001", region1: "광주", region2: "서구", partner: "A파트너", activeOrderId: "O-90010", activeOrderStatus: "예약", lastWash: "2026-01-09", model: "EV6", isRechargeGuaranteed: false },
+  { plate: "66카7878", zoneName: "인천공항 1번존", zoneId: "Z-7001", region1: "인천", region2: "중구", partner: "C파트너", activeOrderId: null, activeOrderStatus: null, lastWash: "2026-01-08", model: "티볼리", isRechargeGuaranteed: false },
+  { plate: "77타9090", zoneName: "제주공항 1번존", zoneId: "Z-8001", region1: "제주", region2: "제주시", partner: "D파트너", activeOrderId: "O-90012", activeOrderStatus: "미배정", lastWash: "2026-01-01", model: "셀토스", isRechargeGuaranteed: false },
 ];
 
 function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, setOrders, missions, setMissions }) {
@@ -122,7 +122,7 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
   };
 
   /**
-   * 세차유형에 따라 표시할 사진 목록을 반환하는 헬퍼 함수.
+   * 세차 유형에 따라 표시할 사진 목록을 반환하는 헬퍼 함수.
    * @param {object} order - 현재 선택된 오더 객체.
    * @returns {{pre: array, post: array}} - 세차 전/후 사진 목록.
    */
@@ -274,7 +274,7 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
   // 오더 발행 핸들러
   const handleCreateOrder = () => {
     if (!foundVehicle) {
-      alert("등록되지 않은 차량번호입니다. 차량 관리에서 먼저 확인해주세요.");
+      alert("등록되지 않은 차량 번호입니다. 차량 관리에서 먼저 확인해주세요.");
       return;
     }
 
@@ -316,7 +316,7 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
     alert(`오더가 발행되었습니다. (포함된 미션: ${pendingMissions.length}건)`);
   };
 
-  // 파트너유형에 따른 진행상태 옵션 동적화
+  // 파트너 유형에 따른 진행 상태 옵션 동적화
   const currentStatuses = useMemo(() => {
     if (fPartnerType === "현장") {
       return ["미배정", "예약", "수행 중", "완료", "취소"];
@@ -377,30 +377,29 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
 
   const columns = [
     { key: "orderId", header: "오더 ID" },
-    { key: "orderGroup", header: "오더구분" },
-    { key: "orderType", header: "발행유형" },
+    { key: "orderGroup", header: "오더 구분" },
+    { key: "orderType", header: "발행 유형" },
     {
       key: "washType",
-      header: "세차유형",
+      header: "세차 유형",
       render: (r) => <span className="text-[#172B4D]">{r.washType}</span>,
     },
     { key: "carId", header: "차량 ID" },
     { key: "model", header: "차종" },
-    { key: "plate", header: "차량번호" },
+    { key: "plate", header: "차량 번호" },
     { key: "region1", header: "지역1" },
     { key: "region2", header: "지역2" },
-    { key: "zone", header: "존이름" },
-    { key: "partner", header: "파트너명" },
-    { key: "partnerType", header: "파트너유형" },
+    { key: "zone", header: "존 이름" },
+    { key: "partner", header: "파트너 명" },
+    { key: "partnerType", header: "파트너 유형" },
     {
       key: "status",
-      header: "진행상태",
+      header: "진행 상태",
       render: (r) => <Badge tone={getStatusBadgeTone(r.status)}>{r.status}</Badge>,
     },
-    { key: "worker", header: "수행원" },
     { 
       key: "createdAt", 
-      header: "발행일시",
+      header: "발행 일시",
       render: (r) => {
         if (!r.createdAt) return "-";
         if (r.createdAt.length > 10) return r.createdAt; // Already has time
@@ -410,7 +409,6 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
         return `${r.createdAt} ${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
       }
     },
-    { key: "completedAt", header: "수행일시", render: (r) => (['수행 중', '세차 완료', '출고 중', '완료'].includes(r.status) && r.completedAt) ? r.completedAt : "-" },
   ];
 
   const chips = (
@@ -424,11 +422,11 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
       {periodFrom || periodTo ? <Chip onRemove={() => { setPeriodFrom(""); setPeriodTo(""); }}>기간: {periodFrom || "-"} ~ {periodTo || "-"}</Chip> : null}
       {fRegion1 ? <Chip onRemove={() => { setFRegion1(""); setFRegion2(""); }}>지역1: {fRegion1}</Chip> : null}
       {fRegion2 ? <Chip onRemove={() => setFRegion2("")}>지역2: {fRegion2}</Chip> : null}
-      {fOrderGroup ? <Chip onRemove={() => setFOrderGroup("")}>오더구분: {fOrderGroup}</Chip> : null}
-      {fOrderType ? <Chip onRemove={() => setFOrderType("")}>발행유형: {fOrderType}</Chip> : null}
-      {fWashType ? <Chip onRemove={() => setFWashType("")}>세차유형: {fWashType}</Chip> : null}
-      {fPartner ? <Chip onRemove={() => setFPartner("")}>파트너명: {fPartner}</Chip> : null}
-      {fPartnerType ? <Chip onRemove={() => setFPartnerType("")}>파트너유형: {fPartnerType}</Chip> : null}
+      {fOrderGroup ? <Chip onRemove={() => setFOrderGroup("")}>오더 구분: {fOrderGroup}</Chip> : null}
+      {fOrderType ? <Chip onRemove={() => setFOrderType("")}>발행 유형: {fOrderType}</Chip> : null}
+      {fWashType ? <Chip onRemove={() => setFWashType("")}>세차 유형: {fWashType}</Chip> : null}
+      {fPartner ? <Chip onRemove={() => setFPartner("")}>파트너 명: {fPartner}</Chip> : null}
+      {fPartnerType ? <Chip onRemove={() => setFPartnerType("")}>파트너 유형: {fPartnerType}</Chip> : null}
       {fStatus ? <Chip onRemove={() => { setFStatus(""); onClearQuickStatus(); }}>상태: {fStatus}</Chip> : null}
     </div>
   );
@@ -460,10 +458,9 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
             <div className="md:col-span-2">
               <label htmlFor="searchField" className="block text-xs font-semibold text-[#6B778C] mb-1.5">검색항목</label>
               <Select id="searchField" value={searchField} onChange={e => setSearchField(e.target.value)}>
-                <option value="plate">차량번호</option>
+                <option value="plate">차량 번호</option>
                 <option value="orderId">오더 ID</option>
-                <option value="zone">존이름</option>
-                <option value="worker">수행원</option>
+                <option value="zone">존 이름</option>
               </Select>
             </div>
             <div className="md:col-span-2">
@@ -475,7 +472,7 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
                   value={q} 
                   onChange={(e) => setQ(e.target.value)} 
                   placeholder={`${
-                    searchField === 'plate' ? '차량번호' : searchField === 'orderId' ? '오더 ID' : searchField === 'zone' ? '존이름' : '수행원'
+                    searchField === 'plate' ? '차량 번호' : searchField === 'orderId' ? '오더 ID' : searchField === 'zone' ? '존 이름' : '수행원'
                   } 검색`} 
                   className="pl-9" 
                 />
@@ -504,39 +501,39 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
               </Select>
             </div>
             <div className="md:col-span-2">
-              <label htmlFor="fOrderGroup" className="block text-xs font-semibold text-[#6B778C] mb-1.5">오더구분</label>
+              <label htmlFor="fOrderGroup" className="block text-xs font-semibold text-[#6B778C] mb-1.5">오더 구분</label>
               <Select id="fOrderGroup" value={fOrderGroup} onChange={(e) => setFOrderGroup(e.target.value)}>
                 <option value="">전체</option>
                 {orderGroups.map((v) => <option key={v} value={v}>{v}</option>)}
               </Select>
             </div>
             <div className="md:col-span-2">
-              <label htmlFor="fOrderType" className="block text-xs font-semibold text-[#6B778C] mb-1.5">발행유형</label>
+              <label htmlFor="fOrderType" className="block text-xs font-semibold text-[#6B778C] mb-1.5">발행 유형</label>
               <Select id="fOrderType" value={fOrderType} onChange={(e) => setFOrderType(e.target.value)}>
                 <option value="">전체</option>
                 {orderTypes.map((v) => <option key={v} value={v}>{v}</option>)}
               </Select>
             </div>
             <div className="md:col-span-2">
-              <label htmlFor="fWashType" className="block text-xs font-semibold text-[#6B778C] mb-1.5">세차유형</label>
+              <label htmlFor="fWashType" className="block text-xs font-semibold text-[#6B778C] mb-1.5">세차 유형</label>
               <Select id="fWashType" value={fWashType} onChange={(e) => setFWashType(e.target.value)}>
                 <option value="">전체</option>
                 {washTypes.map((v) => <option key={v} value={v}>{v}</option>)}
               </Select>
             </div>
             <div className="md:col-span-2">
-              <label htmlFor="fPartner" className="block text-xs font-semibold text-[#6B778C] mb-1.5">파트너명</label>
+              <label htmlFor="fPartner" className="block text-xs font-semibold text-[#6B778C] mb-1.5">파트너 명</label>
               <Select id="fPartner" value={fPartner} onChange={(e) => setFPartner(e.target.value)}>
                 <option value="">전체</option>
                 {partners.map((v) => <option key={v} value={v}>{v}</option>)}
               </Select>
             </div>
             <div className="md:col-span-2">
-              <label htmlFor="fPartnerType" className="block text-xs font-semibold text-[#6B778C] mb-1.5">파트너유형</label>
+              <label htmlFor="fPartnerType" className="block text-xs font-semibold text-[#6B778C] mb-1.5">파트너 유형</label>
               <Select id="fPartnerType" value={fPartnerType} onChange={(e) => {
                 const newType = e.target.value;
                 setFPartnerType(newType);
-                // 파트너유형 변경 시, 현재 선택된 상태값이 유효하지 않으면 초기화
+                // 파트너 유형 변경 시, 현재 선택된 상태값이 유효하지 않으면 초기화
                 let validStatuses = [];
                 if (newType === "현장") {
                   validStatuses = ["미배정", "예약", "수행 중", "완료", "취소"];
@@ -554,7 +551,7 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
               </Select>
             </div>
             <div className="md:col-span-2">
-              <label htmlFor="fStatus" className="block text-xs font-semibold text-[#6B778C] mb-1.5">진행상태</label>
+              <label htmlFor="fStatus" className="block text-xs font-semibold text-[#6B778C] mb-1.5">진행 상태</label>
               <Select id="fStatus" value={fStatus} onChange={(e) => { setFStatus(e.target.value); onClearQuickStatus(); }}>
                 <option value="">전체</option>
                 {currentStatuses.map((v) => <option key={v} value={v}>{v}</option>)}
@@ -694,11 +691,11 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
                   <div className="col-span-2 border-t border-[#DFE1E6] my-1"></div>
 
                   <div className="space-y-1">
-                    <div className="text-xs text-[#6B778C]">차량번호 / 차종</div>
+                    <div className="text-xs text-[#6B778C]">차량 번호 / 차종</div>
                     <div className="font-medium">{selected.plate} ({selected.model})</div>
                   </div>
                   <div className="space-y-1">
-                    <div className="text-xs text-[#6B778C]">존이름</div>
+                    <div className="text-xs text-[#6B778C]">존 이름</div>
                     <div className="font-medium">{selected.zone}</div>
                   </div>
                   <div className="space-y-1">
@@ -706,15 +703,15 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
                     <div className="font-medium">{selected.region1} / {selected.region2}</div>
                   </div>
                   <div className="space-y-1">
-                    <div className="text-xs text-[#6B778C]">발행유형</div>
+                    <div className="text-xs text-[#6B778C]">발행 유형</div>
                     <div>{selected.orderType}</div>
                   </div>
                   <div className="space-y-1">
-                    <div className="text-xs text-[#6B778C]">세차유형</div>
+                    <div className="text-xs text-[#6B778C]">세차 유형</div>
                     <div className="font-medium">{selected.washType}</div>
                   </div>
                   <div className="space-y-1">
-                    <div className="text-xs text-[#6B778C]">파트너유형</div>
+                    <div className="text-xs text-[#6B778C]">파트너 유형</div>
                     <div>{selected.partnerType}</div>
                   </div>
                   <div className="space-y-1">
@@ -727,11 +724,11 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
                   </div>
                   <div className="col-span-2 border-t border-[#DFE1E6] my-1"></div>
                   <div className="space-y-1">
-                    <div className="text-xs text-[#6B778C]">발행일시</div>
+                    <div className="text-xs text-[#6B778C]">발행 일시</div>
                     <div className="font-medium">{formatCreatedAt(selected)}</div>
                   </div>
                   <div className="space-y-1">
-                    <div className="text-xs text-[#6B778C]">수행일시</div>
+                    <div className="text-xs text-[#6B778C]">수행 일시</div>
                     <div className="font-medium">{(['수행 중', '세차 완료', '출고 중', '완료'].includes(selected.status) && selected.completedAt) ? selected.completedAt : "-"}</div>
                   </div>
                   <div className="col-span-2 space-y-1">
@@ -948,7 +945,7 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-[#6B778C]">차량번호 *</label>
+                <label className="text-xs font-semibold text-[#6B778C]">차량 번호 *</label>
                 <Input value={newOrderForm.plate} onChange={e => setNewOrderForm({...newOrderForm, plate: e.target.value})} placeholder="예: 12가3456" />
               </div>
               
@@ -961,7 +958,7 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
                       <div className="font-medium text-blue-900">{foundVehicle.model}</div>
                     </div>
                     <div>
-                      <div className="text-xs text-blue-700">존이름</div>
+                      <div className="text-xs text-blue-700">존 이름</div>
                       <div className="font-medium text-blue-900">{foundVehicle.zoneName}</div>
                     </div>
                     <div className="col-span-2">
@@ -977,7 +974,7 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
               ) : null}
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-[#6B778C]">오더구분</label>
+                <label className="text-xs font-semibold text-[#6B778C]">오더 구분</label>
                 <Select value={newOrderForm.orderGroup} onChange={e => setNewOrderForm({...newOrderForm, orderGroup: e.target.value})}>
                   {orderGroups.map((g) => (
                     <option key={g} value={g}>{g}</option>
@@ -985,7 +982,7 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
                 </Select>
               </div>
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-[#6B778C]">발행유형</label>
+                <label className="text-xs font-semibold text-[#6B778C]">발행 유형</label>
                 <Select value={newOrderForm.orderType} onChange={e => setNewOrderForm({...newOrderForm, orderType: e.target.value})}>
                   {orderTypes.map((t) => (
                     <option key={t} value={t}>{t}</option>
@@ -993,7 +990,7 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
                 </Select>
               </div>
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-[#6B778C]">세차유형</label>
+                <label className="text-xs font-semibold text-[#6B778C]">세차 유형</label>
                 <Select value={newOrderForm.washType} onChange={e => setNewOrderForm({...newOrderForm, washType: e.target.value})}>
                   {washTypes.map((t) => (
                     <option key={t} value={t}>{t}</option>

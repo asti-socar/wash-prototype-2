@@ -153,7 +153,7 @@ const MissionsPage = ({ missionPolicies, setMissionPolicies, policyVehicles, set
   ];
   
   const vehicleColumns = [
-    { key: "plate", header: "차량번호" },
+    { key: "plate", header: "차량 번호" },
     { key: "status", header: "수행 상태", render: r => <Badge tone={r.status === 'completed' ? 'ok' : 'warn'}>{r.status === 'completed' ? '완료' : '대기'}</Badge> },
     { key: "linkedOrderId", header: "연결된 오더", render: r => r.linkedOrderId ? <a href={`/?page=orders&orderId=${r.linkedOrderId}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{r.linkedOrderId} <ExternalLink className="inline h-3 w-3" /></a> : "-" },
     { key: "completedAt", header: "완료일", render: r => r.completedAt ? toYmd(r.completedAt) : "-" },
@@ -369,8 +369,8 @@ const MissionsPage = ({ missionPolicies, setMissionPolicies, policyVehicles, set
               <CardHeader><CardTitle>대상 차량 관리</CardTitle></CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  <label className="text-xs font-semibold text-[#6B778C]">차량번호 대량 입력</label>
-                  <textarea className="w-full rounded-lg border border-[#E2E8F0] p-2 text-sm min-h-[100px]" value={bulkPlates} onChange={e => setBulkPlates(e.target.value)} placeholder="차량번호를 콤마 또는 엔터로 구분하여 입력..."></textarea>
+                  <label className="text-xs font-semibold text-[#6B778C]">차량 번호 대량 입력</label>
+                  <textarea className="w-full rounded-lg border border-[#E2E8F0] p-2 text-sm min-h-[100px]" value={bulkPlates} onChange={e => setBulkPlates(e.target.value)} placeholder="차량 번호를 콤마 또는 엔터로 구분하여 입력..."></textarea>
                   <Button onClick={handleAddVehicles}>차량 추가</Button>
                 </div>
                 <div className="mt-6 border-t pt-4">
@@ -380,7 +380,7 @@ const MissionsPage = ({ missionPolicies, setMissionPolicies, policyVehicles, set
                           className="w-full rounded-lg border border-[#E2E8F0] p-2 text-sm min-h-[60px]"
                           value={vehicleSearchQuery}
                           onChange={e => setVehicleSearchQuery(e.target.value)}
-                          placeholder="차량번호를 콤마 또는 엔터로 구분하여 검색..."
+                          placeholder="차량 번호를 콤마 또는 엔터로 구분하여 검색..."
                       />
                     </div>
                     <div className="text-sm text-[#6B778C] mb-2">할당된 차량 목록 ({filteredAssignedVehicles.length} / {assignedVehiclesForSelectedPolicy.length}대)</div>

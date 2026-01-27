@@ -282,7 +282,7 @@ export default function PartnersPage() {
   };
 
   const columns = [
-    { key: 'partnerName', header: '파트너명' },
+    { key: 'partnerName', header: '파트너 명' },
     { key: 'ceoName', header: '대표자' },
     { key: 'contractStatus', header: '계약 상태', align: 'center', render: r => <Badge tone={getStatusTone(r.contractStatus)}>{r.contractStatus}</Badge> },
     { key: 'phone', header: '휴대전화' },
@@ -392,7 +392,7 @@ function PartnerDetailDrawer({ partner, onClose, onSave }) {
 
         <TabsContent value="info" currentValue={activeTab} className="pt-4">
           <div className="space-y-2">
-            <Field label={<>파트너명<span className="text-rose-500 ml-1">*</span></>}><Input name="partnerName" value={formData.partnerName || ''} onChange={handleInputChange} placeholder="파트너명 입력" /></Field>
+            <Field label={<>파트너 명<span className="text-rose-500 ml-1">*</span></>}><Input name="partnerName" value={formData.partnerName || ''} onChange={handleInputChange} placeholder="파트너 명 입력" /></Field>
             <Field label={<>대표자<span className="text-rose-500 ml-1">*</span></>}><Input name="ceoName" value={formData.ceoName || ''} onChange={handleInputChange} placeholder="대표자 이름 입력" /></Field>
             <Field label="사업자번호"><Input name="businessNumber" value={formData.businessNumber || ''} onChange={handleInputChange} placeholder="사업자번호 입력" /></Field>
             <Field label="주소"><Input name="address" value={formData.address || ''} onChange={handleInputChange} placeholder="주소 입력" /></Field>
@@ -586,8 +586,8 @@ function PricePolicyTab({ formData, setFormData }) {
             <table className="min-w-full text-sm text-left">
               <thead className="bg-[#F8FAFC] border-b border-[#E2E8F0]">
                 <tr>
-                  <th className="px-4 py-2 font-semibold text-[#475569]">오더구분</th>
-                  <th className="px-4 py-2 font-semibold text-[#475569]">세차유형</th>
+                  <th className="px-4 py-2 font-semibold text-[#475569]">오더 구분</th>
+                  <th className="px-4 py-2 font-semibold text-[#475569]">세차 유형</th>
                   <th className="px-4 py-2 font-semibold text-[#475569]">단가</th>
                   <th className="px-4 py-2 font-semibold text-[#475569]">관리</th>
                 </tr>
@@ -611,8 +611,8 @@ function PricePolicyTab({ formData, setFormData }) {
       <Card>
         <CardHeader><CardTitle>정책 추가</CardTitle></CardHeader>
         <CardContent className="flex gap-2 items-end">
-          <div className="flex-1 space-y-1"><label className="text-xs font-semibold text-[#6B778C]">오더구분</label><Select value={newPrice.orderGroup} onChange={e => setNewPrice({...newPrice, orderGroup: e.target.value})}><option>정규</option><option>수시</option><option>긴급</option></Select></div>
-          <div className="flex-1 space-y-1"><label className="text-xs font-semibold text-[#6B778C]">세차유형</label><Select value={newPrice.washType} onChange={e => setNewPrice({...newPrice, washType: e.target.value})}><option>내외부</option><option>내부</option><option>외부</option><option>특수</option></Select></div>
+          <div className="flex-1 space-y-1"><label className="text-xs font-semibold text-[#6B778C]">오더 구분</label><Select value={newPrice.orderGroup} onChange={e => setNewPrice({...newPrice, orderGroup: e.target.value})}><option>정규</option><option>수시</option><option>긴급</option></Select></div>
+          <div className="flex-1 space-y-1"><label className="text-xs font-semibold text-[#6B778C]">세차 유형</label><Select value={newPrice.washType} onChange={e => setNewPrice({...newPrice, washType: e.target.value})}><option>내외부</option><option>내부</option><option>외부</option><option>특수</option></Select></div>
           <div className="flex-1 space-y-1"><label className="text-xs font-semibold text-[#6B778C]">단가</label><Input type="number" value={newPrice.price} onChange={e => setNewPrice({...newPrice, price: Number(e.target.value)})} /></div>
           <Button onClick={handleAdd}><Plus className="h-4 w-4" /></Button>
         </CardContent>

@@ -158,10 +158,10 @@ function DataTable({ columns, rows, onRowClick, rowKey, sortConfig, onSort }) {
 
 export default function WorkersPage() {
   const [workers, setWorkers] = useState([
-    { id: 'W-001', name: '최수행', partner: 'A파트너명', zoneName: '강남역 1번존', zoneId: 'Z-1001', region1: '서울', region2: '강남', score: 95 },
-    { id: 'W-002', name: '강수행', partner: 'B파트너명', zoneName: '잠실역 2번존', zoneId: 'Z-1002', region1: '서울', region2: '송파', score: 88 },
-    { id: 'W-003', name: '한수행', partner: 'C파트너명', zoneName: '판교 1번존', zoneId: 'Z-2001', region1: '경기', region2: '성남', score: 92 },
-    { id: 'W-004', name: '오수행', partner: 'D파트너명', zoneName: '해운대 2번존', zoneId: 'Z-3002', region1: '부산', region2: '해운대', score: 98 },
+    { id: 'W-001', name: '최수행', partner: 'A파트너', zoneName: '강남역 1번존', zoneId: 'Z-1001', region1: '서울', region2: '강남', score: 95 },
+    { id: 'W-002', name: '강수행', partner: 'B파트너', zoneName: '잠실역 2번존', zoneId: 'Z-1002', region1: '서울', region2: '송파', score: 88 },
+    { id: 'W-003', name: '한수행', partner: 'C파트너', zoneName: '판교 1번존', zoneId: 'Z-2001', region1: '경기', region2: '성남', score: 92 },
+    { id: 'W-004', name: '오수행', partner: 'D파트너', zoneName: '해운대 2번존', zoneId: 'Z-3002', region1: '부산', region2: '해운대', score: 98 },
   ]);
 
   const [selected, setSelected] = useState(null);

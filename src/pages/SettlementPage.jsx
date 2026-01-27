@@ -166,9 +166,9 @@ function DataTable({ columns, rows, onRowClick, rowKey, sortConfig, onSort }) {
 
 export default function SettlementPage() {
   const [items, setItems] = useState([
-    { id: "A-1001", orderId: "O-90002", plate: "34나7890", model: "K5", zoneName: "잠실역 2번존", partner: "B파트너명", requestedAt: "2026-01-12 10:30", status: "요청", cost: 15000, reason: "오염도 심각으로 인한 추가 요금", comment: "사진 확인 부탁드립니다.", washItems: ["내부세차", "특수오염제거"] },
-    { id: "A-1002", orderId: "O-90005", plate: "90마5566", model: "스포티지", zoneName: "수원역 2번존", partner: "B파트너명", requestedAt: "2026-01-11 14:20", status: "수락", cost: 10000, reason: "카시트 분리 세척", comment: "승인 완료", washItems: ["카시트세척"] },
-    { id: "A-1003", orderId: "O-90010", plate: "55차5656", model: "EV6", zoneName: "광주 1번존", partner: "A파트너명", requestedAt: "2026-01-10 09:15", status: "거절", cost: 20000, reason: "광택 작업 요청", comment: "정책상 불가", washItems: ["광택"] },
+    { id: "A-1001", orderId: "O-90002", plate: "34나7890", model: "K5", zoneName: "잠실역 2번존", partner: "B파트너", requestedAt: "2026-01-12 10:30", status: "요청", cost: 15000, reason: "오염도 심각으로 인한 추가 요금", comment: "사진 확인 부탁드립니다.", washItems: ["내부세차", "특수오염제거"] },
+    { id: "A-1002", orderId: "O-90005", plate: "90마5566", model: "스포티지", zoneName: "수원역 2번존", partner: "B파트너", requestedAt: "2026-01-11 14:20", status: "수락", cost: 10000, reason: "카시트 분리 세척", comment: "승인 완료", washItems: ["카시트세척"] },
+    { id: "A-1003", orderId: "O-90010", plate: "55차5656", model: "EV6", zoneName: "광주 1번존", partner: "A파트너", requestedAt: "2026-01-10 09:15", status: "거절", cost: 20000, reason: "광택 작업 요청", comment: "정책상 불가", washItems: ["광택"] },
   ]);
 
   const [selected, setSelected] = useState(null);
@@ -178,10 +178,10 @@ export default function SettlementPage() {
 
   const columns = [
     { key: "orderId", header: "오더 ID" },
-    { key: "plate", header: "차량번호" },
+    { key: "plate", header: "차량 번호" },
     { key: "model", header: "차종" },
-    { key: "zoneName", header: "존이름" },
-    { key: "partner", header: "파트너명" },
+    { key: "zoneName", header: "존 이름" },
+    { key: "partner", header: "파트너 명" },
     { key: "requestedAt", header: "요청 시간" },
     {
       key: "status",
@@ -291,8 +291,8 @@ export default function SettlementPage() {
               </CardHeader>
               <CardContent className="space-y-2 text-sm text-[#172B4D]">
                 <Field label="오더 ID" value={selected.orderId} />
-                <Field label="차량번호" value={`${selected.plate} (${selected.model})`} />
-                <Field label="파트너명" value={selected.partner} />
+                <Field label="차량 번호" value={`${selected.plate} (${selected.model})`} />
+                <Field label="파트너 명" value={selected.partner} />
                 <Field label="요청 사유" value={selected.reason} />
                 <Field label="세차 항목" value={selected.washItems.join(", ")} />
                 <div className="flex items-center justify-between gap-3">

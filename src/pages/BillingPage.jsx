@@ -175,9 +175,9 @@ export default function BillingPage() {
   const [periodTo, setPeriodTo] = useState(toYmd(today));
 
   const billingData = [
-    { id: "B-1001", orderId: "O-90002", partner: "B파트너명", amount: 25000, status: "청구완료", date: "2026-01-12" },
-    { id: "B-1002", orderId: "O-90005", partner: "B파트너명", amount: 18000, status: "대기", date: "2026-01-12" },
-    { id: "B-1003", orderId: "O-90011", partner: "C파트너명", amount: 22000, status: "청구완료", date: "2026-01-11" },
+    { id: "B-1001", orderId: "O-90002", partner: "B파트너", amount: 25000, status: "청구완료", date: "2026-01-12" },
+    { id: "B-1002", orderId: "O-90005", partner: "B파트너", amount: 18000, status: "대기", date: "2026-01-12" },
+    { id: "B-1003", orderId: "O-90011", partner: "C파트너", amount: 22000, status: "청구완료", date: "2026-01-11" },
   ];
 
   const filteredData = useMemo(() => {
@@ -254,7 +254,7 @@ export default function BillingPage() {
         columns={[
           { key: "id", header: "청구 ID" },
           { key: "orderId", header: "오더 ID" },
-          { key: "partner", header: "파트너명" },
+          { key: "partner", header: "파트너 명" },
           { key: "amount", header: "금액", render: (r) => `${r.amount.toLocaleString()}원` },
           { key: "status", header: "상태", render: (r) => <Badge tone={r.status === "청구완료" ? "ok" : "default"}>{r.status}</Badge> },
           { key: "date", header: "청구일" },
@@ -312,7 +312,7 @@ export default function BillingPage() {
             <CardContent className="space-y-2 text-sm text-[#172B4D]">
               <Field label="청구 ID" value={selected.id} />
               <Field label="오더 ID" value={selected.orderId} />
-              <Field label="파트너명" value={selected.partner} />
+              <Field label="파트너 명" value={selected.partner} />
               <Field label="청구 금액" value={`${selected.amount.toLocaleString()}원`} />
               <Field label="상태" value={selected.status} />
               <Field label="청구일" value={selected.date} />

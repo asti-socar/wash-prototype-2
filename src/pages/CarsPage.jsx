@@ -31,18 +31,18 @@ import {
 
 // Mock Data for Vehicles (Shared)
 const MOCK_VEHICLES = [
-  { plate: "12가3456", zoneName: "강남역 1번존", zoneId: "Z-1001", region1: "서울", region2: "강남", partner: "A파트너명", activeOrderId: "O-90001", activeOrderStatus: "예약", lastWash: "2026-01-10", model: "아반떼 AD", isRechargeGuaranteed: false },
-  { plate: "34나7890", zoneName: "잠실역 2번존", zoneId: "Z-1002", region1: "서울", region2: "송파", partner: "B파트너명", activeOrderId: null, activeOrderStatus: null, lastWash: "2026-01-08", model: "K5", isRechargeGuaranteed: false },
-  { plate: "56다1122", zoneName: "홍대입구 3번존", zoneId: "Z-1003", region1: "서울", region2: "마포", partner: "A파트너명", activeOrderId: "O-90003", activeOrderStatus: "미배정", lastWash: "2026-01-05", model: "쏘나타", isRechargeGuaranteed: false },
-  { plate: "78라3344", zoneName: "판교 1번존", zoneId: "Z-2001", region1: "경기", region2: "성남", partner: "C파트너명", activeOrderId: "O-90004", activeOrderStatus: "입고 중", lastWash: "2026-01-09", model: "아이오닉5", isRechargeGuaranteed: true },
-  { plate: "90마5566", zoneName: "수원역 2번존", zoneId: "Z-2002", region1: "경기", region2: "수원", partner: "B파트너명", activeOrderId: null, activeOrderStatus: null, lastWash: "2026-01-07", model: "스포티지", isRechargeGuaranteed: false },
-  { plate: "11바7788", zoneName: "부산역 1번존", zoneId: "Z-3001", region1: "부산", region2: "동구", partner: "D파트너명", activeOrderId: "O-90006", activeOrderStatus: "미배정", lastWash: "2026-01-03", model: "그랜저", isRechargeGuaranteed: false },
-  { plate: "22사9900", zoneName: "해운대 2번존", zoneId: "Z-3002", region1: "부산", region2: "해운대", partner: "D파트너명", activeOrderId: "O-90007", activeOrderStatus: "예약", lastWash: "2026-01-11", model: "레이", isRechargeGuaranteed: false },
-  { plate: "33아1212", zoneName: "대전역 1번존", zoneId: "Z-4001", region1: "대전", region2: "동구", partner: "C파트너명", activeOrderId: null, activeOrderStatus: null, lastWash: "2026-01-06", model: "카니발", isRechargeGuaranteed: false },
-  { plate: "44자3434", zoneName: "청주 2번존", zoneId: "Z-5002", region1: "충북", region2: "청주", partner: "B파트너명", activeOrderId: "O-90009", activeOrderStatus: "미배정", lastWash: "2026-01-02", model: "모닝", isRechargeGuaranteed: false },
-  { plate: "55차5656", zoneName: "광주 1번존", zoneId: "Z-6001", region1: "광주", region2: "서구", partner: "A파트너명", activeOrderId: "O-90010", activeOrderStatus: "예약", lastWash: "2026-01-09", model: "EV6", isRechargeGuaranteed: false },
-  { plate: "66카7878", zoneName: "인천공항 1번존", zoneId: "Z-7001", region1: "인천", region2: "중구", partner: "C파트너명", activeOrderId: null, activeOrderStatus: null, lastWash: "2026-01-08", model: "티볼리", isRechargeGuaranteed: false },
-  { plate: "77타9090", zoneName: "제주공항 1번존", zoneId: "Z-8001", region1: "제주", region2: "제주시", partner: "D파트너명", activeOrderId: "O-90012", activeOrderStatus: "미배정", lastWash: "2026-01-01", model: "셀토스", isRechargeGuaranteed: false },
+  { plate: "12가3456", zoneName: "강남역 1번존", zoneId: "Z-1001", region1: "서울", region2: "강남", partner: "A파트너", activeOrderId: "O-90001", activeOrderStatus: "예약", lastWash: "2026-01-10", model: "아반떼 AD", isRechargeGuaranteed: false },
+  { plate: "34나7890", zoneName: "잠실역 2번존", zoneId: "Z-1002", region1: "서울", region2: "송파", partner: "B파트너", activeOrderId: null, activeOrderStatus: null, lastWash: "2026-01-08", model: "K5", isRechargeGuaranteed: false },
+  { plate: "56다1122", zoneName: "홍대입구 3번존", zoneId: "Z-1003", region1: "서울", region2: "마포", partner: "A파트너", activeOrderId: "O-90003", activeOrderStatus: "미배정", lastWash: "2026-01-05", model: "쏘나타", isRechargeGuaranteed: false },
+  { plate: "78라3344", zoneName: "판교 1번존", zoneId: "Z-2001", region1: "경기", region2: "성남", partner: "C파트너", activeOrderId: "O-90004", activeOrderStatus: "입고 중", lastWash: "2026-01-09", model: "아이오닉5", isRechargeGuaranteed: true },
+  { plate: "90마5566", zoneName: "수원역 2번존", zoneId: "Z-2002", region1: "경기", region2: "수원", partner: "B파트너", activeOrderId: null, activeOrderStatus: null, lastWash: "2026-01-07", model: "스포티지", isRechargeGuaranteed: false },
+  { plate: "11바7788", zoneName: "부산역 1번존", zoneId: "Z-3001", region1: "부산", region2: "동구", partner: "D파트너", activeOrderId: "O-90006", activeOrderStatus: "미배정", lastWash: "2026-01-03", model: "그랜저", isRechargeGuaranteed: false },
+  { plate: "22사9900", zoneName: "해운대 2번존", zoneId: "Z-3002", region1: "부산", region2: "해운대", partner: "D파트너", activeOrderId: "O-90007", activeOrderStatus: "예약", lastWash: "2026-01-11", model: "레이", isRechargeGuaranteed: false },
+  { plate: "33아1212", zoneName: "대전역 1번존", zoneId: "Z-4001", region1: "대전", region2: "동구", partner: "C파트너", activeOrderId: null, activeOrderStatus: null, lastWash: "2026-01-06", model: "카니발", isRechargeGuaranteed: false },
+  { plate: "44자3434", zoneName: "청주 2번존", zoneId: "Z-5002", region1: "충북", region2: "청주", partner: "B파트너", activeOrderId: "O-90009", activeOrderStatus: "미배정", lastWash: "2026-01-02", model: "모닝", isRechargeGuaranteed: false },
+  { plate: "55차5656", zoneName: "광주 1번존", zoneId: "Z-6001", region1: "광주", region2: "서구", partner: "A파트너", activeOrderId: "O-90010", activeOrderStatus: "예약", lastWash: "2026-01-09", model: "EV6", isRechargeGuaranteed: false },
+  { plate: "66카7878", zoneName: "인천공항 1번존", zoneId: "Z-7001", region1: "인천", region2: "중구", partner: "C파트너", activeOrderId: null, activeOrderStatus: null, lastWash: "2026-01-08", model: "티볼리", isRechargeGuaranteed: false },
+  { plate: "77타9090", zoneName: "제주공항 1번존", zoneId: "Z-8001", region1: "제주", region2: "제주시", partner: "D파트너", activeOrderId: "O-90012", activeOrderStatus: "미배정", lastWash: "2026-01-01", model: "셀토스", isRechargeGuaranteed: false },
 ];
 
 function CarsPage() {
@@ -102,12 +102,12 @@ function CarsPage() {
   const { currentData, currentPage, totalPages, setCurrentPage, totalItems } = usePagination(sortedData, 40);
 
   const columns = [
-    { key: "plate", header: "차량번호" },
-    { key: "zoneName", header: "존이름" },
+    { key: "plate", header: "차량 번호" },
+    { key: "zoneName", header: "존 이름" },
     { key: "zoneId", header: "존 ID" },
     { key: "region1", header: "지역1" },
     { key: "region2", header: "지역2" },
-    { key: "partner", header: "파트너명" },
+    { key: "partner", header: "파트너 명" },
     {
       key: "activeOrderId",
       header: "발행된 오더",
@@ -129,7 +129,7 @@ function CarsPage() {
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
           <div className="text-base font-bold text-[#172B4D]">차량 관리</div>
-          <div className="mt-1 text-sm text-[#6B778C]">수행률 낮은 차량, 존이름별 현황 모니터링(프로토타입)</div>
+          <div className="mt-1 text-sm text-[#6B778C]">수행률 낮은 차량, 존 이름별 현황 모니터링(프로토타입)</div>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="secondary">
@@ -148,8 +148,8 @@ function CarsPage() {
             <div className="md:col-span-2">
               <label htmlFor="searchField" className="block text-xs font-semibold text-[#6B778C] mb-1.5">검색항목</label>
               <Select id="searchField" value={searchField} onChange={e => setSearchField(e.target.value)}>
-                <option value="plate">차량번호</option>
-                <option value="zoneName">존이름</option>
+                <option value="plate">차량 번호</option>
+                <option value="zoneName">존 이름</option>
                 <option value="zoneId">존 ID</option>
               </Select>
             </div>
@@ -162,7 +162,7 @@ function CarsPage() {
                   value={q} 
                   onChange={(e) => setQ(e.target.value)} 
                   placeholder={`${
-                    searchField === 'plate' ? '차량번호' : searchField === 'zoneName' ? '존이름' : '존 ID'
+                    searchField === 'plate' ? '차량 번호' : searchField === 'zoneName' ? '존 이름' : '존 ID'
                   } 검색`} 
                   className="pl-9" 
                 />
@@ -183,7 +183,7 @@ function CarsPage() {
               </Select>
             </div>
             <div className="md:col-span-2">
-              <label htmlFor="fPartner" className="block text-xs font-semibold text-[#6B778C] mb-1.5">파트너명</label>
+              <label htmlFor="fPartner" className="block text-xs font-semibold text-[#6B778C] mb-1.5">파트너 명</label>
               <Select id="fPartner" value={fPartner} onChange={(e) => setFPartner(e.target.value)}>
                 <option value="">전체</option>
                 {partners.map((v) => <option key={v} value={v}>{v}</option>)}
@@ -195,7 +195,7 @@ function CarsPage() {
                 {q ? <Chip onRemove={() => setQ("")}>검색: {q}</Chip> : null}
                 {fRegion1 ? <Chip onRemove={() => { setFRegion1(""); setFRegion2(""); }}>지역1: {fRegion1}</Chip> : null}
                 {fRegion2 ? <Chip onRemove={() => setFRegion2("")}>지역2: {fRegion2}</Chip> : null}
-                {fPartner ? <Chip onRemove={() => setFPartner("")}>파트너명: {fPartner}</Chip> : null}
+                {fPartner ? <Chip onRemove={() => setFPartner("")}>파트너 명: {fPartner}</Chip> : null}
               </div>
               <Button
                 variant="secondary"
@@ -271,12 +271,12 @@ function CarsPage() {
                 <CardDescription>리스트 필드 + 차종</CardDescription>
               </CardHeader>
               <CardContent className="space-y-2 text-sm text-[#172B4D]">
-                <Field label="차량번호" value={selected.plate} />
+                <Field label="차량 번호" value={selected.plate} />
                 <Field label="차종" value={selected.model} />
-                <Field label="존이름" value={`${selected.zoneName} (${selected.zoneId})`} />
+                <Field label="존 이름" value={`${selected.zoneName} (${selected.zoneId})`} />
                 <Field label="지역1" value={selected.region1} />
                 <Field label="지역2" value={selected.region2} />
-                <Field label="파트너명" value={selected.partner} />
+                <Field label="파트너 명" value={selected.partner} />
                 <Field label="발행된 오더" value={selected.activeOrderId ? `${selected.activeOrderId} (${selected.activeOrderStatus})` : "없음"} />
                 <Field label="마지막 세차일" value={selected.lastWash} />
                 <Field label="세차 경과일" value={`${getElapsedDays(selected.lastWash)}일`} />

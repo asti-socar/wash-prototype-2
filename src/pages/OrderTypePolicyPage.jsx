@@ -46,7 +46,7 @@ const HELP_TEXTS = {
 
 
 
-  order_type_score: "동일 오더구분 그룹 내 우선순위를 결정하는 1~9 사이의 값입니다.",
+  order_type_score: "동일 오더 구분 그룹 내 우선순위를 결정하는 1~9 사이의 값입니다.",
 
 
 
@@ -66,7 +66,7 @@ const HELP_TEXTS = {
 
 
 
-  partner_type: "존유형과 세차유형의 조합에 의해 자동으로 결정됩니다. (현장세차 불가존 혹은 특수/협의 세차 시 '입고'로 자동 전환)"
+  partner_type: "존유형과 세차 유형의 조합에 의해 자동으로 결정됩니다. (현장세차 불가존 혹은 특수/협의 세차 시 '입고'로 자동 전환)"
 
 
 
@@ -2554,7 +2554,7 @@ const DetailDrawer = ({ policy, onClose, onSave, policies, mode }) => {
 
 
 
-    if (!formData.order_type_name?.trim()) newErrors.order_type_name = "발행유형 명칭은 필수입니다.";
+    if (!formData.order_type_name?.trim()) newErrors.order_type_name = "발행 유형 명칭은 필수입니다.";
 
 
 
@@ -2570,7 +2570,7 @@ const DetailDrawer = ({ policy, onClose, onSave, policies, mode }) => {
 
 
 
-    if (policies.some(p => p.order_type_name === formData.order_type_name && p.id !== formData.id)) newErrors.order_type_name = "이미 존재하는 발행유형 명칭입니다.";
+    if (policies.some(p => p.order_type_name === formData.order_type_name && p.id !== formData.id)) newErrors.order_type_name = "이미 존재하는 발행 유형 명칭입니다.";
 
 
 
@@ -2586,7 +2586,7 @@ const DetailDrawer = ({ policy, onClose, onSave, policies, mode }) => {
 
 
 
-    if (formData.order_type_score < 1 || formData.order_type_score > 9) newErrors.order_type_score = "발행유형 점수는 1-9 사이여야 합니다.";
+    if (formData.order_type_score < 1 || formData.order_type_score > 9) newErrors.order_type_score = "발행 유형 점수는 1-9 사이여야 합니다.";
 
 
 
@@ -2602,7 +2602,7 @@ const DetailDrawer = ({ policy, onClose, onSave, policies, mode }) => {
 
 
 
-    else if (policies.some(p => p.order_division === formData.order_division && p.order_type_score === formData.order_type_score && p.id !== formData.id)) newErrors.order_type_score = "동일 오더구분 내에 중복된 발행유형 점수가 있습니다.";
+    else if (policies.some(p => p.order_division === formData.order_division && p.order_type_score === formData.order_type_score && p.id !== formData.id)) newErrors.order_type_score = "동일 오더 구분 내에 중복된 발행 유형 점수가 있습니다.";
 
 
 
@@ -3290,7 +3290,7 @@ const DetailDrawer = ({ policy, onClose, onSave, policies, mode }) => {
 
 
 
-    <Drawer open={!!policy} title={isCreating ? "발행유형 추가" : `[ID: ${policy.id}] 발행유형 정책 수정`} onClose={onClose} footer={
+    <Drawer open={!!policy} title={isCreating ? "발행 유형 추가" : `[ID: ${policy.id}] 발행 유형 정책 수정`} onClose={onClose} footer={
 
 
 
@@ -3754,7 +3754,7 @@ const DetailDrawer = ({ policy, onClose, onSave, policies, mode }) => {
 
 
 
-                        <Field label="오더구분" tooltip={HELP_TEXTS.order_division}>{isEditing ? <Select value={formData.order_division} onChange={e => handleFormDataChange('order_division', e.target.value)}>{ORDER_DIVISIONS.map(o => <option key={o} value={o}>{o}</option>)}</Select> : <ReadOnlyValue>{formData.order_division}</ReadOnlyValue>}</Field>
+                        <Field label="오더 구분" tooltip={HELP_TEXTS.order_division}>{isEditing ? <Select value={formData.order_division} onChange={e => handleFormDataChange('order_division', e.target.value)}>{ORDER_DIVISIONS.map(o => <option key={o} value={o}>{o}</option>)}</Select> : <ReadOnlyValue>{formData.order_division}</ReadOnlyValue>}</Field>
 
 
 
@@ -3770,7 +3770,7 @@ const DetailDrawer = ({ policy, onClose, onSave, policies, mode }) => {
 
 
 
-                        <Field label="세차유형" tooltip={HELP_TEXTS.wash_type}>{isEditing ? <Select value={formData.wash_type} onChange={e => handleFormDataChange('wash_type', e.target.value)}>{WASH_TYPES.map(o => <option key={o} value={o}>{o}</option>)}</Select> : <ReadOnlyValue>{formData.wash_type}</ReadOnlyValue>}</Field>
+                        <Field label="세차 유형" tooltip={HELP_TEXTS.wash_type}>{isEditing ? <Select value={formData.wash_type} onChange={e => handleFormDataChange('wash_type', e.target.value)}>{WASH_TYPES.map(o => <option key={o} value={o}>{o}</option>)}</Select> : <ReadOnlyValue>{formData.wash_type}</ReadOnlyValue>}</Field>
 
 
 
@@ -3802,7 +3802,7 @@ const DetailDrawer = ({ policy, onClose, onSave, policies, mode }) => {
 
 
 
-                        <Field label="파트너유형" tooltip={HELP_TEXTS.partner_type}><ReadOnlyValue>{formData.partner_type}</ReadOnlyValue></Field>
+                        <Field label="파트너 유형" tooltip={HELP_TEXTS.partner_type}><ReadOnlyValue>{formData.partner_type}</ReadOnlyValue></Field>
 
 
 
@@ -3914,7 +3914,7 @@ const DetailDrawer = ({ policy, onClose, onSave, policies, mode }) => {
 
 
 
-                        <Field label="발행유형 명칭" error={errors.order_type_name}>{isEditing ? <Input value={formData.order_type_name || ''} onChange={e => handleFormDataChange('order_type_name', e.target.value)} /> : <ReadOnlyValue>{formData.order_type_name}</ReadOnlyValue>}</Field>
+                        <Field label="발행 유형 명칭" error={errors.order_type_name}>{isEditing ? <Input value={formData.order_type_name || ''} onChange={e => handleFormDataChange('order_type_name', e.target.value)} /> : <ReadOnlyValue>{formData.order_type_name}</ReadOnlyValue>}</Field>
 
 
 
@@ -3930,7 +3930,7 @@ const DetailDrawer = ({ policy, onClose, onSave, policies, mode }) => {
 
 
 
-                        <Field label="발행유형 점수" error={errors.order_type_score} tooltip={HELP_TEXTS.order_type_score}>{isEditing ? <Input type="number" min="1" max="9" value={formData.order_type_score || ''} onChange={e => handleFormDataChange('order_type_score', Number(e.target.value))} /> : <ReadOnlyValue>{formData.order_type_score}</ReadOnlyValue>}</Field>
+                        <Field label="발행 유형 점수" error={errors.order_type_score} tooltip={HELP_TEXTS.order_type_score}>{isEditing ? <Input type="number" min="1" max="9" value={formData.order_type_score || ''} onChange={e => handleFormDataChange('order_type_score', Number(e.target.value))} /> : <ReadOnlyValue>{formData.order_type_score}</ReadOnlyValue>}</Field>
 
 
 
@@ -3962,7 +3962,7 @@ const DetailDrawer = ({ policy, onClose, onSave, policies, mode }) => {
 
 
 
-                        <Field label="세차유형 점수"><ReadOnlyValue>{WASH_TYPE_SCORES[formData.wash_type] || 0}</ReadOnlyValue></Field>
+                        <Field label="세차 유형 점수"><ReadOnlyValue>{WASH_TYPE_SCORES[formData.wash_type] || 0}</ReadOnlyValue></Field>
 
 
 
@@ -3978,7 +3978,7 @@ const DetailDrawer = ({ policy, onClose, onSave, policies, mode }) => {
 
 
 
-                        <Field label="오더구분 점수"><ReadOnlyValue>{ORDER_DIVISION_SCORES[formData.order_division] || 0}</ReadOnlyValue></Field>
+                        <Field label="오더 구분 점수"><ReadOnlyValue>{ORDER_DIVISION_SCORES[formData.order_division] || 0}</ReadOnlyValue></Field>
 
 
 
@@ -5214,15 +5214,15 @@ export default function OrderTypePolicyPage() {
 
 
 
-      { key: 'order_division', header: '오더구분' },
+      { key: 'order_division', header: '오더 구분' },
 
 
 
-      { key: 'order_type_name', header: '발행유형' },
+      { key: 'order_type_name', header: '발행 유형' },
 
 
 
-      { key: 'wash_type', header: '세차유형' },
+      { key: 'wash_type', header: '세차 유형' },
 
 
 
@@ -5238,7 +5238,7 @@ export default function OrderTypePolicyPage() {
 
 
 
-      { key: 'partner_type', header: '파트너유형', render: r => r.partner_type ? <Badge>{r.partner_type}</Badge> : '-' }
+      { key: 'partner_type', header: '파트너 유형', render: r => r.partner_type ? <Badge>{r.partner_type}</Badge> : '-' }
 
 
 
@@ -5254,9 +5254,9 @@ export default function OrderTypePolicyPage() {
 
         <div>
 
-          <h1 className="text-base font-bold text-[#172B4D]">발행유형 정책 관리</h1>
+          <h1 className="text-base font-bold text-[#172B4D]">발행 유형 정책 관리</h1>
 
-          <p className="mt-1 text-sm text-[#6B778C]">오더 발행의 기준이 되는 발행유형별 상세 정책을 관리합니다.</p>
+          <p className="mt-1 text-sm text-[#6B778C]">오더 발행의 기준이 되는 발행 유형별 상세 정책을 관리합니다.</p>
 
         </div>
 
@@ -5264,7 +5264,7 @@ export default function OrderTypePolicyPage() {
 
             <Button variant="secondary" onClick={handleDownloadCsv}><FileDown className="mr-2 h-4 w-4" />엑셀 다운로드</Button>
 
-            <Button onClick={handleCreate}><Plus className="mr-2 h-4 w-4" />발행유형 추가</Button>
+            <Button onClick={handleCreate}><Plus className="mr-2 h-4 w-4" />발행 유형 추가</Button>
 
         </div>
 
