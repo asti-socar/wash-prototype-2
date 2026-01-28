@@ -1,4 +1,5 @@
 export const BROWN_HISTORY = [
+  { id: 69, date: "2026-01-28 23:12", content: "[기능] 오더 관리 고도화: 분실물 상세 표시, 오더 삭제→취소로 변경, 입고 파트너 탁송 정보 추가, 검색 기준 용어 수정", isPolicyChange: true, links: [{ label: "오더 관리", page: "orders" }] },
   { id: 68, date: "2026-01-28 18:27", content: "[정책] 오더 상태 전이 정책 개편: 파트너 유형 무관 통일된 4단계 흐름 (발행→예약→수행 중→완료) 적용", isPolicyChange: true, links: [{ label: "오더 관리", page: "orders" }] },
   { id: 67, date: "2026-01-28 10:13", content: "[문서] 오더 관리 기능 명세서 고도화: 운영 시나리오 구체화, 점검 항목 전체 목록", isPolicyChange: true, links: [{ label: "오더 관리", page: "orders" }] },
   { id: 66, date: "2026-01-26 16:45", content: "미션 정책 관리 - 할당된 차량 검색 기능 및 목업 데이터 추가", isPolicyChange: true, links: [{ label: "미션 관리", page: "missions" }] },

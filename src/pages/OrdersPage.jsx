@@ -77,6 +77,103 @@ const MOCK_VEHICLES = [
   { plate: "77타9090", zoneName: "제주공항 1번존", zoneId: "Z-8001", region1: "제주", region2: "제주시", partner: "D파트너", activeOrderId: "O-90012", activeOrderStatus: "발행", lastWash: "2026-01-01", model: "셀토스", isRechargeGuaranteed: false },
 ];
 
+// 분실물 Mock 데이터 (오더 ID별) - 전체 오더의 50%에 분실물 할당
+const generateMockLostItems = () => {
+  const items = {};
+  const categories = ["전자기기", "지갑", "의류", "일반", "귀중품"];
+  const statuses = ["접수", "보관중", "발송 완료"];
+  const details = [
+    "검은색 스마트폰", "갈색 가죽 지갑", "회색 후드티", "검정 선글라스", "에어팟",
+    "블루투스 이어폰", "손목시계", "우산", "노트북", "충전기"
+  ];
+
+  // 짝수 번호 오더에 분실물 할당 (전체의 50%)
+  for (let i = 2; i <= 100; i += 2) {
+    const orderId = `O-900${String(i).padStart(2, '0')}`;
+    const itemCount = Math.random() > 0.7 ? 2 : 1; // 30% 확률로 2개, 70% 확률로 1개
+    items[orderId] = [];
+
+    for (let j = 0; j < itemCount; j++) {
+      const category = categories[Math.floor(Math.random() * categories.length)];
+      const status = statuses[Math.floor(Math.random() * statuses.length)];
+      const detail = details[Math.floor(Math.random() * details.length)];
+      const date = new Date(2026, 0, Math.floor(Math.random() * 28) + 1);
+
+      items[orderId].push({
+        id: `LI${String(i * 10 + j).padStart(4, '0')}`,
+        createdAt: `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${String(Math.floor(Math.random() * 24)).padStart(2, '0')}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')}`,
+        itemCategory: category,
+        status: status,
+        itemDetails: detail
+      });
+    }
+  }
+
+  return items;
+};
+
+const MOCK_LOST_ITEMS = generateMockLostItems();
+
+// 탁송 상태 매핑
+const DELIVERY_STATUS_MAP = {
+  WAITING: "매칭 전",
+  ASSIGN: "매칭 완료",
+  RUN: "운행 중",
+  END: "운행 종료",
+  FORCE_END: "강제 반납",
+  CANCEL: "예약 취소",
+  ETC: "알 수 없음"
+};
+
+// 입고 파트너 탁송 Mock 데이터 생성 함수
+const generateMockDeliveryInfo = (orders) => {
+  const deliveryInfo = {};
+
+  // 입고 파트너 오더만 필터링
+  const pickupOrders = orders.filter(order => order.partnerType === '입고');
+
+  pickupOrders.forEach((order, index) => {
+    const reservationIdNum = 2001 + index;
+
+    // 상태에 따른 입고 탁송 상태 매핑
+    let pickupStatus;
+    switch(order.status) {
+      case '발행':
+        pickupStatus = 'WAITING';
+        break;
+      case '예약':
+        // 예약: ASSIGN 또는 RUN (50:50 분배)
+        pickupStatus = Math.random() > 0.5 ? 'ASSIGN' : 'RUN';
+        break;
+      case '수행 중':
+        pickupStatus = 'END';
+        break;
+      case '완료':
+        pickupStatus = 'END';
+        break;
+      case '취소':
+        // 취소: CANCEL 또는 END (50:50 분배)
+        pickupStatus = Math.random() > 0.5 ? 'CANCEL' : 'END';
+        break;
+      default:
+        pickupStatus = 'ETC';
+    }
+
+    deliveryInfo[order.orderId] = {
+      pickupReservationId: `DR-${reservationIdNum}`,
+      pickupStatus: pickupStatus
+    };
+
+    // 완료 상태인 경우에만 출고 정보 추가
+    if (order.status === '완료') {
+      deliveryInfo[order.orderId].deliveryReservationId = `DR-${reservationIdNum + 50}`;
+      deliveryInfo[order.orderId].deliveryStatus = 'END';
+    }
+  });
+
+  return deliveryInfo;
+};
+
 function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, setOrders, missions, setMissions }) {
   const today = new Date();
 
@@ -266,6 +363,10 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
     [orders, fRegion1]
   );
   const partners = useMemo(() => Array.from(new Set(orders.map((d) => d.partner))), [orders]);
+
+  // 입고 파트너 탁송 정보 동적 생성
+  const MOCK_DELIVERY_INFO = useMemo(() => generateMockDeliveryInfo(orders), [orders]);
+
   const statuses = ["발행", "예약", "수행 중", "완료", "취소"];
   const orderGroups = ORDER_GROUPS;
   const orderTypes = ORDER_TYPES;
@@ -635,10 +736,12 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
                 <CheckCircle className="mr-2 h-4 w-4" /> 수행 완료
               </Button>
             )}
-            <Button variant="danger" onClick={() => setDeleteModalOpen(true)} className="w-full sm:w-auto">
-              <Trash2 className="mr-2 h-4 w-4" />
-              오더 삭제
-            </Button>
+            {selected?.status !== "취소" && (
+              <Button variant="secondary" onClick={() => setDeleteModalOpen(true)} className="w-full sm:w-auto">
+                <X className="mr-2 h-4 w-4" />
+                오더 취소
+              </Button>
+            )}
           </div>
         }
       >
@@ -732,6 +835,47 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
                       </Button>
                     </div>
                   </div>
+                  {selected.partnerType === '입고' && MOCK_DELIVERY_INFO[selected.orderId] && (
+                    <>
+                      <div className="border-t border-[#DFE1E6] pt-3 space-y-2">
+                        <div className="text-xs font-semibold text-[#172B4D] mb-2">탁송 정보</div>
+                        <div className="grid grid-cols-2 gap-2 text-xs">
+                          <div className="space-y-1">
+                            <div className="text-[#6B778C]">입고 예약 ID</div>
+                            <div className="font-medium text-[#172B4D]">{MOCK_DELIVERY_INFO[selected.orderId].pickupReservationId}</div>
+                          </div>
+                          <div className="space-y-1">
+                            <div className="text-[#6B778C]">입고 탁송 상태</div>
+                            <div>
+                              <Badge tone={MOCK_DELIVERY_INFO[selected.orderId].pickupStatus === "END" ? "ok" : "info"}>
+                                {DELIVERY_STATUS_MAP[MOCK_DELIVERY_INFO[selected.orderId].pickupStatus]}
+                              </Badge>
+                            </div>
+                          </div>
+                          <div className="space-y-1">
+                            <div className="text-[#6B778C]">출고 예약 ID</div>
+                            <div className="font-medium text-[#172B4D]">
+                              {selected.status === '완료' && MOCK_DELIVERY_INFO[selected.orderId].deliveryReservationId
+                                ? MOCK_DELIVERY_INFO[selected.orderId].deliveryReservationId
+                                : '-'}
+                            </div>
+                          </div>
+                          <div className="space-y-1">
+                            <div className="text-[#6B778C]">출고 탁송 상태</div>
+                            <div>
+                              {selected.status === '완료' && MOCK_DELIVERY_INFO[selected.orderId].deliveryStatus ? (
+                                <Badge tone={MOCK_DELIVERY_INFO[selected.orderId].deliveryStatus === "END" ? "ok" : "warn"}>
+                                  {DELIVERY_STATUS_MAP[MOCK_DELIVERY_INFO[selected.orderId].deliveryStatus]}
+                                </Badge>
+                              ) : (
+                                <span className="text-[#6B778C]">-</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
                   {selected.partnerType === '입고' && (
                     <div className="flex items-center justify-between border-t border-[#DFE1E6] pt-3">
                       <span className="text-sm text-[#6B778C]">연계 오더 (Parent)</span>
@@ -838,19 +982,44 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {/* Mock Data for Lost Items */}
-                  <div className="flex items-start gap-3 rounded-lg border border-[#DFE1E6] p-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#F4F5F7]">
-                      <PackageSearch className="h-5 w-5 text-[#6B778C]" />
+                  {MOCK_LOST_ITEMS[selected.orderId] && MOCK_LOST_ITEMS[selected.orderId].length > 0 ? (
+                    <div className="space-y-3">
+                      {MOCK_LOST_ITEMS[selected.orderId].map((item) => (
+                        <div key={item.id} className="rounded-lg border border-[#DFE1E6] p-3">
+                          <div className="flex items-start justify-between mb-2">
+                            <button
+                              onClick={() => window.open(`/lostitems?id=${item.id}`, '_blank')}
+                              className="text-sm font-bold text-[#0052CC] hover:underline flex items-center gap-1"
+                            >
+                              {item.id}
+                              <ExternalLink className="h-3 w-3" />
+                            </button>
+                            <Badge tone={item.status === "발송 완료" ? "ok" : item.status === "접수" ? "warn" : "default"}>
+                              {item.status}
+                            </Badge>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2 text-xs">
+                            <div>
+                              <span className="text-[#6B778C]">접수일시: </span>
+                              <span className="text-[#172B4D]">{item.createdAt}</span>
+                            </div>
+                            <div>
+                              <span className="text-[#6B778C]">분실물 구분: </span>
+                              <span className="text-[#172B4D]">{item.itemCategory}</span>
+                            </div>
+                            <div className="col-span-2">
+                              <span className="text-[#6B778C]">상세 정보: </span>
+                              <span className="text-[#172B4D]">{item.itemDetails}</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center justify-between">
-                        <div className="text-sm font-bold text-[#172B4D]">지갑 (검정색)</div>
-                        <Badge tone="ok">보관중</Badge>
-                      </div>
-                      <div className="mt-1 text-xs text-[#6B778C]">조수석 바닥 발견 (2026-01-12)</div>
+                  ) : (
+                    <div className="text-center text-sm text-[#6B778C] py-4">
+                      연결된 분실물이 없습니다.
                     </div>
-                  </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
@@ -859,31 +1028,32 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
             {deleteModalOpen ? (
               <Card className="ring-rose-200">
                 <CardHeader>
-                  <CardTitle className="text-rose-700">오더 삭제</CardTitle>
-                  <CardDescription>삭제 사유 기록(프로토타입). 실제로는 권한 및 감사 로그가 필요합니다.</CardDescription>
+                  <CardTitle className="text-[#6B778C]">오더 취소</CardTitle>
+                  <CardDescription>취소 사유 기록(프로토타입). 실제로는 권한 및 감사 로그가 필요합니다.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <Input
                     value={deleteReason}
                     onChange={(e) => setDeleteReason(e.target.value)}
-                    placeholder="삭제 사유를 입력하세요"
+                    placeholder="취소 사유를 입력하세요"
                   />
                   <div className="flex justify-end gap-2">
                     <Button variant="secondary" onClick={() => { setDeleteModalOpen(false); setDeleteReason(""); }}>
-                      취소
+                      닫기
                     </Button>
                     <Button
-                      variant="danger"
+                      variant="primary"
                       disabled={!deleteReason.trim()}
                       onClick={() => {
-                        // 실제 삭제는 미구현. 프로토타입용 alert 처리.
-                        alert(`(프로토타입) 삭제 처리: ${selected.orderId}\n사유: ${deleteReason}`);
+                        // 실제 취소는 미구현. 프로토타입용 alert 처리.
+                        alert(`(프로토타입) 취소 처리: ${selected.orderId}\n사유: ${deleteReason}`);
+                        setOrders(orders.map(o => o.orderId === selected.orderId ? { ...o, status: "취소" } : o));
                         setDeleteModalOpen(false);
                         setDeleteReason("");
                         setSelected(null);
                       }}
                     >
-                      삭제 확정
+                      취소 확정
                     </Button>
                   </div>
                 </CardContent>
