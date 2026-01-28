@@ -65,16 +65,16 @@ const WASH_TYPES = ["내외부", "내부", "외부", "특수", "협의", "라이
 const MOCK_VEHICLES = [
   { plate: "12가3456", zoneName: "강남역 1번존", zoneId: "Z-1001", region1: "서울", region2: "강남", partner: "A파트너", activeOrderId: "O-90001", activeOrderStatus: "예약", lastWash: "2026-01-10", model: "아반떼 AD", isRechargeGuaranteed: false },
   { plate: "34나7890", zoneName: "잠실역 2번존", zoneId: "Z-1002", region1: "서울", region2: "송파", partner: "B파트너", activeOrderId: null, activeOrderStatus: null, lastWash: "2026-01-08", model: "K5", isRechargeGuaranteed: false },
-  { plate: "56다1122", zoneName: "홍대입구 3번존", zoneId: "Z-1003", region1: "서울", region2: "마포", partner: "A파트너", activeOrderId: "O-90003", activeOrderStatus: "미배정", lastWash: "2026-01-05", model: "쏘나타", isRechargeGuaranteed: false },
-  { plate: "78라3344", zoneName: "판교 1번존", zoneId: "Z-2001", region1: "경기", region2: "성남", partner: "C파트너", activeOrderId: "O-90004", activeOrderStatus: "입고 중", lastWash: "2026-01-09", model: "아이오닉5", isRechargeGuaranteed: true },
+  { plate: "56다1122", zoneName: "홍대입구 3번존", zoneId: "Z-1003", region1: "서울", region2: "마포", partner: "A파트너", activeOrderId: "O-90003", activeOrderStatus: "발행", lastWash: "2026-01-05", model: "쏘나타", isRechargeGuaranteed: false },
+  { plate: "78라3344", zoneName: "판교 1번존", zoneId: "Z-2001", region1: "경기", region2: "성남", partner: "C파트너", activeOrderId: "O-90004", activeOrderStatus: "수행 중", lastWash: "2026-01-09", model: "아이오닉5", isRechargeGuaranteed: true },
   { plate: "90마5566", zoneName: "수원역 2번존", zoneId: "Z-2002", region1: "경기", region2: "수원", partner: "B파트너", activeOrderId: null, activeOrderStatus: null, lastWash: "2026-01-07", model: "스포티지", isRechargeGuaranteed: false },
-  { plate: "11바7788", zoneName: "부산역 1번존", zoneId: "Z-3001", region1: "부산", region2: "동구", partner: "D파트너", activeOrderId: "O-90006", activeOrderStatus: "미배정", lastWash: "2026-01-03", model: "그랜저", isRechargeGuaranteed: false },
+  { plate: "11바7788", zoneName: "부산역 1번존", zoneId: "Z-3001", region1: "부산", region2: "동구", partner: "D파트너", activeOrderId: "O-90006", activeOrderStatus: "발행", lastWash: "2026-01-03", model: "그랜저", isRechargeGuaranteed: false },
   { plate: "22사9900", zoneName: "해운대 2번존", zoneId: "Z-3002", region1: "부산", region2: "해운대", partner: "D파트너", activeOrderId: "O-90007", activeOrderStatus: "예약", lastWash: "2026-01-11", model: "레이", isRechargeGuaranteed: false },
   { plate: "33아1212", zoneName: "대전역 1번존", zoneId: "Z-4001", region1: "대전", region2: "동구", partner: "C파트너", activeOrderId: null, activeOrderStatus: null, lastWash: "2026-01-06", model: "카니발", isRechargeGuaranteed: false },
-  { plate: "44자3434", zoneName: "청주 2번존", zoneId: "Z-5002", region1: "충북", region2: "청주", partner: "B파트너", activeOrderId: "O-90009", activeOrderStatus: "미배정", lastWash: "2026-01-02", model: "모닝", isRechargeGuaranteed: false },
+  { plate: "44자3434", zoneName: "청주 2번존", zoneId: "Z-5002", region1: "충북", region2: "청주", partner: "B파트너", activeOrderId: "O-90009", activeOrderStatus: "발행", lastWash: "2026-01-02", model: "모닝", isRechargeGuaranteed: false },
   { plate: "55차5656", zoneName: "광주 1번존", zoneId: "Z-6001", region1: "광주", region2: "서구", partner: "A파트너", activeOrderId: "O-90010", activeOrderStatus: "예약", lastWash: "2026-01-09", model: "EV6", isRechargeGuaranteed: false },
   { plate: "66카7878", zoneName: "인천공항 1번존", zoneId: "Z-7001", region1: "인천", region2: "중구", partner: "C파트너", activeOrderId: null, activeOrderStatus: null, lastWash: "2026-01-08", model: "티볼리", isRechargeGuaranteed: false },
-  { plate: "77타9090", zoneName: "제주공항 1번존", zoneId: "Z-8001", region1: "제주", region2: "제주시", partner: "D파트너", activeOrderId: "O-90012", activeOrderStatus: "미배정", lastWash: "2026-01-01", model: "셀토스", isRechargeGuaranteed: false },
+  { plate: "77타9090", zoneName: "제주공항 1번존", zoneId: "Z-8001", region1: "제주", region2: "제주시", partner: "D파트너", activeOrderId: "O-90012", activeOrderStatus: "발행", lastWash: "2026-01-01", model: "셀토스", isRechargeGuaranteed: false },
 ];
 
 function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, setOrders, missions, setMissions }) {
@@ -266,7 +266,7 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
     [orders, fRegion1]
   );
   const partners = useMemo(() => Array.from(new Set(orders.map((d) => d.partner))), [orders]);
-  const statuses = ["미배정", "파트너 배정", "예약", "입고 중", "수행 중", "세차 완료", "출고 중", "완료", "취소"];
+  const statuses = ["발행", "예약", "수행 중", "완료", "취소"];
   const orderGroups = ORDER_GROUPS;
   const orderTypes = ORDER_TYPES;
   const washTypes = WASH_TYPES;
@@ -316,15 +316,6 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
     alert(`오더가 발행되었습니다. (포함된 미션: ${pendingMissions.length}건)`);
   };
 
-  // 파트너 유형에 따른 진행 상태 옵션 동적화
-  const currentStatuses = useMemo(() => {
-    if (fPartnerType === "현장") {
-      return ["미배정", "예약", "수행 중", "완료", "취소"];
-    }
-    // 입고 또는 전체일 경우 전체 상태 노출
-    return ["미배정", "파트너 배정", "예약", "입고 중", "수행 중", "세차 완료", "출고 중", "완료", "취소"];
-  }, [fPartnerType]);
-
   const filtered = useMemo(() => {
     const qq = q.trim().toLowerCase();
     return orders.filter((d) => {
@@ -369,9 +360,8 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
   const getStatusBadgeTone = (status) => {
     if (status === "완료") return "ok";
     if (status === "취소") return "default";
-    if (status === "미배정") return "danger";
-    if (["예약", "파트너 배정"].includes(status)) return "warn";
-    if (["입고 중", "수행 중", "세차 완료", "출고 중"].includes(status)) return "info";
+    if (["발행", "예약"].includes(status)) return "warn";
+    if (status === "수행 중") return "info";
     return "default";
   };
 
@@ -532,19 +522,7 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
             <div className="md:col-span-2">
               <label htmlFor="fPartnerType" className="block text-xs font-semibold text-[#6B778C] mb-1.5">파트너 유형</label>
               <Select id="fPartnerType" value={fPartnerType} onChange={(e) => {
-                const newType = e.target.value;
-                setFPartnerType(newType);
-                // 파트너 유형 변경 시, 현재 선택된 상태값이 유효하지 않으면 초기화
-                let validStatuses = [];
-                if (newType === "현장") {
-                  validStatuses = ["미배정", "예약", "수행 중", "완료", "취소"];
-                } else {
-                  validStatuses = ["미배정", "파트너 배정", "예약", "입고 중", "수행 중", "세차 완료", "출고 중", "완료", "취소"];
-                }
-                if (fStatus && !validStatuses.includes(fStatus)) {
-                  setFStatus("");
-                  onClearQuickStatus();
-                }
+                setFPartnerType(e.target.value);
               }}>
                 <option value="">전체</option>
                 <option value="현장">현장</option>
@@ -555,7 +533,7 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
               <label htmlFor="fStatus" className="block text-xs font-semibold text-[#6B778C] mb-1.5">진행 상태</label>
               <Select id="fStatus" value={fStatus} onChange={(e) => { setFStatus(e.target.value); onClearQuickStatus(); }}>
                 <option value="">전체</option>
-                {currentStatuses.map((v) => <option key={v} value={v}>{v}</option>)}
+                {statuses.map((v) => <option key={v} value={v}>{v}</option>)}
               </Select>
             </div>
 
@@ -730,7 +708,7 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
                   </div>
                   <div className="space-y-1">
                     <div className="text-xs text-[#6B778C]">수행 일시</div>
-                    <div className="font-medium">{(['수행 중', '세차 완료', '출고 중', '완료'].includes(selected.status) && selected.completedAt) ? selected.completedAt : "-"}</div>
+                    <div className="font-medium">{(['수행 중', '완료'].includes(selected.status) && selected.completedAt) ? selected.completedAt : "-"}</div>
                   </div>
                   <div className="col-span-2 space-y-1">
                     <div className="text-xs text-[#6B778C]">메모</div>
@@ -771,10 +749,12 @@ function OrdersPage({ quickStatus, onClearQuickStatus, initialOrderId, orders, s
                 <CardHeader><CardTitle>진행 이력</CardTitle></CardHeader>
                 <CardContent>
                   <div className="relative space-y-4 pl-2 before:absolute before:left-[19px] before:top-2 before:h-[calc(100%-16px)] before:w-0.5 before:bg-[#DFE1E6]">
-                    {(selected.partnerType === "입고" 
-                      ? [{ time: "2026-01-12 10:00", label: "미배정" },{ time: "2026-01-12 10:05", label: "파트너 배정" },{ time: "2026-01-12 10:10", label: "예약" },{ time: "2026-01-12 10:30", label: "입고 중" },{ time: "2026-01-12 11:00", label: "수행 중" },{ time: "2026-01-12 11:45", label: "세차 완료" },{ time: "2026-01-12 11:50", label: "출고 중" },{ time: "2026-01-12 12:00", label: "완료" }]
-                      : [{ time: "2026-01-12 10:00", label: "미배정" },{ time: "2026-01-12 10:10", label: "예약" },{ time: "2026-01-12 11:00", label: "수행 중" },{ time: "2026-01-12 11:45", label: "완료" }]
-                    ).map((item, idx) => (
+                    {[
+                      { time: "2026-01-12 10:00", label: "발행" },
+                      { time: "2026-01-12 10:10", label: "예약" },
+                      { time: "2026-01-12 11:00", label: "수행 중" },
+                      { time: "2026-01-12 11:45", label: "완료" }
+                    ].map((item, idx) => (
                       <div key={idx} className="relative flex items-start gap-3">
                         <div className={cn("z-10 flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full ring-4 ring-white", selected.status === item.label ? "bg-[#0052CC]" : "bg-[#DFE1E6]")} />
                         <div className="flex flex-col">
