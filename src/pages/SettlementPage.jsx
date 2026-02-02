@@ -166,13 +166,16 @@ function DataTable({ columns, rows, onRowClick, rowKey, sortConfig, onSort }) {
 
 export default function SettlementPage() {
   const [items, setItems] = useState([
-    { id: "A-1001", orderId: "O-90002", plate: "34나7890", model: "K5", zoneName: "잠실역 2번존", partner: "B파트너", requestedAt: "2026-01-12 10:30", status: "요청", cost: 15000, reason: "오염도 심각으로 인한 추가 요금", comment: "사진 확인 부탁드립니다.", washItems: ["내부세차", "특수오염제거"] },
-    { id: "A-1002", orderId: "O-90005", plate: "90마5566", model: "스포티지", zoneName: "수원역 2번존", partner: "B파트너", requestedAt: "2026-01-11 14:20", status: "수락", cost: 10000, reason: "카시트 분리 세척", comment: "승인 완료", washItems: ["카시트세척"] },
-    { id: "A-1003", orderId: "O-90010", plate: "55차5656", model: "EV6", zoneName: "광주 1번존", partner: "A파트너", requestedAt: "2026-01-10 09:15", status: "거절", cost: 20000, reason: "광택 작업 요청", comment: "정책상 불가", washItems: ["광택"] },
+    { id: "A-1001", orderId: "O-90012", plate: "34나7890", model: "K5", zoneName: "잠실역 2번존", partner: "B파트너", requestedAt: "2026-01-12 10:30", approvalType: "1단계 승인", requestType: "현장 변경(내부→내외부)", status: "요청", cost: 15000, reason: "오염도 심각으로 인한 세차 유형 상향", requestComment: "조수석 시트 및 바닥 오염 심각합니다. 첨부 사진 확인 부탁드립니다.", rejectComment: null, washItems: ["내부세차", "특수오염제거"] },
+    { id: "A-1002", orderId: "O-90008", plate: "90마5566", model: "스포티지", zoneName: "수원역 2번존", partner: "B파트너", requestedAt: "2026-01-11 14:20", approvalType: "1단계 승인", requestType: "현장 변경(라이트→내외부)", status: "수락", cost: 10000, reason: "현장 세차 유형 업그레이드", requestComment: "유아 카시트 음식물 오염으로 분리 세척 필요합니다.", rejectComment: null, washItems: ["카시트세척"] },
+    { id: "A-1003", orderId: "O-90005", plate: "55차5656", model: "EV6", zoneName: "광주 1번존", partner: "A파트너", requestedAt: "2026-01-10 09:15", approvalType: "2단계 승인", requestType: "입고 변경(내외부→특수)", status: "거절", cost: 20000, reason: "입고 세차 유형 변경 (특수)", requestComment: "외부 스크래치가 많아 광택 작업 요청드립니다.", rejectComment: "광택 작업은 세차 서비스 범위에 포함되지 않습니다. 별도 외부 업체 이용 바랍니다.", washItems: ["광택"] },
+    { id: "A-1004", orderId: "O-90003", plate: "12가3456", model: "아반떼", zoneName: "강남역 1번존", partner: "C파트너", requestedAt: "2026-01-09 16:45", approvalType: "1단계 승인", requestType: "전환(현장→입고)", status: "요청", cost: 8000, reason: "현장 세차 → 입고(특수) 세차 변경", requestComment: "진흙 오염이 심해 현장에서 처리가 어렵습니다.", rejectComment: null, washItems: ["특수오염제거"] },
+    { id: "A-1005", orderId: "O-90001", plate: "78다9012", model: "쏘나타", zoneName: "판교역 3번존", partner: "A파트너", requestedAt: "2026-01-08 11:20", approvalType: "2단계 승인", requestType: "입고 변경(내외부→협의)", status: "수락", cost: 35000, reason: "입고 세차 유형 변경 (협의)", requestComment: "엔진룸 오일 누출로 특수 약품 처리 필요합니다.", rejectComment: null, washItems: ["엔진룸세척", "특수약품처리"] },
   ]);
 
   const [selected, setSelected] = useState(null);
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+  const [sortConfig, setSortConfig] = useState({ key: 'orderId', direction: 'desc' });
+  const [statusFilter, setStatusFilter] = useState("전체");
   const [rejectReason, setRejectReason] = useState("");
   const [isRejecting, setIsRejecting] = useState(false);
 
@@ -183,6 +186,8 @@ export default function SettlementPage() {
     { key: "zoneName", header: "존 이름" },
     { key: "partner", header: "파트너 명" },
     { key: "requestedAt", header: "요청 시간" },
+    { key: "approvalType", header: "합의 유형" },
+    { key: "requestType", header: "요청 유형" },
     {
       key: "status",
       header: "상태",
@@ -193,26 +198,30 @@ export default function SettlementPage() {
     },
   ];
 
-  const handleUpdateStatus = (newStatus, reason = "") => {
+  const handleUpdateStatus = (newStatus, rejectCommentText = "") => {
     if (!selected) return;
     setItems((prev) =>
-      prev.map((it) => (it.id === selected.id ? { ...it, status: newStatus, comment: reason || it.comment } : it))
+      prev.map((it) => (it.id === selected.id ? { ...it, status: newStatus, rejectComment: newStatus === "거절" ? rejectCommentText : it.rejectComment } : it))
     );
     setSelected(null);
     setIsRejecting(false);
     setRejectReason("");
   };
 
-  const sortedData = useMemo(() => {
-    if (!sortConfig.key) return items;
-    return [...items].sort((a, b) => {
+  const filteredAndSortedData = useMemo(() => {
+    let filtered = items;
+    if (statusFilter !== "전체") {
+      filtered = items.filter(item => item.status === statusFilter);
+    }
+    if (!sortConfig.key) return filtered;
+    return [...filtered].sort((a, b) => {
       const aVal = a[sortConfig.key] || "";
       const bVal = b[sortConfig.key] || "";
       if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
       if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
       return 0;
     });
-  }, [items, sortConfig]);
+  }, [items, sortConfig, statusFilter]);
 
   const handleSort = (key) => {
     setSortConfig(prev => ({
@@ -221,7 +230,7 @@ export default function SettlementPage() {
     }));
   };
 
-  const { currentData, currentPage, totalPages, setCurrentPage, totalItems } = usePagination(sortedData, 40);
+  const { currentData, currentPage, totalPages, setCurrentPage, totalItems } = usePagination(filteredAndSortedData, 40);
 
   return (
     <div className="space-y-4">
@@ -232,7 +241,21 @@ export default function SettlementPage() {
         </div>
       </div>
 
-
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-[#6B778C]">상태</span>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="h-9 rounded-lg border border-[#E2E8F0] bg-white px-3 text-sm text-[#172B4D] outline-none focus:border-[#0052CC] focus:ring-1 focus:ring-[#0052CC]"
+          >
+            <option value="전체">전체</option>
+            <option value="요청">요청</option>
+            <option value="수락">수락</option>
+            <option value="거절">거절</option>
+          </select>
+        </div>
+      </div>
 
       <DataTable columns={columns} rows={currentData} rowKey={(r) => r.id} onRowClick={setSelected} sortConfig={sortConfig} onSort={handleSort} />
       <div className="flex items-center pt-2">
@@ -293,6 +316,8 @@ export default function SettlementPage() {
                 <Field label="오더 ID" value={selected.orderId} />
                 <Field label="차량 번호" value={`${selected.plate} (${selected.model})`} />
                 <Field label="파트너 명" value={selected.partner} />
+                <Field label="합의 유형" value={<Badge tone={selected.approvalType === "1단계 승인" ? "ok" : "warn"}>{selected.approvalType}</Badge>} />
+                <Field label="요청 유형" value={selected.requestType} />
                 <Field label="요청 사유" value={selected.reason} />
                 <Field label="세차 항목" value={selected.washItems.join(", ")} />
                 <div className="flex items-center justify-between gap-3">
@@ -304,7 +329,10 @@ export default function SettlementPage() {
                     disabled={selected.status !== "요청"}
                   />
                 </div>
-                <Field label="코멘트" value={selected.comment} />
+                <Field label="요청 코멘트" value={selected.requestComment || '-'} />
+                {selected.status === '거절' && (
+                  <Field label="반려 코멘트" value={<span className="text-rose-600">{selected.rejectComment || '-'}</span>} />
+                )}
               </CardContent>
             </Card>
 

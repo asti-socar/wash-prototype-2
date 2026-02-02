@@ -1917,7 +1917,7 @@
   },
   {
     "orderId": "O-90008",
-    "washType": "내부",
+    "washType": "내외부",
     "orderGroup": "수시",
     "orderType": "수시세차",
     "carId": "C-1008",
@@ -2145,7 +2145,7 @@
   },
   {
     "orderId": "O-90009",
-    "washType": "외부",
+    "washType": "내외부",
     "orderGroup": "수시",
     "orderType": "BMW",
     "carId": "C-1009",
@@ -6657,7 +6657,7 @@
   },
   {
     "orderId": "O-90027",
-    "washType": "내부",
+    "washType": "내외부",
     "orderGroup": "수시",
     "orderType": "주기세차",
     "carId": "C-1027",
@@ -6883,7 +6883,7 @@
   },
   {
     "orderId": "O-90028",
-    "washType": "외부",
+    "washType": "내외부",
     "orderGroup": "수시",
     "orderType": "초장기 미세차",
     "carId": "C-1028",
@@ -11417,7 +11417,7 @@
   },
   {
     "orderId": "O-90046",
-    "washType": "내부",
+    "washType": "내외부",
     "orderGroup": "수시",
     "orderType": "수시세차",
     "carId": "C-1046",
@@ -11663,7 +11663,7 @@
   },
   {
     "orderId": "O-90047",
-    "washType": "외부",
+    "washType": "내외부",
     "orderGroup": "수시",
     "orderType": "재세차",
     "carId": "C-1047",
@@ -16106,7 +16106,7 @@
   },
   {
     "orderId": "O-90065",
-    "washType": "내부",
+    "washType": "내외부",
     "orderGroup": "수시",
     "orderType": "수시세차",
     "carId": "C-1065",
@@ -16318,7 +16318,7 @@
   },
   {
     "orderId": "O-90066",
-    "washType": "외부",
+    "washType": "내외부",
     "orderGroup": "수시",
     "orderType": "주기세차",
     "carId": "C-1066",
@@ -20755,7 +20755,7 @@
   },
   {
     "orderId": "O-90084",
-    "washType": "내부",
+    "washType": "내외부",
     "orderGroup": "수시",
     "orderType": "특수세차",
     "carId": "C-1084",
@@ -20967,7 +20967,7 @@
   },
   {
     "orderId": "O-90085",
-    "washType": "외부",
+    "washType": "내외부",
     "orderGroup": "수시",
     "orderType": "위생장애",
     "carId": "C-1085",
@@ -24894,8 +24894,12 @@
     "startedAt": null,
     "inspectionType": null,
     "handlerPreWashPhotos": [
-      { "url": "https://placehold.co/600x400?text=Handler+Pre+1" },
-      { "url": "https://placehold.co/600x400?text=Handler+Pre+2" }
+      {
+        "url": "https://placehold.co/600x400?text=Handler+Pre+1"
+      },
+      {
+        "url": "https://placehold.co/600x400?text=Handler+Pre+2"
+      }
     ],
     "handlerPostWashPhotos": [],
     "handlerReview": null
@@ -24924,9 +24928,15 @@
     "startedAt": "2026-01-27 14:00",
     "inspectionType": null,
     "handlerPreWashPhotos": [
-      { "url": "https://placehold.co/600x400?text=Handler+Pre+1" },
-      { "url": "https://placehold.co/600x400?text=Handler+Pre+2" },
-      { "url": "https://placehold.co/600x400?text=Handler+Pre+3" }
+      {
+        "url": "https://placehold.co/600x400?text=Handler+Pre+1"
+      },
+      {
+        "url": "https://placehold.co/600x400?text=Handler+Pre+2"
+      },
+      {
+        "url": "https://placehold.co/600x400?text=Handler+Pre+3"
+      }
     ],
     "handlerPostWashPhotos": [],
     "handlerReview": null
@@ -24956,21 +24966,47 @@
     "completedAt": "2026-01-27 15:30",
     "inspectionType": null,
     "handlerPreWashPhotos": [
-      { "url": "https://placehold.co/600x400?text=Handler+Pre+1" },
-      { "url": "https://placehold.co/600x400?text=Handler+Pre+2" },
-      { "url": "https://placehold.co/600x400?text=Handler+Pre+3" },
-      { "url": "https://placehold.co/600x400?text=Handler+Pre+4" },
-      { "url": "https://placehold.co/600x400?text=Handler+Pre+5" }
+      {
+        "url": "https://placehold.co/600x400?text=Handler+Pre+1"
+      },
+      {
+        "url": "https://placehold.co/600x400?text=Handler+Pre+2"
+      },
+      {
+        "url": "https://placehold.co/600x400?text=Handler+Pre+3"
+      },
+      {
+        "url": "https://placehold.co/600x400?text=Handler+Pre+4"
+      },
+      {
+        "url": "https://placehold.co/600x400?text=Handler+Pre+5"
+      }
     ],
     "handlerPostWashPhotos": [
-      { "url": "https://placehold.co/600x400?text=Handler+Post+1" },
-      { "url": "https://placehold.co/600x400?text=Handler+Post+2" },
-      { "url": "https://placehold.co/600x400?text=Handler+Post+3" },
-      { "url": "https://placehold.co/600x400?text=Handler+Post+4" },
-      { "url": "https://placehold.co/600x400?text=Handler+Post+5" },
-      { "url": "https://placehold.co/600x400?text=Handler+Post+6" },
-      { "url": "https://placehold.co/600x400?text=Handler+Post+7" },
-      { "url": "https://placehold.co/600x400?text=Handler+Post+8" }
+      {
+        "url": "https://placehold.co/600x400?text=Handler+Post+1"
+      },
+      {
+        "url": "https://placehold.co/600x400?text=Handler+Post+2"
+      },
+      {
+        "url": "https://placehold.co/600x400?text=Handler+Post+3"
+      },
+      {
+        "url": "https://placehold.co/600x400?text=Handler+Post+4"
+      },
+      {
+        "url": "https://placehold.co/600x400?text=Handler+Post+5"
+      },
+      {
+        "url": "https://placehold.co/600x400?text=Handler+Post+6"
+      },
+      {
+        "url": "https://placehold.co/600x400?text=Handler+Post+7"
+      },
+      {
+        "url": "https://placehold.co/600x400?text=Handler+Post+8"
+      }
     ],
     "handlerReview": "기계세차 완료. 외부 오염 깨끗하게 제거됨. 광택도 좋음."
   }

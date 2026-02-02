@@ -133,8 +133,7 @@ export const mockOrderTypes = [
     { key: 'B_긴급_내외부', inspectionType: "B", orderType: "긴급", washType: "내외부", partnerType: "입고" },
     { key: 'B_정규_내외부', inspectionType: "B", orderType: "정규", washType: "내외부", partnerType: "입고" },
     { key: 'B_수시_내외부', inspectionType: "B", orderType: "수시", washType: "내외부", partnerType: "입고" },
-    { key: 'B_수시_내부', inspectionType: "B", orderType: "수시", washType: "내부", partnerType: "입고" },
-    { key: 'B_수시_외부', inspectionType: "B", orderType: "수시", washType: "외부", partnerType: "입고" },
+    // 입고 파트너는 내부/외부 단독 세차 유형 없음 (내외부, 협의, 특수만 가능)
     { key: 'C_긴급_내외부', inspectionType: "B", orderType: "긴급", washType: "내외부", partnerType: "현장" },
     { key: 'D_정규_내외부', inspectionType: "C", orderType: "정규", washType: "내외부", partnerType: "현장" },
     { key: 'D_정규_내부', inspectionType: "C", orderType: "정규", washType: "내부", partnerType: "현장" },
