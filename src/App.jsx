@@ -467,7 +467,7 @@ function AdminApp() {
         <button
           onClick={() => setIsHideComments(prev => !prev)}
           className={`flex h-12 w-auto items-center justify-center rounded-full px-5 font-bold text-white shadow-lg transition-colors duration-200
-            ${isHideComments ? 'bg-gray-500 hover:bg-gray-600' : 'bg-slate-700 hover:bg-slate-800'}
+            ${isHideComments ? 'bg-gray-500/70 hover:bg-gray-600/80' : 'bg-slate-700/70 hover:bg-slate-800/80'}
           `}
         >
           QnA 숨기기 {isHideComments ? 'ON' : 'OFF'}
@@ -475,7 +475,7 @@ function AdminApp() {
         <button
           onClick={() => setIsFeedbackMode(prev => !prev)}
           className={`flex h-12 w-auto items-center justify-center rounded-full px-5 font-bold text-white shadow-lg transition-colors duration-200
-            ${isFeedbackMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-slate-700 hover:bg-slate-800'}
+            ${isFeedbackMode ? 'bg-blue-600/70 hover:bg-blue-700/80' : 'bg-slate-700/70 hover:bg-slate-800/80'}
           `}
         >
           QnA 입력모드 {isFeedbackMode ? 'ON' : 'OFF'}
