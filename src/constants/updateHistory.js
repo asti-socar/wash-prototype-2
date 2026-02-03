@@ -1,4 +1,5 @@
 export const BROWN_HISTORY = [
+  { id: 78, date: "2026-02-03 18:30", content: "[기능] 대량 존 배정: CSV 파일 업로드를 통한 존-파트너 일괄 배정, 드래그앤드롭 업로드, 양식 다운로드, 검증 실패 내역 표시", isPolicyChange: true, links: [{ label: "존 배정 관리", page: "zone-assignment" }] },
   { id: 77, date: "2026-02-03 17:00", content: "[기능] 파트너 단가 정책 일자별 관리: 적용 시작일 지정, 적용 중/예정 정책 분리 표시, 미래 적용 정책 사전 등록 기능", isPolicyChange: true, links: [{ label: "파트너 관리", page: "partners" }] },
   { id: 73, date: "2026-02-03 11:30", content: "[기능] 존 배정 관리 메뉴 신설: 존 중심 파트너 배정 현황 관리, 미배정 존 식별 UI, 파트너 관리에서 존 배정 탭 분리", isPolicyChange: true, links: [{ label: "존 배정 관리", page: "zone-assignment" }, { label: "파트너 관리", page: "partners" }] },
   { id: 72, date: "2026-02-02 18:15", content: "[정책] 합의 요청 관리: 요청 유형 값 형식 변경 - 변경 내용 명시적 표시 (예: 현장 변경(내부→내외부), 전환(현장→입고), 입고 변경(내외부→특수))", isPolicyChange: true, links: [{ label: "합의 요청 관리", page: "settlement" }] },

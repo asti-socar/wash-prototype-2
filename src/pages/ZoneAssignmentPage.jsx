@@ -1,6 +1,7 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import {
-  Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ArrowUpDown, X, MapPin
+  Search, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ArrowUpDown, X, MapPin,
+  Upload, Download, AlertCircle, CheckCircle2, FileSpreadsheet
 } from 'lucide-react';
 import zoneAssignmentsData from '../mocks/zoneAssignments.json';
 
@@ -185,6 +186,7 @@ const partnerMap = new Map(MOCK_PARTNERS.map(p => [p.partnerId, p.partnerName]))
 export default function ZoneAssignmentPage() {
   const [zones, setZones] = useState(zoneAssignmentsData);
   const [selectedZone, setSelectedZone] = useState(null);
+  const [bulkAssignmentOpen, setBulkAssignmentOpen] = useState(false);
 
   // Filters
   const [searchQuery, setSearchQuery] = useState("");
@@ -266,6 +268,19 @@ export default function ZoneAssignmentPage() {
     setSelectedZone(null);
   };
 
+  const handleBulkAssignment = (assignments) => {
+    setZones(prev => {
+      const updated = [...prev];
+      assignments.forEach(({ zoneId, partnerId }) => {
+        const idx = updated.findIndex(z => z.zoneId === zoneId);
+        if (idx !== -1) {
+          updated[idx] = { ...updated[idx], assignedPartnerId: partnerId || null };
+        }
+      });
+      return updated;
+    });
+  };
+
   // Stats
   const stats = useMemo(() => {
     const total = zones.length;
@@ -295,19 +310,25 @@ export default function ZoneAssignmentPage() {
           <div className="text-base font-bold text-[#172B4D]">존 배정 관리</div>
           <div className="mt-1 text-sm text-[#6B778C]">존별 파트너 배정 현황을 관리합니다.</div>
         </div>
-        <div className="flex items-center gap-4 text-sm">
-          <div className="flex items-center gap-2">
-            <span className="text-[#6B778C]">전체</span>
-            <span className="font-semibold text-[#172B4D]">{stats.total}개</span>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 text-sm">
+            <div className="flex items-center gap-2">
+              <span className="text-[#6B778C]">전체</span>
+              <span className="font-semibold text-[#172B4D]">{stats.total}개</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-[#6B778C]">배정</span>
+              <span className="font-semibold text-emerald-600">{stats.assigned}개</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-[#6B778C]">미배정</span>
+              <span className="font-semibold text-amber-600">{stats.unassigned}개</span>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-[#6B778C]">배정</span>
-            <span className="font-semibold text-emerald-600">{stats.assigned}개</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-[#6B778C]">미배정</span>
-            <span className="font-semibold text-amber-600">{stats.unassigned}개</span>
-          </div>
+          <Button onClick={() => setBulkAssignmentOpen(true)}>
+            <Upload className="mr-2 h-4 w-4" />
+            대량 존 배정
+          </Button>
         </div>
       </div>
 
@@ -394,6 +415,15 @@ export default function ZoneAssignmentPage() {
           onSave={handleSaveAssignment}
         />
       )}
+
+      {/* Bulk Assignment Drawer */}
+      {bulkAssignmentOpen && (
+        <BulkAssignmentDrawer
+          zones={zones}
+          onClose={() => setBulkAssignmentOpen(false)}
+          onApply={handleBulkAssignment}
+        />
+      )}
     </div>
   );
 }
@@ -477,6 +507,347 @@ function ZoneDetailDrawer({ zone, onClose, onSave }) {
             </div>
           </CardContent>
         </Card>
+      </div>
+    </Drawer>
+  );
+}
+
+// ============== BULK ASSIGNMENT DRAWER ==============
+function BulkAssignmentDrawer({ zones, onClose, onApply }) {
+  const fileInputRef = useRef(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState(null);
+  const [parseResult, setParseResult] = useState(null); // { success: [], errors: [] }
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isApplied, setIsApplied] = useState(false);
+
+  const zoneIdSet = useMemo(() => new Set(zones.map(z => z.zoneId)), [zones]);
+  const partnerIdSet = useMemo(() => new Set(MOCK_PARTNERS.map(p => p.partnerId)), []);
+
+  // CSV 양식 다운로드
+  const handleDownloadTemplate = () => {
+    const headers = "zoneId,partnerId";
+    const sampleRows = [
+      "Z-1001,P-001",
+      "Z-1002,P-002",
+      "Z-1003,",
+    ];
+    const csvContent = [headers, ...sampleRows].join("\n");
+    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "zone_assignment_template.csv";
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // CSV 파싱
+  const parseCSV = (text) => {
+    const lines = text.trim().split(/\r?\n/);
+    if (lines.length < 2) return { success: [], errors: [{ row: 0, message: "데이터가 없습니다." }] };
+
+    const headers = lines[0].split(",").map(h => h.trim().toLowerCase());
+    const zoneIdIdx = headers.indexOf("zoneid");
+    const partnerIdIdx = headers.indexOf("partnerid");
+
+    if (zoneIdIdx === -1 || partnerIdIdx === -1) {
+      return { success: [], errors: [{ row: 1, message: "필수 컬럼(zoneId, partnerId)이 없습니다." }] };
+    }
+
+    const success = [];
+    const errors = [];
+
+    for (let i = 1; i < lines.length; i++) {
+      const cols = lines[i].split(",").map(c => c.trim());
+      const zoneId = cols[zoneIdIdx];
+      const partnerId = cols[partnerIdIdx] || null;
+      const rowNum = i + 1;
+
+      // 빈 행 스킵
+      if (!zoneId && !partnerId) continue;
+
+      // 존 ID 검증
+      if (!zoneId) {
+        errors.push({ row: rowNum, zoneId: "(없음)", message: "존 ID가 비어있습니다." });
+        continue;
+      }
+
+      if (!zoneIdSet.has(zoneId)) {
+        errors.push({ row: rowNum, zoneId, message: `존재하지 않는 존 ID입니다.` });
+        continue;
+      }
+
+      // 파트너 ID 검증 (빈 값은 미배정으로 허용)
+      if (partnerId && !partnerIdSet.has(partnerId)) {
+        errors.push({ row: rowNum, zoneId, partnerId, message: `존재하지 않는 파트너 ID입니다.` });
+        continue;
+      }
+
+      success.push({ zoneId, partnerId });
+    }
+
+    return { success, errors };
+  };
+
+  // 파일 처리
+  const handleFile = (file) => {
+    if (!file) return;
+
+    const validTypes = ["text/csv", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"];
+    const isValidFile = file.name.endsWith(".csv") || file.name.endsWith(".xlsx") || file.name.endsWith(".xls") || validTypes.includes(file.type);
+
+    if (!isValidFile) {
+      alert("CSV 또는 엑셀 파일만 업로드 가능합니다.");
+      return;
+    }
+
+    setUploadedFile(file);
+    setIsProcessing(true);
+    setParseResult(null);
+    setIsApplied(false);
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = e.target.result;
+      const result = parseCSV(text);
+      setParseResult(result);
+      setIsProcessing(false);
+    };
+    reader.onerror = () => {
+      alert("파일을 읽는 중 오류가 발생했습니다.");
+      setIsProcessing(false);
+    };
+    reader.readAsText(file);
+  };
+
+  // 드래그 앤 드롭 핸들러
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files[0];
+    handleFile(file);
+  };
+
+  const handleFileInput = (e) => {
+    const file = e.target.files[0];
+    handleFile(file);
+  };
+
+  // 배정 적용
+  const handleApply = () => {
+    if (!parseResult || parseResult.success.length === 0) return;
+    if (!window.confirm(`${parseResult.success.length}건의 배정을 적용하시겠습니까?`)) return;
+
+    onApply(parseResult.success);
+    setIsApplied(true);
+  };
+
+  // 초기화
+  const handleReset = () => {
+    setUploadedFile(null);
+    setParseResult(null);
+    setIsApplied(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  return (
+    <Drawer
+      open={true}
+      title="대량 존 배정"
+      onClose={onClose}
+      footer={
+        <div className="flex w-full flex-col-reverse sm:flex-row sm:justify-end gap-2">
+          <Button variant="secondary" onClick={onClose} className="w-full sm:w-auto">닫기</Button>
+          {parseResult && parseResult.success.length > 0 && !isApplied && (
+            <Button onClick={handleApply} className="w-full sm:w-auto">
+              <CheckCircle2 className="mr-2 h-4 w-4" />
+              {parseResult.success.length}건 배정 적용
+            </Button>
+          )}
+        </div>
+      }
+    >
+      <div className="space-y-4">
+        {/* 안내 */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileSpreadsheet className="h-4 w-4" />
+              대량 배정 안내
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm text-[#6B778C]">
+            <p>CSV 또는 엑셀 파일을 업로드하여 다수의 존에 파트너를 일괄 배정할 수 있습니다.</p>
+            <ul className="list-disc list-inside space-y-1">
+              <li>파일 형식: CSV (쉼표 구분) 또는 Excel (.xlsx)</li>
+              <li>필수 컬럼: zoneId, partnerId</li>
+              <li>파트너 ID를 비워두면 미배정 처리됩니다.</li>
+            </ul>
+            <Button variant="secondary" size="sm" onClick={handleDownloadTemplate}>
+              <Download className="mr-2 h-4 w-4" />
+              양식 다운로드
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* 파일 업로드 영역 */}
+        <Card>
+          <CardHeader>
+            <CardTitle>파일 업로드</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div
+              className={cn(
+                "border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors",
+                isDragging ? "border-[#0052CC] bg-blue-50" : "border-[#E2E8F0] hover:border-[#94A3B8]",
+                uploadedFile && "border-emerald-400 bg-emerald-50"
+              )}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".csv,.xlsx,.xls"
+                className="hidden"
+                onChange={handleFileInput}
+              />
+              {uploadedFile ? (
+                <div className="space-y-2">
+                  <CheckCircle2 className="h-10 w-10 mx-auto text-emerald-500" />
+                  <p className="font-medium text-[#172B4D]">{uploadedFile.name}</p>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleReset(); }}
+                    className="text-sm text-[#0052CC] hover:underline"
+                  >
+                    다른 파일 선택
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <Upload className="h-10 w-10 mx-auto text-[#94A3B8]" />
+                  <p className="text-[#6B778C]">클릭하거나 파일을 드롭하여 업로드하세요.</p>
+                  <p className="text-xs text-[#94A3B8]">CSV, Excel 파일 지원</p>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* 처리 중 */}
+        {isProcessing && (
+          <Card>
+            <CardContent className="py-8 text-center text-[#6B778C]">
+              파일을 분석 중입니다...
+            </CardContent>
+          </Card>
+        )}
+
+        {/* 적용 완료 */}
+        {isApplied && (
+          <Card>
+            <CardContent className="py-6">
+              <div className="flex items-center gap-3 text-emerald-600">
+                <CheckCircle2 className="h-6 w-6" />
+                <div>
+                  <p className="font-semibold">배정이 완료되었습니다.</p>
+                  <p className="text-sm text-[#6B778C]">{parseResult.success.length}건의 존 배정이 적용되었습니다.</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* 파싱 결과 - 성공 */}
+        {parseResult && !isApplied && parseResult.success.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-emerald-600">
+                <CheckCircle2 className="h-4 w-4" />
+                배정 가능 ({parseResult.success.length}건)
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="max-h-40 overflow-y-auto rounded-lg border border-[#E2E8F0]">
+                <table className="min-w-full text-sm">
+                  <thead className="bg-[#F8FAFC] sticky top-0">
+                    <tr>
+                      <th className="px-3 py-2 text-left font-semibold text-[#475569]">존 ID</th>
+                      <th className="px-3 py-2 text-left font-semibold text-[#475569]">파트너 ID</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#E2E8F0]">
+                    {parseResult.success.slice(0, 50).map((item, idx) => (
+                      <tr key={idx}>
+                        <td className="px-3 py-2">{item.zoneId}</td>
+                        <td className="px-3 py-2">{item.partnerId || <span className="text-[#94A3B8]">미배정</span>}</td>
+                      </tr>
+                    ))}
+                    {parseResult.success.length > 50 && (
+                      <tr><td colSpan={2} className="px-3 py-2 text-center text-[#6B778C]">외 {parseResult.success.length - 50}건...</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* 파싱 결과 - 실패 */}
+        {parseResult && parseResult.errors.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-rose-600">
+                <AlertCircle className="h-4 w-4" />
+                배정 실패 ({parseResult.errors.length}건)
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="max-h-48 overflow-y-auto rounded-lg border border-rose-200 bg-rose-50">
+                <table className="min-w-full text-sm">
+                  <thead className="bg-rose-100 sticky top-0">
+                    <tr>
+                      <th className="px-3 py-2 text-left font-semibold text-rose-700">행</th>
+                      <th className="px-3 py-2 text-left font-semibold text-rose-700">존 ID</th>
+                      <th className="px-3 py-2 text-left font-semibold text-rose-700">오류 내용</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-rose-200">
+                    {parseResult.errors.map((err, idx) => (
+                      <tr key={idx}>
+                        <td className="px-3 py-2 text-rose-600">{err.row}</td>
+                        <td className="px-3 py-2">{err.zoneId || "-"}</td>
+                        <td className="px-3 py-2 text-rose-600">{err.message}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* 성공 0건일 때 */}
+        {parseResult && parseResult.success.length === 0 && parseResult.errors.length === 0 && (
+          <Card>
+            <CardContent className="py-6 text-center text-[#6B778C]">
+              처리할 데이터가 없습니다.
+            </CardContent>
+          </Card>
+        )}
       </div>
     </Drawer>
   );
