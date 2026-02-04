@@ -1,273 +1,589 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ResponsiveContainer,
-  BarChart,
-  Bar,
-  AreaChart,
-  Area,
   PieChart,
   Pie,
   Cell,
+  LineChart,
+  Line,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   Tooltip,
   CartesianGrid,
   Legend,
-  ComposedChart,
+  ReferenceLine,
 } from "recharts";
-import { X } from "lucide-react";
+import { RefreshCw, ArrowRight, ChevronDown } from "lucide-react";
+import dashboardData from "../mocks/dashboard.json";
 
 function cn(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-function Card({ className, children }) {
+// 클릭 가능한 수치 컴포넌트
+function ClickableValue({ value, label, onClick, size = "md", color = "text-[#172B4D]" }) {
+  const sizeClasses = {
+    sm: "text-lg",
+    md: "text-2xl",
+    lg: "text-3xl",
+  };
   return (
-    <div className={cn("rounded-xl bg-white border border-[#E2E8F0] shadow-[0_2px_4px_rgba(0,0,0,0.02)]", className)}>
-      {children}
+    <button
+      onClick={onClick}
+      className={cn(
+        "flex flex-col items-center gap-1 rounded-lg px-3 py-2 transition-all hover:bg-[#F4F5F7] active:scale-95",
+        onClick ? "cursor-pointer" : "cursor-default"
+      )}
+    >
+      <span className="text-xs font-medium text-[#6B778C]">{label}</span>
+      <span className={cn("font-bold", sizeClasses[size], color)}>{value}</span>
+    </button>
+  );
+}
+
+// 취소 유형 상세 컴포넌트
+function CancelTypeDetail({ cancelled, onCancelTypeClick }) {
+  const cancelTypes = [
+    { key: "change", label: "변경취소", filterValue: "변경취소" },
+    { key: "no_reservation", label: "미예약취소", filterValue: "미예약취소" },
+    { key: "no_show", label: "노쇼취소", filterValue: "노쇼취소" },
+    { key: "agent", label: "수행원취소", filterValue: "수행원취소" },
+    { key: "rain", label: "우천취소", filterValue: "우천취소" },
+  ];
+
+  return (
+    <div className="mt-3 rounded-lg bg-[#FEF2F2] p-3">
+      <div className="text-xs font-semibold text-rose-700 mb-2">취소 유형 상세</div>
+      <div className="flex flex-wrap gap-2">
+        {cancelTypes.map((ct) => (
+          <button
+            key={ct.key}
+            onClick={() => onCancelTypeClick(ct.filterValue)}
+            className="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 text-xs font-medium text-rose-700 border border-rose-200 hover:bg-rose-50 transition-colors"
+          >
+            {ct.label}: <span className="font-bold">{cancelled[ct.key]}</span>
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
-function CardHeader({ className, children }) {
-  return <div className={cn("p-5 pb-3", className)}>{children}</div>;
-}
-function CardTitle({ className, children }) {
-  return <div className={cn("text-sm font-bold text-[#172B4D]", className)}>{children}</div>;
-}
-function CardDescription({ className, children }) {
-  return <div className={cn("mt-1 text-xs text-[#6B778C]", className)}>{children}</div>;
-}
-function CardContent({ className, children }) {
-  return <div className={cn("p-5 pt-2", className)}>{children}</div>;
-}
 
-function Dashboard() {
-  const [isGuideOpen, setIsGuideOpen] = useState(true);
+function Dashboard({ goOrdersWithFilter }) {
+  const [data, setData] = useState(dashboardData);
+  const [lastUpdated, setLastUpdated] = useState(new Date());
+  const [secondsAgo, setSecondsAgo] = useState(0);
+  const [riskTab, setRiskTab] = useState("hygiene");
 
-  // Mock Data for Charts
-  const dailyData = [
-    { day: "월", prevWeek: 300, currWeek: 320 },
-    { day: "화", prevWeek: 330, currWeek: 350 },
-    { day: "수", prevWeek: 310, currWeek: 300 },
-    { day: "목", prevWeek: 360, currWeek: 0 },
-    { day: "금", prevWeek: 400, currWeek: 0 },
-    { day: "토", prevWeek: 0, currWeek: 0 },
-    { day: "일", prevWeek: 0, currWeek: 0 },
+  // 갱신 시간 카운터
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSecondsAgo(Math.floor((Date.now() - lastUpdated.getTime()) / 1000));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [lastUpdated]);
+
+  // 새로고침 핸들러
+  const handleRefresh = () => {
+    setLastUpdated(new Date());
+    setSecondsAgo(0);
+  };
+
+  const { order_status, risk_management, hourly_orders, daily_risks } = data;
+
+  // 오더 상태 도넛 차트 데이터
+  const statusDonutData = [
+    { name: "발행", value: order_status.issued, color: "#3B82F6" },
+    { name: "예약", value: order_status.reserved, color: "#22C55E" },
+    { name: "수행 중", value: order_status.in_progress, color: "#EAB308" },
+    { name: "취소", value: order_status.cancelled.total, color: "#94A3B8" },
+    { name: "완료", value: order_status.completed.total, color: "#8B5CF6" },
   ];
 
-  const partnerData = [
-    { name: "A파트너", timely: 45, undone: 10, delayed: 5 },
-    { name: "B파트너", timely: 38, undone: 5, delayed: 12 },
-    { name: "C파트너", timely: 52, undone: 8, delayed: 2 },
-    { name: "D파트너", timely: 40, undone: 15, delayed: 8 },
+  // 리스크 비율 도넛 차트 데이터
+  const riskTotal = risk_management.hygiene.total + risk_management.ml_urgent.total + risk_management.long_term.total;
+  const normalOrders = order_status.total - riskTotal;
+  const riskDonutData = [
+    { name: "일반 오더", value: normalOrders, color: "#E2E8F0" },
+    { name: "위생장애", value: risk_management.hygiene.total, color: "#EF4444" },
+    { name: "ML긴급", value: risk_management.ml_urgent.total, color: "#F97316" },
+    { name: "초장기미세차", value: risk_management.long_term.total, color: "#EAB308" },
   ];
 
-  const hourlyData = [
-    { time: "00", value: 10 }, { time: "04", value: 5 },
-    { time: "08", value: 20 }, { time: "12", value: 50 },
-    { time: "16", value: 40 }, { time: "20", value: 80 },
-    { time: "24", value: 30 },
-  ];
+  // 시간대별 오더 생성량 차트 데이터
+  const hourlyChartData = hourly_orders.data;
+  const currentHour = new Date().getHours();
 
-  const issueData = [
-    { name: "완료", value: 85 },
-    { name: "미처리", value: 15 },
-  ];
-  const COLORS = ["#0052CC", "#DFE1E6"];
+  // 일별 리스크 추이 차트 데이터
+  const dailyRiskChartData = daily_risks.data.map((d) => ({
+    ...d,
+    date: d.date.slice(5), // MM-DD 형식
+  }));
 
-  // KPI Data
-  const performanceFlow = [
-    { label: "발행", value: 248, color: "text-[#172B4D]" },
-    { label: "예약 완료", value: 164, color: "text-[#0052CC]" },
-    { label: "수행 완료", value: 79, color: "text-[#0052CC]" },
-    { label: "취소", value: 5, color: "text-rose-600" },
-  ];
+  // 리스크 탭 데이터 매핑
+  const riskTabData = {
+    hygiene: { label: "위생장애", data: risk_management.hygiene, orderType: "위생장애" },
+    ml_urgent: { label: "고객피드백(ML)_긴급", data: risk_management.ml_urgent, orderType: "고객 피드백(ML)_긴급" },
+    long_term: { label: "초장기미세차", data: risk_management.long_term, orderType: "초장기 미세차" },
+  };
 
-  const emergencyMetrics = [
-    { label: "긴급 세차 오더", value: "15건" },
-    { label: "위생 장애 인입", value: "12건" },
-    { label: "적시 수행 (72시간 이내)", value: "10건" },
-    { label: "평균 장애 처리 리드타임", value: "45시간" },
-  ];
+  const currentRisk = riskTabData[riskTab];
+
+  // 네비게이션 핸들러
+  const goToOrders = (filter = {}) => {
+    if (goOrdersWithFilter) {
+      goOrdersWithFilter(filter);
+    }
+  };
 
   return (
     <div className="space-y-6">
-      {/* Guide Modal */}
-      {isGuideOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 animate-in fade-in-0">
-          <div className="relative w-full max-w-2xl rounded-2xl bg-white p-8 shadow-2xl animate-in fade-in-0 zoom-in-95">
-            <button 
-              onClick={() => setIsGuideOpen(false)}
-              className="absolute top-4 right-4 p-2 rounded-full text-gray-500 hover:bg-gray-100"
-            >
-              <X className="h-6 w-6" />
-            </button>
-            <h2 className="text-xl font-bold text-slate-800">대시보드 구현 방향 안내</h2>
-            <p className="mt-2 text-sm text-slate-500">
-              현재 대시보드 UI는 프로토타입에서만 제공합니다. 실제 기능 제공은 아래 방향으로 계획 중입니다.
-            </p>
-            <div className="mt-6 space-y-4 rounded-lg border border-slate-200 bg-slate-50 p-6 text-sm">
-              <div className="flex items-start gap-4">
-                <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-600 font-bold">1</div>
-                <div>
-                  <h3 className="font-bold text-slate-800">관제 대시보드 기능 구현</h3>
-                  <p className="mt-1 text-slate-600">
-                    신규 시스템 DB 데이터를 BigQuery에 적재하고, 이를 구글 스프레드시트와 1시간 주기로 연동하여 KPI 및 차트 데이터를 제공합니다. (인터널 어드민에서 제공하지 않음. 구글 스프레드시트로 제공.)
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start gap-4">
-                <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-600 font-bold">2</div>
-                <div>
-                  <h3 className="font-bold text-slate-800">오더 관리 연동</h3>
-                  <p className="mt-1 text-slate-600">
-                    현재 대시보드 UI안의 각 지표 클릭 시, 해당 조건으로 필터링된 오더 관리 화면으로 즉시 연결할 수 있도록, 오더 관리 필터 화면 Short-Cut 기능을 제공할 예정입니다. (인터널 어드민에서)
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="mt-8 flex justify-end">
-              <button onClick={() => setIsGuideOpen(false)} className="w-full sm:w-auto rounded-lg bg-blue-600 px-8 py-3 text-sm font-bold text-white shadow-lg transition hover:bg-blue-700 active:scale-95">
-                확인했습니다
-              </button>
-            </div>
-          </div>
+      {/* 헤더 */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-bold text-[#172B4D]">세차 운영 대시보드</h1>
+          <p className="text-sm text-[#6B778C]">실시간 현황 모니터링 및 리스크 관리</p>
         </div>
-      )}
-      {/* KPI Section */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {/* Car Wash Performance Status */}
-        <Card>
-          <CardHeader>
-            <CardTitle>세차 수행 현황 (Today)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              {performanceFlow.map((item, idx) => (
-                <React.Fragment key={item.label}>
-                  <div className="flex flex-col items-center gap-1">
-                    <span className="text-xs font-medium text-[#6B778C]">{item.label}</span>
-                    <span className={cn("text-2xl font-bold", item.color)}>{item.value}</span>
-                  </div>
-                  {idx < performanceFlow.length - 1 && (
-                    <div className="h-px w-8 bg-[#DFE1E6] md:w-16" />
-                  )}
-                </React.Fragment>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Emergency Wash Status */}
-        <Card>
-          <CardHeader>
-            <CardTitle>긴급 세차 처리 현황 (최근 1주일)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-4 gap-4 text-center">
-              {emergencyMetrics.map((item) => (
-                <div key={item.label} className="flex flex-col gap-1">
-                  <span className="text-xs font-medium text-[#6B778C]">{item.label}</span>
-                  <span className="text-xl font-bold text-[#172B4D]">{item.value}</span>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-[#6B778C]">
+            마지막 갱신: {secondsAgo < 60 ? `${secondsAgo}초 전` : `${Math.floor(secondsAgo / 60)}분 전`}
+          </span>
+          <button
+            onClick={handleRefresh}
+            className="inline-flex items-center gap-2 rounded-lg border border-[#E2E8F0] bg-white px-3 py-2 text-sm font-medium text-[#172B4D] hover:bg-[#F4F5F7] transition-colors"
+          >
+            <RefreshCw className="h-4 w-4" />
+            새로고침
+          </button>
+        </div>
       </div>
 
-      {/* Charts Section */}
-      <div>
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          
-          {/* Daily Orders */}
-          <Card>
-            <CardHeader><CardTitle>전주 대비 일자별 오더</CardTitle></CardHeader>
-            <CardContent className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart data={dailyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#DFE1E6" />
-                  <XAxis dataKey="day" tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: "#6B778C" }} />
-                  <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: "#6B778C" }} />
-                  <Tooltip cursor={{ fill: "#F4F5F7" }} />
-                  <Legend verticalAlign="top" align="right" wrapperStyle={{ top: -10 }} iconType="circle" />
-                  <Area type="monotone" dataKey="prevWeek" name="전주" fill="#F1F5F9" stroke="#E2E8F0" />
-                  <Bar dataKey="currWeek" name="금주" fill="#0052CC" radius={[4, 4, 0, 0]} barSize={30} />
-                </ComposedChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+      {/* [영역 1] 오더 현황 */}
+      <div className="rounded-xl border border-[#E2E8F0] bg-white shadow-sm">
+        <div className="border-b border-[#E2E8F0] px-5 py-4">
+          <h2 className="text-sm font-bold text-[#172B4D]">오더 현황</h2>
+          <p className="text-xs text-[#6B778C] mt-0.5">전체 오더의 상태별 흐름과 분포</p>
+        </div>
+        <div className="p-5">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Funnel 시각화 */}
+            <div className="lg:col-span-2 space-y-4">
+              {/* 1단계: 전체 오더 */}
+              <div className="text-center">
+                <ClickableValue
+                  label="전체 오더"
+                  value={order_status.total}
+                  size="lg"
+                  onClick={() => goToOrders({})}
+                />
+              </div>
 
-          {/* Partner Performance */}
-          <Card>
-            <CardHeader><CardTitle>파트너별 수행 현황 (최근 1주일)</CardTitle></CardHeader>
-            <CardContent className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={partnerData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#DFE1E6" />
-                  <XAxis dataKey="name" tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: "#6B778C" }} />
-                  <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: "#6B778C" }} />
-                  <Tooltip cursor={{ fill: "#F4F5F7" }} />
-                  <Legend verticalAlign="top" align="right" wrapperStyle={{ top: -10 }} iconType="circle" />
-                  <Bar dataKey="timely" name="적시수행" fill="#0052CC" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="undone" name="미수행" fill="#DFE1E6" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="delayed" name="지연" fill="#ef4444" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+              {/* 2단계: 발행 / 예약 / 취소 */}
+              <div className="flex items-center justify-center gap-4">
+                <ClickableValue
+                  label="발행"
+                  value={order_status.issued}
+                  color="text-blue-600"
+                  onClick={() => goToOrders({ status: "발행" })}
+                />
+                <ArrowRight className="h-4 w-4 text-[#DFE1E6]" />
+                <ClickableValue
+                  label="예약"
+                  value={order_status.reserved}
+                  color="text-green-600"
+                  onClick={() => goToOrders({ status: "예약" })}
+                />
+                <div className="h-8 w-px bg-[#DFE1E6] mx-2" />
+                <ClickableValue
+                  label="취소"
+                  value={order_status.cancelled.total}
+                  color="text-rose-600"
+                  onClick={() => goToOrders({ status: "취소" })}
+                />
+              </div>
 
-          {/* Hourly Concentration */}
-          <Card>
-            <CardHeader><CardTitle>시간대별 세차 집중도 (최근 1주일, 세차 시작시간 기준)</CardTitle></CardHeader>
-            <CardContent className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={hourlyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#0052CC" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#0052CC" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#DFE1E6" />
-                  <XAxis dataKey="time" tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: "#6B778C" }} />
-                  <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: "#6B778C" }} />
-                  <Tooltip />
-                  <Area type="monotone" dataKey="value" stroke="#0052CC" fillOpacity={1} fill="url(#colorValue)" strokeWidth={2} />
-                </AreaChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+              {/* 3단계: 수행 중 */}
+              <div className="text-center">
+                <ArrowRight className="h-4 w-4 text-[#DFE1E6] mx-auto rotate-90 mb-1" />
+                <ClickableValue
+                  label="수행 중"
+                  value={order_status.in_progress}
+                  color="text-amber-600"
+                  onClick={() => goToOrders({ status: "수행 중" })}
+                />
+              </div>
 
-          {/* Issue Resolution Rate */}
-          <Card>
-            <CardHeader><CardTitle>장애 처리율 (최근 1주일)</CardTitle></CardHeader>
-            <CardContent className="h-64 flex items-center justify-center">
-              <ResponsiveContainer width="100%" height="100%">
+              {/* 4단계: 수행 완료 */}
+              <div className="text-center">
+                <ArrowRight className="h-4 w-4 text-[#DFE1E6] mx-auto rotate-90 mb-1" />
+                <ClickableValue
+                  label="완료"
+                  value={order_status.completed.total}
+                  color="text-purple-600"
+                  onClick={() => goToOrders({ status: "완료" })}
+                />
+                <div className="flex items-center justify-center gap-4 mt-2">
+                  <button
+                    onClick={() => goToOrders({ status: "완료" })}
+                    className="text-xs text-[#6B778C] hover:text-[#172B4D] transition-colors"
+                  >
+                    적시수행: <span className="font-bold text-green-600">{order_status.completed.on_time}</span>
+                  </button>
+                  <span className="text-[#DFE1E6]">|</span>
+                  <button
+                    onClick={() => goToOrders({ status: "완료" })}
+                    className="text-xs text-[#6B778C] hover:text-[#172B4D] transition-colors"
+                  >
+                    지연수행: <span className="font-bold text-rose-600">{order_status.completed.delayed}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* 취소 유형 상세 */}
+              <CancelTypeDetail
+                cancelled={order_status.cancelled}
+                onCancelTypeClick={(cancelType) => goToOrders({ status: "취소", cancelType })}
+              />
+            </div>
+
+            {/* 오더 상태 도넛 차트 */}
+            <div className="flex flex-col items-center justify-center">
+              <ResponsiveContainer width="100%" height={220}>
                 <PieChart>
                   <Pie
-                    data={issueData}
+                    data={statusDonutData}
                     cx="50%"
                     cy="50%"
                     innerRadius={60}
-                    outerRadius={80}
-                    paddingAngle={5}
+                    outerRadius={85}
+                    paddingAngle={2}
                     dataKey="value"
                   >
-                    {issueData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    {statusDonutData.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={entry.color}
+                        className="cursor-pointer"
+                        onClick={() => goToOrders({ status: entry.name })}
+                      />
                     ))}
                   </Pie>
-                  <Tooltip />
-                  <Legend verticalAlign="bottom" height={36} iconType="circle" />
-                  <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle" className="text-2xl font-bold fill-[#172B4D]">
-                    85%
+                  <Tooltip
+                    formatter={(value, name) => [`${value}건 (${((value / order_status.total) * 100).toFixed(1)}%)`, name]}
+                  />
+                  <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle">
+                    <tspan x="50%" dy="-5" className="text-2xl font-bold fill-[#172B4D]">
+                      {order_status.total}
+                    </tspan>
+                    <tspan x="50%" dy="20" className="text-xs fill-[#6B778C]">
+                      전체
+                    </tspan>
                   </text>
                 </PieChart>
               </ResponsiveContainer>
-            </CardContent>
-          </Card>
+              <div className="flex flex-wrap justify-center gap-2 mt-2">
+                {statusDonutData.map((item) => (
+                  <button
+                    key={item.name}
+                    onClick={() => goToOrders({ status: item.name })}
+                    className="inline-flex items-center gap-1.5 text-xs text-[#6B778C] hover:text-[#172B4D] transition-colors"
+                  >
+                    <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: item.color }} />
+                    {item.name}: {item.value}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
+      {/* [영역 2] 리스크 관리 */}
+      <div className="rounded-xl border border-[#E2E8F0] bg-white shadow-sm">
+        <div className="border-b border-[#E2E8F0] px-5 py-4">
+          <h2 className="text-sm font-bold text-[#172B4D]">리스크 관리</h2>
+          <p className="text-xs text-[#6B778C] mt-0.5">리스크 유형별 오더 현황 모니터링</p>
+        </div>
+        <div className="p-5">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* 탭 + 상세 내용 */}
+            <div className="lg:col-span-2">
+              {/* 탭 헤더 */}
+              <div className="flex border-b border-[#E2E8F0]">
+                {Object.entries(riskTabData).map(([key, { label, data }]) => (
+                  <button
+                    key={key}
+                    onClick={() => setRiskTab(key)}
+                    className={cn(
+                      "relative px-4 py-2.5 text-sm font-medium transition-all",
+                      riskTab === key ? "text-[#0052CC]" : "text-[#6B778C] hover:text-[#172B4D]"
+                    )}
+                  >
+                    {label}
+                    <span
+                      className={cn(
+                        "ml-1.5 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-bold",
+                        riskTab === key ? "bg-[#0052CC] text-white" : "bg-[#F1F5F9] text-[#6B778C]"
+                      )}
+                    >
+                      {data.total}
+                    </span>
+                    {riskTab === key && (
+                      <span className="absolute bottom-0 left-0 h-0.5 w-full bg-[#0052CC]" />
+                    )}
+                  </button>
+                ))}
+              </div>
+
+              {/* 탭 콘텐츠 */}
+              <div className="py-4 space-y-4">
+                {/* 오더 상태 수치 */}
+                <div className="grid grid-cols-4 gap-3">
+                  <ClickableValue
+                    label="전체"
+                    value={currentRisk.data.total}
+                    size="sm"
+                    onClick={() => goToOrders({ orderType: currentRisk.orderType })}
+                  />
+                  <ClickableValue
+                    label="발행"
+                    value={currentRisk.data.issued}
+                    size="sm"
+                    color="text-blue-600"
+                    onClick={() => goToOrders({ status: "발행", orderType: currentRisk.orderType })}
+                  />
+                  <ClickableValue
+                    label="예약"
+                    value={currentRisk.data.reserved}
+                    size="sm"
+                    color="text-green-600"
+                    onClick={() => goToOrders({ status: "예약", orderType: currentRisk.orderType })}
+                  />
+                  <ClickableValue
+                    label="수행 중"
+                    value={currentRisk.data.in_progress}
+                    size="sm"
+                    color="text-amber-600"
+                    onClick={() => goToOrders({ status: "수행 중", orderType: currentRisk.orderType })}
+                  />
+                </div>
+
+                {/* 취소된 오더 상세 */}
+                {currentRisk.data.cancelled.total > 0 && (
+                  <div className="rounded-lg bg-[#FEF2F2] p-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-semibold text-rose-700">취소된 오더</span>
+                      <button
+                        onClick={() => goToOrders({ status: "취소", orderType: currentRisk.orderType })}
+                        className="text-xs font-bold text-rose-700 hover:underline"
+                      >
+                        {currentRisk.data.cancelled.total}건
+                      </button>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {[
+                        { key: "change", label: "변경취소", filterValue: "변경취소" },
+                        { key: "no_reservation", label: "미예약취소", filterValue: "미예약취소" },
+                        { key: "no_show", label: "노쇼취소", filterValue: "노쇼취소" },
+                        { key: "agent", label: "수행원취소", filterValue: "수행원취소" },
+                        { key: "rain", label: "우천취소", filterValue: "우천취소" },
+                      ]
+                        .filter((ct) => currentRisk.data.cancelled[ct.key] > 0)
+                        .map((ct) => (
+                          <button
+                            key={ct.key}
+                            onClick={() =>
+                              goToOrders({ status: "취소", orderType: currentRisk.orderType, cancelType: ct.filterValue })
+                            }
+                            className="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 text-xs font-medium text-rose-700 border border-rose-200 hover:bg-rose-50 transition-colors"
+                          >
+                            {ct.label}: {currentRisk.data.cancelled[ct.key]}
+                          </button>
+                        ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* 수행완료 상세 */}
+                {currentRisk.data.completed.total > 0 && (
+                  <div className="rounded-lg bg-[#F0FDF4] p-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-semibold text-green-700">수행 완료</span>
+                      <button
+                        onClick={() => goToOrders({ status: "완료", orderType: currentRisk.orderType })}
+                        className="text-xs font-bold text-green-700 hover:underline"
+                      >
+                        {currentRisk.data.completed.total}건
+                      </button>
+                    </div>
+                    <div className="flex gap-4 text-xs">
+                      <span className="text-green-700">
+                        적시수행: <span className="font-bold">{currentRisk.data.completed.on_time}</span>
+                      </span>
+                      <span className="text-rose-600">
+                        지연수행: <span className="font-bold">{currentRisk.data.completed.delayed}</span>
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* 리스크 비율 도넛 차트 */}
+            <div className="flex flex-col items-center justify-center">
+              <ResponsiveContainer width="100%" height={220}>
+                <PieChart>
+                  <Pie
+                    data={riskDonutData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={85}
+                    paddingAngle={2}
+                    dataKey="value"
+                  >
+                    {riskDonutData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} className="cursor-pointer" />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    formatter={(value, name) => [`${value}건 (${((value / order_status.total) * 100).toFixed(1)}%)`, name]}
+                  />
+                  <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle">
+                    <tspan x="50%" dy="-5" className="text-2xl font-bold fill-[#172B4D]">
+                      {riskTotal}
+                    </tspan>
+                    <tspan x="50%" dy="20" className="text-xs fill-[#6B778C]">
+                      리스크
+                    </tspan>
+                  </text>
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="flex flex-wrap justify-center gap-2 mt-2">
+                {riskDonutData.map((item) => (
+                  <span key={item.name} className="inline-flex items-center gap-1.5 text-xs text-[#6B778C]">
+                    <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: item.color }} />
+                    {item.name}: {item.value}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* [영역 3] 시계열 트렌드 그래프 */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* 시간대별 오더 생성량 */}
+        <div className="rounded-xl border border-[#E2E8F0] bg-white shadow-sm">
+          <div className="border-b border-[#E2E8F0] px-5 py-4">
+            <h2 className="text-sm font-bold text-[#172B4D]">시간대별 오더 생성량</h2>
+            <p className="text-xs text-[#6B778C] mt-0.5">오늘 vs 어제</p>
+          </div>
+          <div className="p-5">
+            <ResponsiveContainer width="100%" height={240}>
+              <LineChart data={hourlyChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
+                <XAxis
+                  dataKey="hour"
+                  tickLine={false}
+                  axisLine={false}
+                  tick={{ fontSize: 11, fill: "#6B778C" }}
+                  tickFormatter={(h) => `${h}시`}
+                />
+                <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "#6B778C" }} />
+                <Tooltip
+                  formatter={(value, name) => [
+                    `${value}건`,
+                    name === "today" ? `오늘 (${hourly_orders.today})` : `어제 (${hourly_orders.yesterday})`,
+                  ]}
+                  labelFormatter={(h) => `${h}시`}
+                />
+                <Legend
+                  verticalAlign="top"
+                  align="right"
+                  wrapperStyle={{ top: -5 }}
+                  iconType="line"
+                  formatter={(value) => (value === "today" ? "오늘" : "어제")}
+                />
+                <ReferenceLine x={currentHour} stroke="#0052CC" strokeDasharray="3 3" label="" />
+                <Line
+                  type="monotone"
+                  dataKey="yesterday"
+                  stroke="#94A3B8"
+                  strokeDasharray="5 5"
+                  strokeWidth={2}
+                  dot={false}
+                />
+                <Line type="monotone" dataKey="today" stroke="#0052CC" strokeWidth={2} dot={{ r: 3 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* 일별 리스크 유형별 추이 */}
+        <div className="rounded-xl border border-[#E2E8F0] bg-white shadow-sm">
+          <div className="border-b border-[#E2E8F0] px-5 py-4">
+            <h2 className="text-sm font-bold text-[#172B4D]">일별 리스크 유형별 추이</h2>
+            <p className="text-xs text-[#6B778C] mt-0.5">최근 7일</p>
+          </div>
+          <div className="p-5">
+            <ResponsiveContainer width="100%" height={240}>
+              <AreaChart data={dailyRiskChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorHygiene" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#EF4444" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#EF4444" stopOpacity={0} />
+                  </linearGradient>
+                  <linearGradient id="colorMlUrgent" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#F97316" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#F97316" stopOpacity={0} />
+                  </linearGradient>
+                  <linearGradient id="colorLongTerm" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#EAB308" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#EAB308" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
+                <XAxis dataKey="date" tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "#6B778C" }} />
+                <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "#6B778C" }} />
+                <Tooltip formatter={(value, name) => [`${value}건`, name]} />
+                <Legend
+                  verticalAlign="top"
+                  align="right"
+                  wrapperStyle={{ top: -5 }}
+                  iconType="circle"
+                  formatter={(value) => {
+                    const labels = { hygiene: "위생장애", ml_urgent: "ML긴급", long_term: "초장기미세차" };
+                    return labels[value] || value;
+                  }}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="hygiene"
+                  stroke="#EF4444"
+                  fill="url(#colorHygiene)"
+                  strokeWidth={2}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="ml_urgent"
+                  stroke="#F97316"
+                  fill="url(#colorMlUrgent)"
+                  strokeWidth={2}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="long_term"
+                  stroke="#EAB308"
+                  fill="url(#colorLongTerm)"
+                  strokeWidth={2}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       </div>
     </div>

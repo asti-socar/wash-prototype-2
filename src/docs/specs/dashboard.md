@@ -76,7 +76,7 @@
                        │
          ┌─────────────┼─────────────┐
          ▼             ▼             ▼
-      예약 전       예약 완료      취소된 오더
+       발행          예약        취소된 오더
          │             │             │
          └──────┬──────┘             ▼
                 ▼              [취소 유형 상세]
@@ -96,8 +96,8 @@
 | 필드명 | 설명 | 데이터 타입 |
 |--------|------|------------|
 | total_orders | 전체 오더 수 | Integer |
-| pre_reservation | 예약 전 오더 수 | Integer |
-| reserved | 예약 완료 오더 수 | Integer |
+| issued | 발행 오더 수 | Integer |
+| reserved | 예약 오더 수 | Integer |
 | in_progress | 수행 중 오더 수 | Integer |
 | cancelled | 취소된 오더 수 | Integer |
 | completed | 수행 완료 오더 수 | Integer |
@@ -117,8 +117,8 @@
 | 요소 | 클릭 시 동작 |
 |------|-------------|
 | 전체 오더 | 전체 오더 목록 페이지로 이동 |
-| 예약 전 | 예약 전 상태 필터링된 목록으로 이동 |
-| 예약 완료 | 예약 완료 상태 필터링된 목록으로 이동 |
+| 발행 | 발행 상태 필터링된 목록으로 이동 |
+| 예약 | 예약 상태 필터링된 목록으로 이동 |
 | 수행 중 | 수행 중 상태 필터링된 목록으로 이동 |
 | 취소된 오더 | 취소 상태 필터링된 목록으로 이동 |
 | 수행 완료 | 수행 완료 상태 필터링된 목록으로 이동 |
@@ -133,8 +133,8 @@
 
 | 상태 | 색상 (권장) | 설명 |
 |------|------------|------|
-| 예약 전 | Blue | 아직 예약되지 않은 오더 |
-| 예약 완료 | Green | 예약 완료된 오더 |
+| 발행 | Blue | 발행되었으나 아직 예약되지 않은 오더 |
+| 예약 | Green | 예약 완료된 오더 |
 | 수행 중 | Yellow | 현재 수행 중인 오더 |
 | 취소 | Gray | 취소된 오더 |
 | 수행 완료 | Purple | 수행 완료된 오더 |
@@ -191,8 +191,8 @@
 | 필드명 | 설명 | 데이터 타입 |
 |--------|------|------------|
 | risk_total | 해당 리스크 유형 전체 오더 수 | Integer |
-| risk_pre_reservation | 예약 전 오더 수 | Integer |
-| risk_reserved | 예약 완료 오더 수 | Integer |
+| risk_issued | 발행 오더 수 | Integer |
+| risk_reserved | 예약 오더 수 | Integer |
 | risk_in_progress | 수행 중 오더 수 | Integer |
 
 #### 4.4.2 취소된 오더 상세
@@ -217,7 +217,7 @@
 위생장애 전체: 16건
 
 [오더 상태]
-예약 전: 3 | 예약완료: 8 | 수행 중: 5
+발행: 3 | 예약: 8 | 수행 중: 5
 
 [취소된 오더: 1건]
 변경취소: 1 | 미예약취소: 0 | 노쇼취소: 0 | 수행원취소: 0 | 우천취소: 0
@@ -364,7 +364,7 @@ GET /api/v1/admin/dashboard
     "updated_at": "2025-02-04T14:30:00Z",
     "order_status": {
       "total": 600,
-      "pre_reservation": 300,
+      "issued": 300,
       "reserved": 200,
       "in_progress": 100,
       "cancelled": {
@@ -384,7 +384,7 @@ GET /api/v1/admin/dashboard
     "risk_management": {
       "hygiene": {
         "total": 16,
-        "pre_reservation": 3,
+        "issued": 3,
         "reserved": 8,
         "in_progress": 5,
         "cancelled": {
@@ -403,7 +403,7 @@ GET /api/v1/admin/dashboard
       },
       "ml_urgent": {
         "total": 27,
-        "pre_reservation": 2,
+        "issued": 2,
         "reserved": 15,
         "in_progress": 10,
         "cancelled": {
@@ -422,7 +422,7 @@ GET /api/v1/admin/dashboard
       },
       "long_term": {
         "total": 70,
-        "pre_reservation": 25,
+        "issued": 25,
         "reserved": 15,
         "in_progress": 20,
         "cancelled": {
@@ -520,8 +520,8 @@ GET /api/v1/admin/dashboard/daily-risks
 | 용어 | 정의 |
 |------|------|
 | 오더 | 세차 서비스 요청 건 |
-| 예약 전 | 오더가 생성되었으나 아직 예약이 완료되지 않은 상태 |
-| 예약 완료 | 파트너사 승인 완료 후 예약이 확정된 상태 |
+| 발행 | 오더가 생성(발행)되었으나 아직 예약이 완료되지 않은 상태 |
+| 예약 | 파트너사 승인 완료 후 예약이 확정된 상태 |
 | 수행 중 | 에이전트가 세차를 진행 중인 상태 |
 | 수행 완료 | 세차가 완료된 상태 |
 | 적시수행 | 예정된 시간 내에 완료된 수행 |
