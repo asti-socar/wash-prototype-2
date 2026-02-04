@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   ResponsiveContainer,
   PieChart,
@@ -17,6 +17,7 @@ import {
 } from "recharts";
 import { RefreshCw } from "lucide-react";
 import dashboardData from "../mocks/dashboard.json";
+import ordersData from "../mocks/orders.json";
 
 function cn(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -52,11 +53,9 @@ function Dashboard({ goOrdersWithFilter }) {
     { name: "취소", value: order_status.cancelled.total, color: "#D98E8E", filterStatus: "취소" },
   ];
 
-  // 리스크 비율 도넛 차트 데이터 - 쿨 톤 색상
+  // 리스크 비율 도넛 차트 데이터 - 쿨 톤 색상 (리스크 오더만 표시)
   const riskTotal = risk_management.hygiene.total + risk_management.ml_urgent.total + risk_management.long_term.total;
-  const normalOrders = order_status.total - riskTotal;
   const riskDonutData = [
-    { name: "일반 오더", value: normalOrders, color: "#E2E8F0" },
     { name: "위생장애", value: risk_management.hygiene.total, color: "#D98E8E" },
     { name: "ML긴급", value: risk_management.ml_urgent.total, color: "#E8C47C" },
     { name: "초장기미세차", value: risk_management.long_term.total, color: "#7BA3C9" },
@@ -80,6 +79,87 @@ function Dashboard({ goOrdersWithFilter }) {
   };
 
   const currentRisk = riskTabData[riskTab];
+
+  // 파트너별 데이터 집계
+  const partnerStats = useMemo(() => {
+    const stats = {};
+
+    ordersData.forEach((order) => {
+      const partner = order.partner || "미지정";
+      if (!stats[partner]) {
+        stats[partner] = {
+          partner,
+          total: 0,
+          waiting: 0, // 발행 + 예약
+          inProgress: 0, // 수행 중
+          completedOnTime: 0, // 적시수행
+          completedDelayed: 0, // 지연수행
+          risk: 0, // 리스크 오더 (위생장애, ML긴급, 초장기미세차)
+          delayed: 0, // 지연 중인 오더 (현재 수행 중이면서 지연)
+        };
+      }
+
+      stats[partner].total += 1;
+
+      // 상태별 집계
+      if (order.status === "발행" || order.status === "예약") {
+        stats[partner].waiting += 1;
+      } else if (order.status === "수행 중") {
+        stats[partner].inProgress += 1;
+        // 지연 여부 체크 (elapsedDays가 특정 기준 초과 시)
+        if (order.elapsedDays > 7) {
+          stats[partner].delayed += 1;
+        }
+      } else if (order.status === "완료") {
+        // 적시/지연 구분 (elapsedDays 기준)
+        if (order.elapsedDays <= 7) {
+          stats[partner].completedOnTime += 1;
+        } else {
+          stats[partner].completedDelayed += 1;
+        }
+      }
+
+      // 리스크 오더 집계
+      const riskTypes = ["위생장애", "고객 피드백(ML)_긴급", "초장기 미세차"];
+      if (riskTypes.includes(order.orderType)) {
+        stats[partner].risk += 1;
+      }
+    });
+
+    // 적시율 계산 및 배열로 변환
+    return Object.values(stats).map((s) => ({
+      ...s,
+      onTimeRate: s.completedOnTime + s.completedDelayed > 0
+        ? Math.round((s.completedOnTime / (s.completedOnTime + s.completedDelayed)) * 100)
+        : 100,
+    })).sort((a, b) => b.total - a.total); // 담당 오더 수 기준 정렬
+  }, []);
+
+  // 경고 표시 로직
+  const getWarningLevel = (type, value) => {
+    const thresholds = {
+      waiting: { red: 10, yellow: 7 },
+      onTimeRate: { red: 80, yellow: 85 }, // 미만이면 경고
+      risk: { red: 5, yellow: 3 },
+      delayed: { red: 3, yellow: 1 },
+    };
+    const t = thresholds[type];
+    if (!t) return null;
+
+    if (type === "onTimeRate") {
+      if (value < t.red) return "red";
+      if (value < t.yellow) return "yellow";
+    } else {
+      if (value >= t.red) return "red";
+      if (value >= t.yellow) return "yellow";
+    }
+    return null;
+  };
+
+  const warningColors = {
+    red: "#D98E8E",
+    yellow: "#E8C47C",
+  };
 
   // 네비게이션 핸들러
   const goToOrders = (filter = {}) => {
@@ -459,6 +539,144 @@ function Dashboard({ goOrdersWithFilter }) {
                 )}
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* [영역 4] 파트너 수행 관리 */}
+      <div className="rounded-xl border border-[#E2E8F0] bg-white shadow-sm">
+        <div className="border-b border-[#E2E8F0] px-5 py-4">
+          <h2 className="text-sm font-bold text-[#172B4D]">파트너 수행 관리</h2>
+          <p className="text-xs text-[#6B778C] mt-0.5">파트너별 오더 현황 및 성과 지표</p>
+        </div>
+        <div className="p-5">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-[#E2E8F0]">
+                  <th className="text-left py-3 px-3 font-medium text-[#6B778C]">파트너</th>
+                  <th className="text-center py-3 px-3 font-medium text-[#6B778C]">담당</th>
+                  <th className="text-center py-3 px-3 font-medium text-[#6B778C]">대기</th>
+                  <th className="text-center py-3 px-3 font-medium text-[#6B778C]">수행중</th>
+                  <th className="text-center py-3 px-3 font-medium text-[#6B778C]">적시율</th>
+                  <th className="text-center py-3 px-3 font-medium text-[#6B778C]">리스크</th>
+                  <th className="text-center py-3 px-3 font-medium text-[#6B778C]">지연</th>
+                </tr>
+              </thead>
+              <tbody>
+                {partnerStats.map((row) => {
+                  const waitingWarning = getWarningLevel("waiting", row.waiting);
+                  const onTimeWarning = getWarningLevel("onTimeRate", row.onTimeRate);
+                  const riskWarning = getWarningLevel("risk", row.risk);
+                  const delayedWarning = getWarningLevel("delayed", row.delayed);
+
+                  return (
+                    <tr
+                      key={row.partner}
+                      className="border-b border-[#E2E8F0] last:border-b-0 hover:bg-[#F8FAFC] transition-colors"
+                    >
+                      {/* 파트너 이름 */}
+                      <td className="py-3 px-3">
+                        <button
+                          onClick={() => goToOrders({ partner: row.partner })}
+                          className="font-medium text-[#172B4D] hover:text-[#0052CC] transition-colors"
+                        >
+                          {row.partner}
+                        </button>
+                      </td>
+
+                      {/* 담당 */}
+                      <td className="text-center py-3 px-3">
+                        <button
+                          onClick={() => goToOrders({ partner: row.partner })}
+                          className="text-[#172B4D] hover:text-[#0052CC] transition-colors"
+                        >
+                          {row.total}
+                        </button>
+                      </td>
+
+                      {/* 대기 */}
+                      <td className="text-center py-3 px-3">
+                        <button
+                          onClick={() => goToOrders({ partner: row.partner, status: "발행" })}
+                          className="inline-flex items-center gap-1 hover:opacity-80 transition-opacity"
+                          style={{ color: waitingWarning ? warningColors[waitingWarning] : "#172B4D" }}
+                        >
+                          {waitingWarning && (
+                            <span
+                              className="inline-block w-2 h-2 rounded-full"
+                              style={{ backgroundColor: warningColors[waitingWarning] }}
+                            />
+                          )}
+                          <span className={waitingWarning ? "font-semibold" : ""}>{row.waiting}</span>
+                        </button>
+                      </td>
+
+                      {/* 수행중 */}
+                      <td className="text-center py-3 px-3">
+                        <button
+                          onClick={() => goToOrders({ partner: row.partner, status: "수행 중" })}
+                          className="text-[#172B4D] hover:text-[#0052CC] transition-colors"
+                        >
+                          {row.inProgress}
+                        </button>
+                      </td>
+
+                      {/* 적시율 */}
+                      <td className="text-center py-3 px-3">
+                        <button
+                          onClick={() => goToOrders({ partner: row.partner, status: "완료" })}
+                          className="inline-flex items-center gap-1 hover:opacity-80 transition-opacity"
+                          style={{ color: onTimeWarning ? warningColors[onTimeWarning] : "#7BC9A8" }}
+                        >
+                          {onTimeWarning && (
+                            <span
+                              className="inline-block w-2 h-2 rounded-full"
+                              style={{ backgroundColor: warningColors[onTimeWarning] }}
+                            />
+                          )}
+                          <span className={onTimeWarning ? "font-semibold" : ""}>{row.onTimeRate}%</span>
+                        </button>
+                      </td>
+
+                      {/* 리스크 */}
+                      <td className="text-center py-3 px-3">
+                        <button
+                          onClick={() => goToOrders({ partner: row.partner, orderType: "위생장애" })}
+                          className="inline-flex items-center gap-1 hover:opacity-80 transition-opacity"
+                          style={{ color: riskWarning ? warningColors[riskWarning] : "#172B4D" }}
+                        >
+                          {riskWarning && (
+                            <span
+                              className="inline-block w-2 h-2 rounded-full"
+                              style={{ backgroundColor: warningColors[riskWarning] }}
+                            />
+                          )}
+                          <span className={riskWarning ? "font-semibold" : ""}>{row.risk}</span>
+                        </button>
+                      </td>
+
+                      {/* 지연 */}
+                      <td className="text-center py-3 px-3">
+                        <button
+                          onClick={() => goToOrders({ partner: row.partner, status: "수행 중" })}
+                          className="inline-flex items-center gap-1 hover:opacity-80 transition-opacity"
+                          style={{ color: delayedWarning ? warningColors[delayedWarning] : "#172B4D" }}
+                        >
+                          {delayedWarning && (
+                            <span
+                              className="inline-block w-2 h-2 rounded-full"
+                              style={{ backgroundColor: warningColors[delayedWarning] }}
+                            />
+                          )}
+                          <span className={delayedWarning ? "font-semibold" : ""}>{row.delayed}</span>
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
