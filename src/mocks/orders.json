@@ -3367,7 +3367,8 @@
         "name": "Other-10",
         "url": "https://placehold.co/600x400?text=Other-10"
       }
-    ]
+    ],
+    "cancelType": "미예약취소"
   },
   {
     "orderId": "O-90014",
@@ -6105,7 +6106,8 @@
         "name": "Other-10",
         "url": "https://placehold.co/600x400?text=Other-10"
       }
-    ]
+    ],
+    "cancelType": "미예약취소"
   },
   {
     "orderId": "O-90025",
@@ -7371,7 +7373,8 @@
         "name": "Other-5",
         "url": "https://placehold.co/600x400?text=Other-5"
       }
-    ]
+    ],
+    "cancelType": "미예약취소"
   },
   {
     "orderId": "O-90030",
@@ -8519,7 +8522,8 @@
         "name": "Other-2",
         "url": "https://placehold.co/600x400?text=Other-2"
       }
-    ]
+    ],
+    "cancelType": "미예약취소"
   },
   {
     "orderId": "O-90035",
@@ -10821,7 +10825,8 @@
         "name": "Other-8",
         "url": "https://placehold.co/600x400?text=Other-8"
       }
-    ]
+    ],
+    "cancelType": "변경취소"
   },
   {
     "orderId": "O-90044",
@@ -13297,7 +13302,8 @@
         "name": "Other-8",
         "url": "https://placehold.co/600x400?text=Other-8"
       }
-    ]
+    ],
+    "cancelType": "변경취소"
   },
   {
     "orderId": "O-90054",
@@ -16102,7 +16108,8 @@
         "name": "Other-6",
         "url": "https://placehold.co/600x400?text=Other-6"
       }
-    ]
+    ],
+    "cancelType": "변경취소"
   },
   {
     "orderId": "O-90065",
@@ -17008,7 +17015,8 @@
         "name": "Other-1",
         "url": "https://placehold.co/600x400?text=Other-1"
       }
-    ]
+    ],
+    "cancelType": "노쇼취소"
   },
   {
     "orderId": "O-90069",
@@ -18363,7 +18371,8 @@
         "name": "Other-9",
         "url": "https://placehold.co/600x400?text=Other-9"
       }
-    ]
+    ],
+    "cancelType": "노쇼취소"
   },
   {
     "orderId": "O-90075",
@@ -21169,7 +21178,8 @@
         "name": "Other-3",
         "url": "https://placehold.co/600x400?text=Other-3"
       }
-    ]
+    ],
+    "cancelType": "수행원취소"
   },
   {
     "orderId": "O-90086",
@@ -22166,7 +22176,8 @@
         "name": "Other-3",
         "url": "https://placehold.co/600x400?text=Other-3"
       }
-    ]
+    ],
+    "cancelType": "우천취소"
   },
   {
     "orderId": "O-90090",
